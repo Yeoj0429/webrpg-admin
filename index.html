@@ -3,168 +3,295 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! // ADMIN PORTAL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+  <title>WEBRPG! // CYBERPUNK ADMIN DASHBOARD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- FLOATING CYBERPUNK.NET TOP NAVBAR -->
-  <header class="cp-header">
-    <a href="#hero" class="cp-logo">WEBRPG<span>!</span></a>
+  <!-- MOBILE DRAWER BACKDROP -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
 
-    <nav id="cp-nav" class="cp-nav-bar">
-      <a href="#progress-section" class="cp-nav-link" onclick="closeMobileNav()">PROGRESS</a>
-      <a href="#analytics-section" class="cp-nav-link" onclick="closeMobileNav()">ANALYTICS</a>
-      <a href="#lessons-section" class="cp-nav-link" onclick="closeMobileNav()">LESSONS</a>
-      <a href="#quizzes-section" class="cp-nav-cta" onclick="closeMobileNav()">QUIZ MATRIX</a>
-    </nav>
-
-    <button id="cp-burger" class="cp-burger" onclick="toggleMobileNav()" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </header>
-
-  <!-- SECTION 1: BRIGHT CYAN/BLUE HERO BANNER -->
-  <section id="hero" class="cp-hero">
-    <div class="cp-hero-inner">
-      <div class="cp-laurels">
-        <div class="laurel-item">
-          <span class="laurel-title" id="hero-lesson-count">"05 TOTAL LESSONS"</span>
-          <span class="laurel-sub">ACTIVE MODULES</span>
+  <div class="dashboard-shell">
+    <!-- LEFT SIDEBAR (Matches Designer Inspo 1 & 2) -->
+    <aside class="cp-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-pill">
+          <span class="brand-dot"></span>
+          <strong>WEBRPG<span>!</span></strong>
         </div>
-        <div class="laurel-item">
-          <span class="laurel-title">"35 ASSESSMENTS"</span>
-          <span class="laurel-sub">PRE • MISSION • POST</span>
-        </div>
-        <div class="laurel-item">
-          <span class="laurel-title">"225 QUESTIONS"</span>
-          <span class="laurel-sub">LIVE TIDB CLOUD</span>
-        </div>
-      </div>
-
-      <h1 class="cp-hero-title">
-        MANAGE THE ULTIMATE<br />
-        WEBRPG! LEARNING<br />
-        EXPERIENCE
-      </h1>
-
-      <div class="cp-hero-buttons">
-        <a href="#lessons-section" class="cp-btn-outline-dark">MANAGE LESSONS</a>
-        <a href="#quizzes-section" class="cp-btn-outline-dark">MANAGE QUIZZES</a>
-      </div>
-    </div>
-
-    <div class="cp-section-meta-bar">
-      <span>/// LEARNER_PROGRESS_HIGHLIGHT</span>
-      <span>LIVE DATABASE STREAM</span>
-    </div>
-  </section>
-
-  <!-- SECTION 2: DARK DOT-MATRIX PROGRESS & ANALYTICS -->
-  <section id="progress-section" class="cp-dark-matrix">
-    <div class="cp-matrix-grid">
-      <!-- LEFT FEATURED HIGHLIGHT BOX -->
-      <div class="cp-featured-box" id="featured-lesson-box"></div>
-
-      <!-- RIGHT 2x2 GRID FOR REMAINING LESSONS -->
-      <div class="cp-sub-grid" id="remaining-lessons-grid"></div>
-    </div>
-
-    <!-- ANALYTICS SUB-SECTION -->
-    <div id="analytics-section" class="cp-analytics-wrapper">
-      <div class="cp-section-meta-bar" style="margin-bottom: 20px;">
-        <span>/// LEARNING_ANALYTICS_OVERVIEW</span>
-        <span>AGE GROUPS & ASSESSMENT SCORES</span>
-      </div>
-
-      <div id="analytics-kpis" class="cp-kpi-row"></div>
-
-      <div class="cp-analytics-cards">
-        <div class="cp-dark-card">
-          <h3>AGE DISTRIBUTION</h3>
-          <div id="age-group-bars"></div>
-        </div>
-        <div class="cp-dark-card">
-          <h3>QUIZ & EXAM SCORES</h3>
-          <div id="score-comparison-bars"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NOTCHED TECH DIVIDER (TOP) -->
-  <div class="cp-razor-divider top-razor"></div>
-
-  <!-- SECTION 3: VERTICAL LESSON POSTER CARDS -->
-  <section id="lessons-section" class="cp-bright-section">
-    <div class="cp-bright-header">
-      <h2>WELCOME TO THE LESSON MODULES</h2>
-      <p>Select any in-game educational sector below to edit, add, or delete modules.</p>
-      <button class="cp-btn-outline-dark" style="margin-top: 18px;" onclick="openAddLessonModal()">
-        + ADD LESSON MODULE
-      </button>
-    </div>
-
-    <!-- TECHNICAL CROSSHAIR BRACKETS (TOP) -->
-    <div class="cp-bracket-line top-brackets">
-      <span></span><span></span>
-    </div>
-
-    <!-- VERTICAL POSTER COLUMNS -->
-    <div id="lesson-posters-container" class="cp-posters-strip"></div>
-
-    <!-- TECHNICAL CROSSHAIR BRACKETS (BOTTOM) -->
-    <div class="cp-bracket-line bottom-brackets">
-      <span></span><span></span>
-    </div>
-  </section>
-
-  <!-- SECTION 4: QUIZ MATRIX EDITOR STRIP -->
-  <section id="quizzes-section" class="cp-quiz-section">
-    <div class="cp-quiz-inner">
-      <h2>CONFIGURE LESSON QUIZZES & QUESTIONS</h2>
-      <p>Each lesson contains 7 assessments: 1 Pre-Test (10 Qs), 5 Missions (5 Qs each), and 1 Post-Test (10 Qs).</p>
-
-      <div class="cp-underline-controls">
-        <div class="cp-field">
-          <label>SELECT LESSON</label>
-          <select id="quiz-lesson-select" class="cp-underline-select" onchange="loadAssessmentQuestions()"></select>
-        </div>
-        <div class="cp-field">
-          <label>SELECT ASSESSMENT TYPE</label>
-          <select id="quiz-type-select" class="cp-underline-select" onchange="loadAssessmentQuestions()">
-            <option value="pre_test">Pre-Test (10 Questions)</option>
-            <option value="mission_1">Mission 1 (5 Questions)</option>
-            <option value="mission_2">Mission 2 (5 Questions)</option>
-            <option value="mission_3">Mission 3 (5 Questions)</option>
-            <option value="mission_4">Mission 4 (5 Questions)</option>
-            <option value="mission_5">Mission 5 (5 Questions)</option>
-            <option value="post_test">Post-Test (10 Questions)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="cp-quiz-toolbar">
-        <button class="cp-btn-outline-dark" onclick="openAddQuestionModal()">
-          + ADD NEW QUESTION
+        <button id="burger-btn" class="burger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+          <span></span><span></span><span></span>
         </button>
       </div>
 
-      <div id="questions-editor-list" class="cp-questions-grid"></div>
-    </div>
-  </section>
+      <div id="sidebar-drawer" class="sidebar-drawer">
+        <div class="admin-profile-mini">
+          <div class="avatar-ring">AD</div>
+          <div>
+            <strong>ADMIN_WEBRPG</strong>
+            <span>NETWATCH // LVL 99</span>
+          </div>
+        </div>
 
-  <!-- NOTCHED TECH DIVIDER (BOTTOM) -->
-  <div class="cp-razor-divider bottom-razor"></div>
+        <nav class="sidebar-nav">
+          <a href="#row-charts" class="side-link active" onclick="setActiveNav(this)">
+            <span class="side-icon">◈</span> DASHBOARD
+          </a>
+          <a href="#row-kpis" class="side-link" onclick="setActiveNav(this)">
+            <span class="side-icon">▤</span> ANALYTICS
+          </a>
+          <a href="#row-bottom" class="side-link" onclick="setActiveNav(this)">
+            <span class="side-icon">❖</span> LESSON MODULES
+          </a>
+          <a href="#quiz-table-card" class="side-link" onclick="setActiveNav(this)">
+            <span class="side-icon">⚡</span> QUIZ MATRIX
+          </a>
+        </nav>
 
-  <!-- FOOTER -->
-  <footer class="cp-footer">
-    <div class="cp-footer-inner">
-      <div class="cp-logo">WEBRPG<span>!</span></div>
-      <div class="cp-footer-meta">MYSQL + TIDB CLOUD CONNECTED // VERCEL LIVE BUILD</div>
-    </div>
-  </footer>
+        <div class="sidebar-bottom-card">
+          <span class="micro-label">/// DB_CONNECTION</span>
+          <div class="db-live-row">
+            <span class="pulse-dot"></span> TIDB MYSQL ONLINE
+          </div>
+          <button class="cp-notch-btn cyan-btn full-w" onclick="openAddLessonModal()">
+            + NEW LESSON
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="cp-workspace">
+      <!-- TOP BAR -->
+      <header class="cp-topbar">
+        <div class="topbar-left">
+          <span class="micro-tag">/// SYSTEM_TELEMETRY_V2.077</span>
+          <h1>ADMINISTRATION OVERVIEW</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div class="search-box">
+            <span>⌕</span>
+            <input type="text" id="question-search" placeholder="Filter questions or modules..." oninput="renderQuestionTable()" />
+          </div>
+          <button class="cp-notch-btn magenta-btn" onclick="openAddQuestionModal()">
+            + ADD QUESTION
+          </button>
+        </div>
+      </header>
+
+      <!-- ==========================================================
+           ROW 1: 2/3 AREA SPLINE CHART + 1/3 DONUT CHART (Inspo Layout)
+           ========================================================== -->
+      <section id="row-charts" class="grid-row-1">
+        <!-- LEFT 2/3 CARD: LEARNER PROGRESS AREA SPLINE CHART -->
+        <div class="cp-panel spline-panel">
+          <div class="panel-header">
+            <div>
+              <span class="micro-tag">/// LESSON_SUCCESS_TELEMETRY</span>
+              <h3>LEARNER PROGRESS & QUIZ CURVE</h3>
+            </div>
+            <div class="chart-legend">
+              <span><i class="dot-cyan"></i> Success Rate (%)</span>
+              <span><i class="dot-magenta"></i> Avg Quiz Score (%)</span>
+            </div>
+          </div>
+
+          <div class="spline-body">
+            <!-- Left Big Numbers (Matches Designer Inspo 1) -->
+            <div class="spline-stats">
+              <div class="big-metric">
+                <strong id="hero-avg-success">84.4%</strong>
+                <span>OVERALL SUCCESS RATE</span>
+              </div>
+              <div class="sub-metric">
+                <strong id="hero-total-lessons">05</strong>
+                <span>ACTIVE GAME SECTORS</span>
+              </div>
+              <button class="cp-notch-btn magenta-btn" onclick="openAddLessonModal()">
+                + ADD MODULE
+              </button>
+            </div>
+
+            <!-- Center Neon Area Spline Wave Chart -->
+            <div class="spline-canvas-wrap">
+              <svg id="spline-svg" viewBox="0 0 600 210" preserveAspectRatio="none"></svg>
+              <div id="spline-x-labels" class="spline-x-labels"></div>
+            </div>
+          </div>
+
+          <!-- Bottom 4 Circular Stat Badges (Matches Designer Inspo 1) -->
+          <div class="spline-bottom-badges">
+            <div class="badge-item">
+              <div class="badge-icon pink">★</div>
+              <div>
+                <span>PRE-TEST AVG</span>
+                <strong>78.0%</strong>
+              </div>
+            </div>
+            <div class="badge-item">
+              <div class="badge-icon purple">⚡</div>
+              <div>
+                <span>MISSIONS 1–5</span>
+                <strong>84.2%</strong>
+              </div>
+            </div>
+            <div class="badge-item">
+              <div class="badge-icon cyan">◈</div>
+              <div>
+                <span>POST-TEST AVG</span>
+                <strong>88.5%</strong>
+              </div>
+            </div>
+            <div class="badge-item">
+              <div class="badge-icon blue">❖</div>
+              <div>
+                <span>PASS THRESHOLD</span>
+                <strong>70.0%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT 1/3 CARD: AGE DISTRIBUTION DONUT CHART (Matches Inspo 1 & 2) -->
+        <div class="cp-panel donut-panel">
+          <div class="panel-header">
+            <div>
+              <span class="micro-tag">/// DEMOGRAPHICS</span>
+              <h3>LEARNER AGE GROUPS</h3>
+            </div>
+          </div>
+
+          <div class="donut-wrap">
+            <svg viewBox="0 0 160 160" class="donut-svg">
+              <circle cx="80" cy="80" r="56" class="donut-track" />
+              <!-- 16-18 YRS (38%) -->
+              <circle cx="80" cy="80" r="56" class="donut-seg seg-1" stroke-dasharray="134 352" stroke-dashoffset="0" />
+              <!-- 13-15 YRS (25%) -->
+              <circle cx="80" cy="80" r="56" class="donut-seg seg-2" stroke-dasharray="88 352" stroke-dashoffset="-134" />
+              <!-- 19-21 YRS (25%) -->
+              <circle cx="80" cy="80" r="56" class="donut-seg seg-3" stroke-dasharray="88 352" stroke-dashoffset="-222" />
+              <!-- 22+ YRS (12%) -->
+              <circle cx="80" cy="80" r="56" class="donut-seg seg-4" stroke-dasharray="42 352" stroke-dashoffset="-310" />
+            </svg>
+            <div class="donut-center">
+              <strong>08</strong>
+              <span>RUNNERS</span>
+            </div>
+          </div>
+
+          <div id="donut-legend" class="donut-legend"></div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           ROW 2: 4 GRADIENT METRIC CARDS WITH SPARKLINES (Inspo 1)
+           ========================================================== -->
+      <section id="row-kpis" class="grid-row-2">
+        <div class="grad-card grad-magenta">
+          <div class="grad-info">
+            <span>LESSON 01 TOP RATE</span>
+            <strong id="card-l1-rate">90%</strong>
+            <small>Sector 01: Neo-Intramuros</small>
+          </div>
+          <div class="mini-bars">
+            <span style="height:45%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:95%"></span><span style="height:85%"></span>
+          </div>
+        </div>
+
+        <div class="grad-card grad-purple">
+          <div class="grad-info">
+            <span>TOTAL ASSESSMENTS</span>
+            <strong>35</strong>
+            <small>7 Quizzes Per Lesson</small>
+          </div>
+          <svg viewBox="0 0 100 40" class="mini-wave">
+            <path d="M0,30 Q20,5 40,22 T80,12 T100,18" fill="none" stroke="#8CEEF6" stroke-width="3" />
+          </svg>
+        </div>
+
+        <div class="grad-card grad-cyan">
+          <div class="grad-info">
+            <span>QUESTION BANK</span>
+            <strong id="card-q-count">225</strong>
+            <small>45 Questions Per Lesson</small>
+          </div>
+          <svg viewBox="0 0 100 40" class="mini-wave">
+            <path d="M0,28 Q25,35 45,12 T85,20 T100,6" fill="none" stroke="#0A0E24" stroke-width="3" />
+          </svg>
+        </div>
+
+        <div class="grad-card grad-indigo">
+          <div class="grad-info">
+            <span>MAX XP REWARD</span>
+            <strong id="card-total-xp">550 XP</strong>
+            <small>Across All Active Modules</small>
+          </div>
+          <div class="mini-bars">
+            <span style="height:35%"></span><span style="height:55%"></span><span style="height:75%"></span><span style="height:65%"></span><span style="height:100%"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================================
+           ROW 3: 1/3 VERTICAL LESSON LIST + 2/3 QUIZ TABLE (Inspo 1)
+           ========================================================== -->
+      <section id="row-bottom" class="grid-row-3">
+        <!-- LEFT 1/3: LESSON MODULES TIMELINE FEED -->
+        <div class="cp-panel timeline-panel">
+          <div class="panel-header">
+            <div>
+              <span class="micro-tag">/// IN-GAME_SECTORS</span>
+              <h3>LESSON MODULES</h3>
+            </div>
+            <button class="cp-notch-btn cyan-btn sm" onclick="openAddLessonModal()">+ ADD</button>
+          </div>
+
+          <div id="lesson-timeline-list" class="timeline-list"></div>
+        </div>
+
+        <!-- RIGHT 2/3: QUIZ MATRIX DATA TABLE WITH COLORED PILLS -->
+        <div id="quiz-table-card" class="cp-panel table-panel">
+          <div class="panel-header wrap-header">
+            <div>
+              <span class="micro-tag">/// ASSESSMENT_MATRIX</span>
+              <h3>QUIZ QUESTIONS & ANSWERS</h3>
+            </div>
+
+            <div class="table-filters">
+              <select id="quiz-lesson-select" class="cp-select" onchange="loadAssessmentQuestions()"></select>
+              <select id="quiz-type-select" class="cp-select" onchange="loadAssessmentQuestions()">
+                <option value="pre_test">Pre-Test (10 Qs)</option>
+                <option value="mission_1">Mission 01 (5 Qs)</option>
+                <option value="mission_2">Mission 02 (5 Qs)</option>
+                <option value="mission_3">Mission 03 (5 Qs)</option>
+                <option value="mission_4">Mission 04 (5 Qs)</option>
+                <option value="mission_5">Mission 05 (5 Qs)</option>
+                <option value="post_test">Post-Test (10 Qs)</option>
+              </select>
+              <button class="cp-notch-btn magenta-btn sm" onclick="openAddQuestionModal()">+ NEW Q</button>
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="cp-data-table">
+              <thead>
+                <tr>
+                  <th>ORDER</th>
+                  <th>QUESTION PROMPT</th>
+                  <th>CORRECT ANSWER</th>
+                  <th>POINTS</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="questions-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <!-- MODAL 1: ADD / EDIT / DELETE LESSON MODULE -->
   <div id="lesson-modal" class="cp-modal hidden" onclick="if(event.target===this) closeLessonModal()">
@@ -178,11 +305,11 @@
       <textarea id="edit-lesson-content" rows="5" class="cp-input" placeholder="Enter in-game reading material or dialogue..."></textarea>
       <label>XP REWARD</label>
       <input type="number" id="edit-lesson-xp" class="cp-input" value="50" />
-      <div class="cp-modal-actions" style="justify-content: space-between;">
-        <button id="delete-lesson-btn" class="cp-btn-Notch danger" onclick="deleteLesson()">DELETE</button>
-        <div style="display:flex; gap:10px; margin-left:auto;">
-          <button class="cp-btn-Notch secondary" onclick="closeLessonModal()">CANCEL</button>
-          <button class="cp-btn-Notch primary" onclick="saveLessonEdit()">SAVE CHANGES</button>
+      <div class="cp-modal-actions">
+        <button id="delete-lesson-btn" class="cp-notch-btn danger-btn" onclick="deleteLesson()">DELETE</button>
+        <div class="modal-right-btns">
+          <button class="cp-notch-btn ghost-btn" onclick="closeLessonModal()">CANCEL</button>
+          <button class="cp-notch-btn cyan-btn" onclick="saveLessonEdit()">SAVE MODULE</button>
         </div>
       </div>
     </div>
@@ -196,13 +323,13 @@
       <input type="hidden" id="edit-question-index" />
       <label>QUESTION PROMPT</label>
       <textarea id="edit-question-text" rows="3" class="cp-input" placeholder="Enter quiz question prompt..."></textarea>
-      <label>ANSWER CHOICES (SELECT CORRECT OPTION)</label>
+      <label>ANSWER CHOICES (SELECT CORRECT RADIO)</label>
       <div id="modal-options-container" class="cp-options-stack"></div>
-      <div class="cp-modal-actions" style="justify-content: space-between;">
-        <button id="delete-question-btn" class="cp-btn-Notch danger" onclick="deleteQuestionModal()">DELETE</button>
-        <div style="display:flex; gap:10px; margin-left:auto;">
-          <button class="cp-btn-Notch secondary" onclick="closeQuestionModal()">CANCEL</button>
-          <button class="cp-btn-Notch primary" onclick="saveQuestionModal()">SAVE QUESTION</button>
+      <div class="cp-modal-actions">
+        <button id="delete-question-btn" class="cp-notch-btn danger-btn" onclick="deleteQuestionModal()">DELETE</button>
+        <div class="modal-right-btns">
+          <button class="cp-notch-btn ghost-btn" onclick="closeQuestionModal()">CANCEL</button>
+          <button class="cp-notch-btn cyan-btn" onclick="saveQuestionModal()">SAVE QUESTION</button>
         </div>
       </div>
     </div>
@@ -210,10 +337,10 @@
 
   <!-- MODAL 3: NOTIFICATION -->
   <div id="notify-modal" class="cp-modal hidden" onclick="closeNotifyModal()">
-    <div class="cp-modal-box" style="max-width: 380px; text-align: center;">
+    <div class="cp-modal-box" style="max-width: 360px; text-align: center;">
       <h3 id="notify-title" style="color: var(--pal-cyan-bright);">SAVED</h3>
-      <p id="notify-message" style="margin: 12px 0 22px;"></p>
-      <button class="cp-btn-Notch primary" onclick="closeNotifyModal()">OK</button>
+      <p id="notify-message" style="margin: 12px 0 20px;"></p>
+      <button class="cp-notch-btn cyan-btn" onclick="closeNotifyModal()">OK</button>
     </div>
   </div>
 

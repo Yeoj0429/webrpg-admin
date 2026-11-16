@@ -7,25 +7,28 @@ const state = {
     { lesson_id: 5, location_name: "Sector 05: Blackwall Core", title: "Lesson 5: Autonomous AI Countermeasures", content: "Final bastion protocol. Combine all prior subroutines to breach the Blackwall Core and pass the post-assessment.", xp_reward: 200, success_rate: 78, avg_quiz: 72 }
   ],
   demographics: [
-    { group: "13 - 15 YRS", percent: 25, avgScore: 81 },
-    { group: "16 - 18 YRS", percent: 38, avgScore: 86 },
-    { group: "19 - 21 YRS", percent: 25, avgScore: 89 },
-    { group: "22+ YRS", percent: 12, avgScore: 84 }
-  ],
-  scoreBreakdown: [
-    { label: "Pre-Test Exam", score: 78 },
-    { label: "Mission Quizzes (1-5)", score: 84 },
-    { label: "Post-Test Exam", score: 88 }
+    { group: "16 - 18 YRS", percent: 38, color: "#4AD8F0" },
+    { group: "13 - 15 YRS", percent: 25, color: "#C84BF2" },
+    { group: "19 - 21 YRS", percent: 25, color: "#8B4DF2" },
+    { group: "22+ YRS", percent: 12, color: "#2696E8" }
   ],
   currentQuestions: []
 };
 
-function toggleMobileNav() {
-  document.getElementById('cp-nav').classList.toggle('open');
+function toggleMobileMenu() {
+  document.getElementById('sidebar-drawer').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('open');
 }
 
-function closeMobileNav() {
-  document.getElementById('cp-nav')?.classList.remove('open');
+function closeMobileMenu() {
+  document.getElementById('sidebar-drawer')?.classList.remove('open');
+  document.getElementById('sidebar-backdrop')?.classList.remove('open');
+}
+
+function setActiveNav(el) {
+  document.querySelectorAll('.side-link').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+  closeMobileMenu();
 }
 
 function showNotify(title, message) {
@@ -47,127 +50,126 @@ async function initDashboard() {
     }
   } catch (e) {}
 
-  renderProgressMatrix();
-  renderAnalytics();
-  renderLessonPosters();
+  renderAll();
   loadAssessmentQuestions();
 }
 
-// 1. RENDER PROGRESS MATRIX
-function renderProgressMatrix() {
-  if (state.lessons.length === 0) return;
+function renderAll() {
+  renderSplineChart();
+  renderDonutLegend();
+  renderGradientKPIs();
+  renderLessonTimeline();
+}
 
-  const countLabel = String(state.lessons.length).padStart(2, '0');
-  const heroCounter = document.getElementById('hero-lesson-count');
-  if (heroCounter) heroCounter.innerText = `"${countLabel} TOTAL LESSONS"`;
+// 1. RENDER SVG AREA SPLINE CHART (Matches Designer Inspo 1 & 2)
+function renderSplineChart() {
+  const lessons = state.lessons;
+  if (lessons.length === 0) return;
 
-  const first = state.lessons[0];
-  const rest = state.lessons.slice(1);
+  const avgSuccess = (lessons.reduce((s, l) => s + Number(l.success_rate || 0), 0) / lessons.length).toFixed(1);
+  document.getElementById('hero-avg-success').innerText = `${avgSuccess}%`;
+  document.getElementById('hero-total-lessons').innerText = String(lessons.length).padStart(2, '0');
 
-  document.getElementById('featured-lesson-box').innerHTML = `
-    <div class="cp-featured-banner">
-      <h4>FEATURED MODULE</h4>
-      <span>${(first.location_name || 'Sector 01').toUpperCase()}</span>
-    </div>
-    <div class="cp-featured-body">
-      <h3>${first.title.toUpperCase()}</h3>
-      <p style="margin-bottom: 18px; color: #EDE9F7;">${first.content}</p>
-      <div style="display:flex; justify-content:space-between; font-weight:700; color:#8CEEF6;">
-        <span>SUCCESS RATE: ${first.success_rate}%</span>
-        <span>AVG QUIZ SCORE: ${first.avg_quiz}%</span>
-      </div>
-      <div class="cp-progress-track">
-        <div class="cp-progress-fill" style="width:${first.success_rate}%"></div>
-      </div>
-    </div>
+  const width = 600;
+  const height = 200;
+  const stepX = lessons.length > 1 ? width / (lessons.length - 1) : width;
+
+  const ptsSuccess = lessons.map((l, i) => ({
+    x: Math.round(i * stepX),
+    y: Math.round(height - (Math.min(100, Math.max(10, Number(l.success_rate || 75))) / 100) * 165)
+  }));
+
+  const ptsQuiz = lessons.map((l, i) => ({
+    x: Math.round(i * stepX),
+    y: Math.round(height - (Math.min(100, Math.max(10, Number(l.avg_quiz || 70))) / 100) * 165)
+  }));
+
+  const buildSmoothPath = (pts) => {
+    if (pts.length === 1) return `M 0,${pts[0].y} L ${width},${pts[0].y}`;
+    let d = `M ${pts[0].x},${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const midX = (pts[i].x + pts[i + 1].x) / 2;
+      d += ` C ${midX},${pts[i].y} ${midX},${pts[i + 1].y} ${pts[i + 1].x},${pts[i + 1].y}`;
+    }
+    return d;
+  };
+
+  const successLine = buildSmoothPath(ptsSuccess);
+  const successArea = `${successLine} L ${width},${height} L 0,${height} Z`;
+
+  const quizLine = buildSmoothPath(ptsQuiz);
+  const quizArea = `${quizLine} L ${width},${height} L 0,${height} Z`;
+
+  document.getElementById('spline-svg').innerHTML = `
+    <defs>
+      <linearGradient id="cyanAreaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4AD8F0" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#4AD8F0" stop-opacity="0.0"/>
+      </linearGradient>
+      <linearGradient id="magentaAreaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#C84BF2" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#C84BF2" stop-opacity="0.0"/>
+      </linearGradient>
+    </defs>
+    <line x1="0" y1="45" x2="600" y2="45" stroke="rgba(140,238,246,0.1)" stroke-dasharray="4"/>
+    <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(140,238,246,0.1)" stroke-dasharray="4"/>
+    <line x1="0" y1="155" x2="600" y2="155" stroke="rgba(140,238,246,0.1)" stroke-dasharray="4"/>
+    <path d="${quizArea}" fill="url(#magentaAreaGrad)" />
+    <path d="${successArea}" fill="url(#cyanAreaGrad)" />
+    <path d="${quizLine}" fill="none" stroke="#C84BF2" stroke-width="3" />
+    <path d="${successLine}" fill="none" stroke="#4AD8F0" stroke-width="3.5" />
+    ${ptsSuccess.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#080B1A" stroke="#8CEEF6" stroke-width="3"/>`).join('')}
   `;
 
-  document.getElementById('remaining-lessons-grid').innerHTML = rest.map(l => `
-    <div class="cp-news-card">
-      <div>
-        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#F288E8; font-weight:700; letter-spacing:1.5px;">
-          <span>${(l.location_name || 'Sector').toUpperCase()}</span>
-          <span>${l.xp_reward} XP</span>
-        </div>
-        <h4 style="font-family:'Orbitron',sans-serif; font-size:1.05rem; margin:8px 0; color:#8CEEF6;">
-          ${l.title}
-        </h4>
-      </div>
-      <div>
-        <div style="display:flex; justify-content:space-between; font-size:0.9rem; font-weight:700;">
-          <span>${l.success_rate}% Success Rate</span>
-          <span style="color:#4AD8F0;">Avg: ${l.avg_quiz}%</span>
-        </div>
-        <div class="cp-progress-track">
-          <div class="cp-progress-fill" style="width:${l.success_rate}%"></div>
-        </div>
-      </div>
+  document.getElementById('spline-x-labels').innerHTML = lessons
+    .map(l => `<span>L0${l.lesson_id} (${l.success_rate}%)</span>`)
+    .join('');
+}
+
+// 2. RENDER DONUT LEGEND
+function renderDonutLegend() {
+  document.getElementById('donut-legend').innerHTML = state.demographics.map(d => `
+    <div class="legend-box" style="border-left-color: ${d.color}">
+      <strong style="color:${d.color}">${d.percent}%</strong>
+      <span>${d.group}</span>
     </div>
   `).join('');
 }
 
-// 2. RENDER ANALYTICS
-function renderAnalytics() {
-  const len = state.lessons.length || 1;
-  const avgSuccess = Math.round(
-    state.lessons.reduce((sum, l) => sum + Number(l.success_rate || 0), 0) / len
-  );
-  const avgQuizAll = Math.round(
-    state.lessons.reduce((sum, l) => sum + Number(l.avg_quiz || 0), 0) / len
-  );
+// 3. RENDER 4 GRADIENT KPI CARDS
+function renderGradientKPIs() {
+  const topRate = state.lessons.length ? Math.max(...state.lessons.map(l => Number(l.success_rate || 0))) : 90;
+  const totalXp = state.lessons.reduce((s, l) => s + Number(l.xp_reward || 0), 0);
 
-  document.getElementById('analytics-kpis').innerHTML = `
-    <div class="cp-kpi-box"><span>ACTIVE LEARNERS</span><strong>08</strong></div>
-    <div class="cp-kpi-box"><span>AVG SUCCESS RATE</span><strong>${avgSuccess}%</strong></div>
-    <div class="cp-kpi-box"><span>AVG QUIZ SCORE</span><strong>${avgQuizAll}%</strong></div>
-    <div class="cp-kpi-box"><span>TOTAL LESSONS</span><strong>${String(state.lessons.length).padStart(2, '0')}</strong></div>
-  `;
-
-  document.getElementById('age-group-bars').innerHTML = state.demographics.map(d => `
-    <div style="margin-top: 14px;">
-      <div style="display:flex; justify-content:space-between; font-weight:700;">
-        <span>${d.group}</span>
-        <span style="color:#4AD8F0;">${d.percent}% (${d.avgScore}% Avg)</span>
-      </div>
-      <div class="cp-progress-track"><div class="cp-progress-fill" style="width:${d.percent}%"></div></div>
-    </div>
-  `).join('');
-
-  document.getElementById('score-comparison-bars').innerHTML = state.scoreBreakdown.map(s => `
-    <div style="margin-top: 14px;">
-      <div style="display:flex; justify-content:space-between; font-weight:700;">
-        <span>${s.label}</span>
-        <span style="color:#F288E8;">${s.score}%</span>
-      </div>
-      <div class="cp-progress-track"><div class="cp-progress-fill" style="width:${s.score}%"></div></div>
-    </div>
-  `).join('');
+  document.getElementById('card-l1-rate').innerText = `${topRate}%`;
+  document.getElementById('card-total-xp').innerText = `${totalXp} XP`;
 }
 
-// 3. RENDER LESSON POSTERS + ADD / EDIT / DELETE LESSON
-function renderLessonPosters() {
-  document.getElementById('lesson-posters-container').innerHTML = state.lessons.map(l => `
-    <div class="cp-poster-card">
-      <div>
-        <div class="cp-poster-sector">${(l.location_name || 'Sector').toUpperCase()}</div>
-        <div class="cp-poster-title">${l.title}</div>
-        <div class="cp-poster-xp">REWARD: ${l.xp_reward} XP</div>
-        <p class="cp-poster-desc">${l.content}</p>
+// 4. RENDER LEFT TIMELINE LESSON MODULES + SELECT DROPDOWN
+function renderLessonTimeline() {
+  const container = document.getElementById('lesson-timeline-list');
+  container.innerHTML = state.lessons.map(l => `
+    <div class="timeline-item">
+      <div class="tl-left">
+        <div class="tl-circle">0${l.lesson_id}</div>
+        <div class="tl-text">
+          <h4>${l.title}</h4>
+          <span>${l.xp_reward} XP • ${l.success_rate}% Pass</span>
+        </div>
       </div>
-      <button class="cp-btn-outline-cyan" style="width:100%; min-width:0;" onclick="openLessonModal(${l.lesson_id})">
-        EDIT / DELETE
-      </button>
+      <button class="status-pill pill-cyan" onclick="openLessonModal(${l.lesson_id})">EDIT</button>
     </div>
   `).join('');
 
   const select = document.getElementById('quiz-lesson-select');
-  const currentVal = select.value;
+  const prev = select.value;
   select.innerHTML = state.lessons.map(l => `<option value="${l.lesson_id}">${l.title}</option>`).join('');
-  if (currentVal && state.lessons.some(l => String(l.lesson_id) === String(currentVal))) {
-    select.value = currentVal;
+  if (prev && state.lessons.some(l => String(l.lesson_id) === String(prev))) {
+    select.value = prev;
   }
 }
 
+// LESSON CRUD MODALS
 function openAddLessonModal() {
   document.getElementById('modal-lesson-tag').innerText = 'NEW MODULE';
   document.getElementById('modal-lesson-heading').innerText = 'ADD LESSON MODULE';
@@ -182,7 +184,7 @@ function openAddLessonModal() {
 function openLessonModal(lessonId) {
   const lesson = state.lessons.find(l => l.lesson_id === lessonId);
   if (!lesson) return;
-  document.getElementById('modal-lesson-tag').innerText = `LESSON #${lesson.lesson_id}`;
+  document.getElementById('modal-lesson-tag').innerText = `LESSON #0${lesson.lesson_id}`;
   document.getElementById('modal-lesson-heading').innerText = 'EDIT LESSON MODULE';
   document.getElementById('edit-lesson-id').value = lesson.lesson_id;
   document.getElementById('edit-lesson-title').value = lesson.title;
@@ -203,12 +205,11 @@ async function saveLessonEdit() {
   const xp_reward = parseInt(document.getElementById('edit-lesson-xp').value) || 50;
 
   if (!title || !content) {
-    showNotify('MISSING FIELDS', 'Please enter both a title and lesson content.');
+    showNotify('MISSING FIELDS', 'Please enter both a module title and lesson text.');
     return;
   }
 
   if (!rawId) {
-    // ADD NEW LESSON (POST)
     let newId = state.lessons.length > 0 ? Math.max(...state.lessons.map(l => l.lesson_id)) + 1 : 1;
     try {
       const res = await fetch('/api/admin/lessons', {
@@ -224,16 +225,15 @@ async function saveLessonEdit() {
 
     state.lessons.push({
       lesson_id: newId,
-      location_name: `Sector 01: Neo-Intramuros`,
+      location_name: `Sector 0${newId}`,
       title,
       content,
       xp_reward,
-      success_rate: 0,
-      avg_quiz: 0
+      success_rate: 80,
+      avg_quiz: 78
     });
-    showNotify('LESSON ADDED', `${title} has been created.`);
+    showNotify('MODULE CREATED', `${title} added.`);
   } else {
-    // EDIT EXISTING LESSON (PUT)
     const id = parseInt(rawId);
     const lesson = state.lessons.find(l => l.lesson_id === id);
     if (lesson) {
@@ -249,32 +249,28 @@ async function saveLessonEdit() {
         body: JSON.stringify({ title, content, xp_reward })
       });
     } catch (e) {}
-    showNotify('LESSON SAVED', `${title} updated.`);
+    showNotify('MODULE SAVED', `${title} updated.`);
   }
 
-  renderProgressMatrix();
-  renderAnalytics();
-  renderLessonPosters();
+  renderAll();
   closeLessonModal();
 }
 
 async function deleteLesson() {
   const id = parseInt(document.getElementById('edit-lesson-id').value);
-  if (!id || !confirm('Are you sure you want to delete this Lesson Module?')) return;
+  if (!id || !confirm('Delete this Lesson Module?')) return;
 
   try {
     await fetch(`/api/admin/lessons/${id}`, { method: 'DELETE' });
   } catch (e) {}
 
   state.lessons = state.lessons.filter(l => l.lesson_id !== id);
-  renderProgressMatrix();
-  renderAnalytics();
-  renderLessonPosters();
+  renderAll();
   closeLessonModal();
-  showNotify('LESSON DELETED', `Lesson #${id} has been removed.`);
+  showNotify('MODULE DELETED', `Lesson #${id} removed.`);
 }
 
-// 4. QUIZ QUESTIONS: LOAD, ADD, EDIT & DELETE
+// 5. QUIZ QUESTIONS TABLE + CRUD MODALS
 async function loadAssessmentQuestions() {
   const lessonId = document.getElementById('quiz-lesson-select').value || 1;
   const type = document.getElementById('quiz-type-select').value;
@@ -286,7 +282,7 @@ async function loadAssessmentQuestions() {
       const dbQuestions = await res.json();
       if (dbQuestions.length > 0) {
         state.currentQuestions = dbQuestions;
-        renderQuestionCards();
+        renderQuestionTable();
         return;
       }
     }
@@ -295,32 +291,43 @@ async function loadAssessmentQuestions() {
   state.currentQuestions = Array.from({ length: count }, (_, i) => ({
     question_id: i + 1,
     question_order: i + 1,
-    question_text: `Verify system protocol response for node #${i + 1}?`,
+    points: 1,
+    question_text: `[L${lessonId} // ${type.toUpperCase()}] Verify neural protocol response for node #${i + 1}?`,
     options: [
-      { option_id: i * 4 + 1, option_text: `Option A (Correct)`, is_correct: 1 },
-      { option_id: i * 4 + 2, option_text: `Option B`, is_correct: 0 },
-      { option_id: i * 4 + 3, option_text: `Option C`, is_correct: 0 },
-      { option_id: i * 4 + 4, option_text: `Option D`, is_correct: 0 }
+      { option_id: i * 4 + 1, option_text: `Option A: Execute protocol #${i + 1}`, is_correct: 1 },
+      { option_id: i * 4 + 2, option_text: `Option B: Bypass firewall`, is_correct: 0 },
+      { option_id: i * 4 + 3, option_text: `Option C: Terminate packet`, is_correct: 0 },
+      { option_id: i * 4 + 4, option_text: `Option D: Flush buffer`, is_correct: 0 }
     ]
   }));
-  renderQuestionCards();
+  renderQuestionTable();
 }
 
-function renderQuestionCards() {
-  const container = document.getElementById('questions-editor-list');
-  container.innerHTML = state.currentQuestions.map((q, idx) => {
-    const correctOpt = q.options.find(o => o.is_correct) || q.options[0];
-    return `
-      <div class="cp-q-card">
-        <div>
-          <span style="font-size:0.72rem; color:#F288E8; font-weight:700; letter-spacing:1.5px;">QUESTION #${q.question_order}</span>
-          <h4>${q.question_text}</h4>
-          <div class="cp-q-correct">Correct: ${correctOpt ? correctOpt.option_text : 'N/A'}</div>
-        </div>
-        <button class="cp-btn-Notch primary" onclick="openQuestionModal(${idx})">EDIT</button>
-      </div>
-    `;
-  }).join('');
+function renderQuestionTable() {
+  const query = (document.getElementById('question-search')?.value || '').toLowerCase();
+  const tbody = document.getElementById('questions-table-body');
+  const pillClasses = ['pill-cyan', 'pill-magenta', 'pill-purple'];
+
+  tbody.innerHTML = state.currentQuestions
+    .map((q, idx) => ({ q, idx }))
+    .filter(({ q }) => q.question_text.toLowerCase().includes(query))
+    .map(({ q, idx }) => {
+      const correctOpt = q.options.find(o => o.is_correct) || q.options[0];
+      const pillClass = pillClasses[idx % pillClasses.length];
+      return `
+        <tr>
+          <td><strong>#0${q.question_order}</strong></td>
+          <td>${q.question_text}</td>
+          <td style="color:#8CEEF6;">${correctOpt ? correctOpt.option_text : 'N/A'}</td>
+          <td>${q.points || 1} PT</td>
+          <td>
+            <button class="status-pill ${pillClass}" onclick="openQuestionModal(${idx})">
+              EDIT
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
 }
 
 function openAddQuestionModal() {
@@ -344,7 +351,7 @@ function openQuestionModal(idx) {
   const q = state.currentQuestions[idx];
   if (!q) return;
   document.getElementById('edit-question-index').value = idx;
-  document.getElementById('modal-question-tag').innerText = `QUESTION #${q.question_order}`;
+  document.getElementById('modal-question-tag').innerText = `QUESTION #0${q.question_order}`;
   document.getElementById('modal-question-heading').innerText = 'EDIT QUESTION';
   document.getElementById('edit-question-text').value = q.question_text;
   document.getElementById('delete-question-btn').style.display = 'inline-block';
@@ -375,7 +382,6 @@ async function saveQuestionModal() {
   }
 
   if (rawIdx === '') {
-    // ADD NEW QUESTION (POST)
     const lessonId = document.getElementById('quiz-lesson-select').value || 1;
     const assessmentType = document.getElementById('quiz-type-select').value;
     const options = [0, 1, 2, 3].map(oIdx => ({
@@ -401,15 +407,15 @@ async function saveQuestionModal() {
     state.currentQuestions.push({
       question_id: newQuestionId,
       question_order: newOrder,
+      points: 1,
       question_text,
       options
     });
 
-    renderQuestionCards();
+    renderQuestionTable();
     closeQuestionModal();
     showNotify('QUESTION ADDED', `Question #${newOrder} added.`);
   } else {
-    // EDIT EXISTING QUESTION (PUT)
     const idx = parseInt(rawIdx);
     const q = state.currentQuestions[idx];
     q.question_text = question_text;
@@ -427,7 +433,7 @@ async function saveQuestionModal() {
       });
     } catch (e) {}
 
-    renderQuestionCards();
+    renderQuestionTable();
     closeQuestionModal();
     showNotify('QUESTION SAVED', `Question #${q.question_order} updated.`);
   }
@@ -443,7 +449,7 @@ async function deleteQuestionModal() {
   } catch (e) {}
 
   state.currentQuestions.splice(idx, 1);
-  renderQuestionCards();
+  renderQuestionTable();
   closeQuestionModal();
   showNotify('QUESTION DELETED', `Question #${q.question_order} removed.`);
 }
