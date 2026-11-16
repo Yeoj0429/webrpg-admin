@@ -3,185 +3,217 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! - Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <title>WEBRPG! // ADMIN PORTAL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="scanline-overlay"></div>
 
-  <div class="admin-layout">
-    <!-- MOBILE BACKDROP OVERLAY -->
-    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
+  <!-- FLOATING CYBERPUNK.NET TOP NAVBAR -->
+  <header class="cp-header">
+    <a href="#hero" class="cp-logo">WEBRPG<span>!</span></a>
 
-    <!-- SIDEBAR / STICKY MOBILE NAVBAR -->
-    <aside class="cyber-sidebar">
-      <div class="sidebar-top-row">
-        <div class="brand-box">
-          <h1>WEBRPG!</h1>
-          <p class="brand-sub">ADMIN CONSOLE</p>
+    <nav id="cp-nav" class="cp-nav-bar">
+      <a href="#progress-section" class="cp-nav-link" onclick="closeMobileNav()">PROGRESS</a>
+      <a href="#analytics-section" class="cp-nav-link" onclick="closeMobileNav()">ANALYTICS</a>
+      <a href="#lessons-section" class="cp-nav-link" onclick="closeMobileNav()">LESSONS</a>
+      <a href="#quizzes-section" class="cp-nav-cta" onclick="closeMobileNav()">QUIZ MATRIX</a>
+    </nav>
+
+    <button id="cp-burger" class="cp-burger" onclick="toggleMobileNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- SECTION 1: BRIGHT CYAN/BLUE HERO BANNER -->
+  <section id="hero" class="cp-hero">
+    <div class="cp-hero-inner">
+      <div class="cp-laurels">
+        <div class="laurel-item">
+          <span class="laurel-title" id="hero-lesson-count">"05 TOTAL LESSONS"</span>
+          <span class="laurel-sub">ACTIVE MODULES</span>
         </div>
+        <div class="laurel-item">
+          <span class="laurel-title">"35 ASSESSMENTS"</span>
+          <span class="laurel-sub">PRE • MISSION • POST</span>
+        </div>
+        <div class="laurel-item">
+          <span class="laurel-title">"225 QUESTIONS"</span>
+          <span class="laurel-sub">LIVE TIDB CLOUD</span>
+        </div>
+      </div>
 
-        <!-- HAMBURGER BUTTON (Visible on Tablet/Mobile) -->
-        <button id="burger-btn" class="burger-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
-          <span></span>
-          <span></span>
-          <span></span>
+      <h1 class="cp-hero-title">
+        MANAGE THE ULTIMATE<br />
+        WEBRPG! LEARNING<br />
+        EXPERIENCE
+      </h1>
+
+      <div class="cp-hero-buttons">
+        <a href="#lessons-section" class="cp-btn-outline-dark">MANAGE LESSONS</a>
+        <a href="#quizzes-section" class="cp-btn-outline-dark">MANAGE QUIZZES</a>
+      </div>
+    </div>
+
+    <div class="cp-section-meta-bar">
+      <span>/// LEARNER_PROGRESS_HIGHLIGHT</span>
+      <span>LIVE DATABASE STREAM</span>
+    </div>
+  </section>
+
+  <!-- SECTION 2: DARK DOT-MATRIX PROGRESS & ANALYTICS -->
+  <section id="progress-section" class="cp-dark-matrix">
+    <div class="cp-matrix-grid">
+      <!-- LEFT FEATURED HIGHLIGHT BOX -->
+      <div class="cp-featured-box" id="featured-lesson-box"></div>
+
+      <!-- RIGHT 2x2 GRID FOR REMAINING LESSONS -->
+      <div class="cp-sub-grid" id="remaining-lessons-grid"></div>
+    </div>
+
+    <!-- ANALYTICS SUB-SECTION -->
+    <div id="analytics-section" class="cp-analytics-wrapper">
+      <div class="cp-section-meta-bar" style="margin-bottom: 20px;">
+        <span>/// LEARNING_ANALYTICS_OVERVIEW</span>
+        <span>AGE GROUPS & ASSESSMENT SCORES</span>
+      </div>
+
+      <div id="analytics-kpis" class="cp-kpi-row"></div>
+
+      <div class="cp-analytics-cards">
+        <div class="cp-dark-card">
+          <h3>AGE DISTRIBUTION</h3>
+          <div id="age-group-bars"></div>
+        </div>
+        <div class="cp-dark-card">
+          <h3>QUIZ & EXAM SCORES</h3>
+          <div id="score-comparison-bars"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTCHED TECH DIVIDER (TOP) -->
+  <div class="cp-razor-divider top-razor"></div>
+
+  <!-- SECTION 3: VERTICAL LESSON POSTER CARDS -->
+  <section id="lessons-section" class="cp-bright-section">
+    <div class="cp-bright-header">
+      <h2>WELCOME TO THE LESSON MODULES</h2>
+      <p>Select any in-game educational sector below to edit, add, or delete modules.</p>
+      <button class="cp-btn-outline-dark" style="margin-top: 18px;" onclick="openAddLessonModal()">
+        + ADD LESSON MODULE
+      </button>
+    </div>
+
+    <!-- TECHNICAL CROSSHAIR BRACKETS (TOP) -->
+    <div class="cp-bracket-line top-brackets">
+      <span></span><span></span>
+    </div>
+
+    <!-- VERTICAL POSTER COLUMNS -->
+    <div id="lesson-posters-container" class="cp-posters-strip"></div>
+
+    <!-- TECHNICAL CROSSHAIR BRACKETS (BOTTOM) -->
+    <div class="cp-bracket-line bottom-brackets">
+      <span></span><span></span>
+    </div>
+  </section>
+
+  <!-- SECTION 4: QUIZ MATRIX EDITOR STRIP -->
+  <section id="quizzes-section" class="cp-quiz-section">
+    <div class="cp-quiz-inner">
+      <h2>CONFIGURE LESSON QUIZZES & QUESTIONS</h2>
+      <p>Each lesson contains 7 assessments: 1 Pre-Test (10 Qs), 5 Missions (5 Qs each), and 1 Post-Test (10 Qs).</p>
+
+      <div class="cp-underline-controls">
+        <div class="cp-field">
+          <label>SELECT LESSON</label>
+          <select id="quiz-lesson-select" class="cp-underline-select" onchange="loadAssessmentQuestions()"></select>
+        </div>
+        <div class="cp-field">
+          <label>SELECT ASSESSMENT TYPE</label>
+          <select id="quiz-type-select" class="cp-underline-select" onchange="loadAssessmentQuestions()">
+            <option value="pre_test">Pre-Test (10 Questions)</option>
+            <option value="mission_1">Mission 1 (5 Questions)</option>
+            <option value="mission_2">Mission 2 (5 Questions)</option>
+            <option value="mission_3">Mission 3 (5 Questions)</option>
+            <option value="mission_4">Mission 4 (5 Questions)</option>
+            <option value="mission_5">Mission 5 (5 Questions)</option>
+            <option value="post_test">Post-Test (10 Questions)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cp-quiz-toolbar">
+        <button class="cp-btn-outline-dark" onclick="openAddQuestionModal()">
+          + ADD NEW QUESTION
         </button>
       </div>
 
-      <!-- COLLAPSIBLE DRAWER ON MOBILE -->
-      <div id="sidebar-drawer" class="sidebar-drawer">
-        <nav class="cyber-nav">
-          <button class="nav-btn active" onclick="switchTab('progress', this)">
-            <span class="nav-code">01</span> PROGRESS
-          </button>
-          <button class="nav-btn" onclick="switchTab('analytics', this)">
-            <span class="nav-code">02</span> ANALYTICS
-          </button>
-          <button class="nav-btn" onclick="switchTab('lessons', this)">
-            <span class="nav-code">03</span> LESSONS
-          </button>
-          <button class="nav-btn" onclick="switchTab('quizzes', this)">
-            <span class="nav-code">04</span> QUIZZES
-          </button>
-        </nav>
+      <div id="questions-editor-list" class="cp-questions-grid"></div>
+    </div>
+  </section>
 
-        <div class="sidebar-footer">
-          <div class="status-indicator">
-            <span class="pulse-dot"></span> ONLINE
-          </div>
-        </div>
-      </div>
-    </aside>
+  <!-- NOTCHED TECH DIVIDER (BOTTOM) -->
+  <div class="cp-razor-divider bottom-razor"></div>
 
-    <!-- MAIN CONTENT -->
-    <main class="cyber-main">
-      <header class="cyber-topbar">
-        <h2 id="view-title">LEARNER PROGRESS</h2>
-        <div class="topbar-stats">
-          <div class="mini-stat">
-            <span>LESSONS</span>
-            <strong>05</strong>
-          </div>
-          <div class="mini-stat">
-            <span>QUIZZES</span>
-            <strong>35</strong>
-          </div>
-        </div>
-      </header>
+  <!-- FOOTER -->
+  <footer class="cp-footer">
+    <div class="cp-footer-inner">
+      <div class="cp-logo">WEBRPG<span>!</span></div>
+      <div class="cp-footer-meta">MYSQL + TIDB CLOUD CONNECTED // VERCEL LIVE BUILD</div>
+    </div>
+  </footer>
 
-      <!-- TAB 1: LEARNER PROGRESS -->
-      <section id="tab-progress" class="tab-panel active">
-        <div id="lesson-success-list" class="success-grid"></div>
-      </section>
-
-      <!-- TAB 2: LEARNING ANALYTICS -->
-      <section id="tab-analytics" class="tab-panel">
-        <div id="analytics-kpis" class="kpi-grid"></div>
-
-        <div class="analytics-grid">
-          <div class="cyber-card">
-            <h3>AGE GROUPS</h3>
-            <div id="age-group-bars" class="bar-chart-list"></div>
-          </div>
-
-          <div class="cyber-card">
-            <h3>QUIZ & EXAM SCORES</h3>
-            <div id="score-comparison-bars" class="bar-chart-list"></div>
-          </div>
-        </div>
-
-        <div class="cyber-card" style="margin-top: 20px;">
-          <h3>LESSON PERFORMANCE BREAKDOWN</h3>
-          <table class="cyber-table">
-            <thead>
-              <tr>
-                <th>LESSON</th>
-                <th>LOCATION</th>
-                <th>AVG QUIZ SCORE</th>
-                <th>SUCCESS RATE</th>
-                <th>XP REWARD</th>
-              </tr>
-            </thead>
-            <tbody id="analytics-table-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- TAB 3: LESSON MODULES -->
-      <section id="tab-lessons" class="tab-panel">
-        <div id="lesson-cards-container" class="lesson-cards-grid"></div>
-      </section>
-
-      <!-- TAB 4: QUIZ QUESTIONS -->
-      <section id="tab-quizzes" class="tab-panel">
-        <div class="quiz-controls">
-          <div class="selector-group">
-            <label>LESSON</label>
-            <select id="quiz-lesson-select" class="cyber-select" onchange="loadAssessmentQuestions()"></select>
-          </div>
-          <div class="selector-group">
-            <label>ASSESSMENT</label>
-            <select id="quiz-type-select" class="cyber-select" onchange="loadAssessmentQuestions()">
-              <option value="pre_test">Pre-Test</option>
-              <option value="mission_1">Mission 1</option>
-              <option value="mission_2">Mission 2</option>
-              <option value="mission_3">Mission 3</option>
-              <option value="mission_4">Mission 4</option>
-              <option value="mission_5">Mission 5</option>
-              <option value="post_test">Post-Test</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="questions-editor-list" class="questions-list"></div>
-      </section>
-    </main>
-  </div>
-
-  <!-- MODAL 1: EDIT LESSON MODULE -->
-  <div id="lesson-modal" class="cyber-modal hidden" onclick="if(event.target===this) closeLessonModal()">
-    <div class="cyber-modal-content">
-      <div class="card-tag" id="modal-lesson-tag">LESSON MODULE</div>
-      <h3 style="margin-bottom: 14px;">EDIT LESSON</h3>
+  <!-- MODAL 1: ADD / EDIT / DELETE LESSON MODULE -->
+  <div id="lesson-modal" class="cp-modal hidden" onclick="if(event.target===this) closeLessonModal()">
+    <div class="cp-modal-box">
+      <div class="cp-modal-tag" id="modal-lesson-tag">LESSON MODULE</div>
+      <h3 id="modal-lesson-heading">EDIT LESSON MODULE</h3>
       <input type="hidden" id="edit-lesson-id" />
-      <label>TITLE</label>
-      <input type="text" id="edit-lesson-title" class="cyber-input" />
-      <label>CONTENT</label>
-      <textarea id="edit-lesson-content" rows="5" class="cyber-input"></textarea>
+      <label>MODULE TITLE</label>
+      <input type="text" id="edit-lesson-title" class="cp-input" placeholder="e.g. Lesson 6: Neural Firewall" />
+      <label>IN-GAME LESSON TEXT</label>
+      <textarea id="edit-lesson-content" rows="5" class="cp-input" placeholder="Enter in-game reading material or dialogue..."></textarea>
       <label>XP REWARD</label>
-      <input type="number" id="edit-lesson-xp" class="cyber-input" />
-      <div class="modal-actions">
-        <button class="cyber-btn secondary" onclick="closeLessonModal()">CANCEL</button>
-        <button class="cyber-btn primary" onclick="saveLessonEdit()">SAVE</button>
+      <input type="number" id="edit-lesson-xp" class="cp-input" value="50" />
+      <div class="cp-modal-actions" style="justify-content: space-between;">
+        <button id="delete-lesson-btn" class="cp-btn-Notch danger" onclick="deleteLesson()">DELETE</button>
+        <div style="display:flex; gap:10px; margin-left:auto;">
+          <button class="cp-btn-Notch secondary" onclick="closeLessonModal()">CANCEL</button>
+          <button class="cp-btn-Notch primary" onclick="saveLessonEdit()">SAVE CHANGES</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: EDIT INDIVIDUAL QUESTION & 4 OPTIONS -->
-  <div id="question-modal" class="cyber-modal hidden" onclick="if(event.target===this) closeQuestionModal()">
-    <div class="cyber-modal-content">
-      <div class="card-tag" id="modal-question-tag">QUESTION EDITOR</div>
-      <h3 style="margin-bottom: 14px;">EDIT QUESTION</h3>
+  <!-- MODAL 2: ADD / EDIT / DELETE QUESTION & 4 OPTIONS -->
+  <div id="question-modal" class="cp-modal hidden" onclick="if(event.target===this) closeQuestionModal()">
+    <div class="cp-modal-box">
+      <div class="cp-modal-tag" id="modal-question-tag">QUESTION EDITOR</div>
+      <h3 id="modal-question-heading">EDIT QUESTION</h3>
       <input type="hidden" id="edit-question-index" />
       <label>QUESTION PROMPT</label>
-      <textarea id="edit-question-text" rows="3" class="cyber-input"></textarea>
-      <label style="display:block; margin-bottom:8px;">CHOICES (SELECT CORRECT ANSWER)</label>
-      <div id="modal-options-container" class="modal-options-list"></div>
-      <div class="modal-actions" style="margin-top: 18px;">
-        <button class="cyber-btn secondary" onclick="closeQuestionModal()">CANCEL</button>
-        <button class="cyber-btn primary" onclick="saveQuestionModal()">SAVE</button>
+      <textarea id="edit-question-text" rows="3" class="cp-input" placeholder="Enter quiz question prompt..."></textarea>
+      <label>ANSWER CHOICES (SELECT CORRECT OPTION)</label>
+      <div id="modal-options-container" class="cp-options-stack"></div>
+      <div class="cp-modal-actions" style="justify-content: space-between;">
+        <button id="delete-question-btn" class="cp-btn-Notch danger" onclick="deleteQuestionModal()">DELETE</button>
+        <div style="display:flex; gap:10px; margin-left:auto;">
+          <button class="cp-btn-Notch secondary" onclick="closeQuestionModal()">CANCEL</button>
+          <button class="cp-btn-Notch primary" onclick="saveQuestionModal()">SAVE QUESTION</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: STATUS NOTIFICATION -->
-  <div id="notify-modal" class="cyber-modal hidden" onclick="closeNotifyModal()">
-    <div class="cyber-modal-content" style="max-width: 380px; text-align: center;">
-      <h3 id="notify-title" style="color: #4AD8F0; margin-bottom: 10px;">SAVED</h3>
-      <p id="notify-message" style="margin-bottom: 20px;"></p>
-      <button class="cyber-btn primary" onclick="closeNotifyModal()">OK</button>
+  <!-- MODAL 3: NOTIFICATION -->
+  <div id="notify-modal" class="cp-modal hidden" onclick="closeNotifyModal()">
+    <div class="cp-modal-box" style="max-width: 380px; text-align: center;">
+      <h3 id="notify-title" style="color: var(--pal-cyan-bright);">SAVED</h3>
+      <p id="notify-message" style="margin: 12px 0 22px;"></p>
+      <button class="cp-btn-Notch primary" onclick="closeNotifyModal()">OK</button>
     </div>
   </div>
 

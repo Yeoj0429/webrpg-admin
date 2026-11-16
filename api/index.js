@@ -6,9 +6,8 @@ const path = require('path');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..'))); // Serves index.html, style.css, admin.js locally
+app.use(express.static(path.join(__dirname, '..')));
 
-// Connects to Cloud MySQL on Vercel (or localhost when testing locally)
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST || 'localhost',
   port: process.env.MYSQL_PORT || 3306,
@@ -20,7 +19,6 @@ const pool = mysql.createPool({
   connectionLimit: 5
 });
 
-// Health check
 app.get('/api/health', async (req, res) => {
   try {
     await pool.query('SELECT 1');
@@ -30,7 +28,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// 1. GET Learner Progress & Lesson Success Rates
+// 1. GET Lessons + Progress
 app.get('/api/admin/lesson-progress', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -43,7 +41,7 @@ app.get('/api/admin/lesson-progress', async (req, res) => {
         COALESCE(ROUND(AVG(aa.is_passed) * 100, 0), 0) AS success_rate,
         COALESCE(ROUND(AVG(aa.score), 0), 0) AS avg_quiz
       FROM lessons l
-      JOIN locations loc ON l.location_id = loc.location_id
+      LEFT JOIN locations loc ON l.location_id = loc.location_id
       LEFT JOIN assessments a ON l.lesson_id = a.lesson_id
       LEFT JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id
       GROUP BY l.lesson_id, l.title, l.content, l.xp_reward, loc.location_name
@@ -55,49 +53,28 @@ app.get('/api/admin/lesson-progress', async (req, res) => {
   }
 });
 
-// 2. GET Learning Analytics
-app.get('/api/admin/analytics', async (req, res) => {
+// 2. POST Add Lesson
+app.post('/api/admin/lessons', async (req, res) => {
   try {
-    const [ageGroups] = await pool.query(`
-      SELECT 
-        CASE 
-          WHEN lp.age BETWEEN 13 AND 15 THEN '13 - 15 YRS'
-          WHEN lp.age BETWEEN 16 AND 18 THEN '16 - 18 YRS'
-          WHEN lp.age BETWEEN 19 AND 21 THEN '19 - 21 YRS'
-          ELSE '22+ YRS'
-        END AS group_label,
-        COUNT(DISTINCT lp.user_id) AS learner_count,
-        COALESCE(ROUND(AVG(aa.score), 0), 0) AS avgScore
-      FROM learner_profiles lp
-      LEFT JOIN assessment_attempts aa ON lp.user_id = aa.user_id
-      GROUP BY group_label
-    `);
+    const { location_id, title, content, xp_reward } = req.body;
+    const [[{ maxOrder }]] = await pool.query(`SELECT COALESCE(MAX(lesson_order), 0) AS maxOrder FROM lessons`);
 
-    const [examVsQuiz] = await pool.query(`
-      SELECT 
-        CASE 
-          WHEN a.assessment_type = 'pre_test' THEN 'PRE-TEST EXAM AVG (10 Qs)'
-          WHEN a.assessment_type = 'post_test' THEN 'POST-TEST EXAM AVG (10 Qs)'
-          ELSE 'MISSIONS 1-5 QUIZ AVG (5 Qs each)'
-        END AS label,
-        COALESCE(ROUND(AVG(aa.score), 0), 0) AS score
-      FROM assessments a
-      JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id
-      GROUP BY label
-    `);
-
-    res.json({ ageGroups, examVsQuiz });
+    const [result] = await pool.query(
+      `INSERT INTO lessons (location_id, title, content, xp_reward, lesson_order, created_by, updated_by)
+       VALUES (?, ?, ?, ?, ?, 1, 1)`,
+      [location_id || 1, title, content, xp_reward || 50, maxOrder + 1]
+    );
+    res.json({ status: 'created', lesson_id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 3. PUT Edit a Lesson Module (5 Total Lessons)
+// 3. PUT Edit Lesson
 app.put('/api/admin/lessons/:lessonId', async (req, res) => {
   try {
     const { lessonId } = req.params;
     const { title, content, xp_reward } = req.body;
-
     await pool.query(
       `UPDATE lessons SET title = ?, content = ?, xp_reward = ?, updated_by = 1 WHERE lesson_id = ?`,
       [title, content, xp_reward, lessonId]
@@ -108,7 +85,18 @@ app.put('/api/admin/lessons/:lessonId', async (req, res) => {
   }
 });
 
-// 4. GET Questions + 4 Options for a Lesson & Assessment Type
+// 4. DELETE Lesson
+app.delete('/api/admin/lessons/:lessonId', async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+    await pool.query(`DELETE FROM lessons WHERE lesson_id = ?`, [lessonId]);
+    res.json({ status: 'deleted', lessonId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5. GET Questions + Options
 app.get('/api/admin/questions', async (req, res) => {
   try {
     const { lessonId, assessmentType } = req.query;
@@ -133,7 +121,60 @@ app.get('/api/admin/questions', async (req, res) => {
   }
 });
 
-// 5. PUT Edit an Individual Question & its 4 Options
+// 6. POST Add Question + 4 Options
+app.post('/api/admin/questions', async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const { lessonId, assessmentType, question_text, options } = req.body;
+    await conn.beginTransaction();
+
+    let [assessments] = await conn.query(
+      `SELECT assessment_id FROM assessments WHERE lesson_id = ? AND assessment_type = ? LIMIT 1`,
+      [lessonId, assessmentType]
+    );
+
+    let assessmentId;
+    if (assessments.length === 0) {
+      const [newAssess] = await conn.query(
+        `INSERT INTO assessments (lesson_id, assessment_type, title, passing_score, xp_reward)
+         VALUES (?, ?, ?, 70.00, 20)`,
+        [lessonId, assessmentType, `Lesson ${lessonId} - ${assessmentType}`]
+      );
+      assessmentId = newAssess.insertId;
+    } else {
+      assessmentId = assessments[0].assessment_id;
+    }
+
+    const [[{ maxOrder }]] = await conn.query(
+      `SELECT COALESCE(MAX(question_order), 0) AS maxOrder FROM questions WHERE assessment_id = ?`,
+      [assessmentId]
+    );
+
+    const [qRes] = await conn.query(
+      `INSERT INTO questions (assessment_id, question_text, points, question_order, updated_by)
+       VALUES (?, ?, 1, ?, 1)`,
+      [assessmentId, question_text, maxOrder + 1]
+    );
+    const questionId = qRes.insertId;
+
+    for (const opt of options) {
+      await conn.query(
+        `INSERT INTO answer_options (question_id, option_text, is_correct) VALUES (?, ?, ?)`,
+        [questionId, opt.option_text, opt.is_correct ? 1 : 0]
+      );
+    }
+
+    await conn.commit();
+    res.json({ status: 'question_created', question_id: questionId, question_order: maxOrder + 1 });
+  } catch (err) {
+    await conn.rollback();
+    res.status(500).json({ error: err.message });
+  } finally {
+    conn.release();
+  }
+});
+
+// 7. PUT Edit Question + Options
 app.put('/api/admin/questions/:questionId', async (req, res) => {
   const conn = await pool.getConnection();
   try {
@@ -147,10 +188,12 @@ app.put('/api/admin/questions/:questionId', async (req, res) => {
     );
 
     for (const opt of options) {
-      await conn.query(
-        `UPDATE answer_options SET option_text = ?, is_correct = ? WHERE option_id = ? AND question_id = ?`,
-        [opt.option_text, opt.is_correct ? 1 : 0, opt.option_id, questionId]
-      );
+      if (opt.option_id) {
+        await conn.query(
+          `UPDATE answer_options SET option_text = ?, is_correct = ? WHERE option_id = ? AND question_id = ?`,
+          [opt.option_text, opt.is_correct ? 1 : 0, opt.option_id, questionId]
+        );
+      }
     }
 
     await conn.commit();
@@ -163,11 +206,20 @@ app.put('/api/admin/questions/:questionId', async (req, res) => {
   }
 });
 
-// Local dev fallback
+// 8. DELETE Question
+app.delete('/api/admin/questions/:questionId', async (req, res) => {
+  try {
+    const { questionId } = req.params;
+    await pool.query(`DELETE FROM questions WHERE question_id = ?`, [questionId]);
+    res.json({ status: 'question_deleted', questionId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
 }
 
-// Required for Vercel Serverless Functions
 module.exports = app;
