@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! // Official Site</title>
+  <title>WEBRPG! // Official Game Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="landing.css" />
 </head>
 <body>
 
-  <!-- TOP NAVBAR -->
+  <!-- MOBILE BACKDROP -->
+  <div id="landing-backdrop" class="landing-backdrop" onclick="closeMobileNav()"></div>
+
+  <!-- RESPONSIVE TOP NAVBAR -->
   <header class="cp-header">
     <a href="#hero" class="cp-logo">WEBRPG<span>!</span></a>
 
@@ -26,7 +29,7 @@
     </button>
   </header>
 
-  <!-- SECTION 1: HERO BANNER -->
+  <!-- SECTION 1: HERO -->
   <section id="hero" class="cp-hero">
     <div class="cp-hero-grid">
       <div class="cp-hero-left">
@@ -61,17 +64,16 @@
         </div>
 
         <div class="cp-platforms">
-          <span class="plat-pill"><strong>WINDOWS 10/11</strong></span>
-          <span class="plat-pill"><strong>UNITY 3D</strong></span>
-          <span class="plat-pill"><strong>FREE TO PLAY</strong></span>
+          <span class="plat-pill">WINDOWS 10/11</span>
+          <span class="plat-pill">UNITY 3D</span>
+          <span class="plat-pill">FREE TO PLAY</span>
         </div>
       </div>
 
-      <!-- RIGHT STATS CARD -->
       <div class="cp-hero-right">
         <div class="hero-holo-card">
           <h3>GAME STATS</h3>
-          <div class="holo-stats-grid" style="margin-top: 14px;">
+          <div class="holo-stats-grid">
             <div class="holo-stat">
               <strong id="live-lesson-count">05</strong>
               <span>LESSONS</span>
@@ -94,7 +96,7 @@
     </div>
   </section>
 
-  <!-- SECTION 2: GAME FEATURES & LIVE SECTORS -->
+  <!-- SECTION 2: FEATURES -->
   <section id="features" class="cp-dark-matrix">
     <div class="cp-matrix-container">
       <div class="cp-featured-frame">
@@ -124,14 +126,13 @@
         </div>
       </div>
 
-      <!-- RIGHT 2x2 GRID (LIVE LESSONS) -->
       <div id="live-lessons-preview" class="cp-matrix-cards"></div>
     </div>
   </section>
 
   <div class="cp-razor top-razor"></div>
 
-  <!-- SECTION 3: 4 CORE TOPICS -->
+  <!-- SECTION 3: TOPICS -->
   <section id="pillars" class="cp-bright-section">
     <div class="cp-bright-intro">
       <h2>WHAT YOU WILL LEARN</h2>
@@ -225,17 +226,17 @@
 
   <!-- FOOTER -->
   <footer class="cp-footer">
-    <div class="cp-footer-copy" style="border:none; padding-top:0;">
+    <div class="cp-footer-copy">
       <div class="cp-logo">WEBRPG<span>!</span></div>
       <p>© 2026 WebRPG! Team • Pamantasan ng Lungsod ng Valenzuela</p>
     </div>
   </footer>
 
-  <!-- MODAL 1: DOWNLOAD -->
+  <!-- MODALS -->
   <div id="download-modal" class="cp-modal hidden" onclick="if(event.target===this) closeDownloadModal()">
     <div class="cp-modal-box">
       <h3>DOWNLOAD WEBRPG!</h3>
-      <div class="modal-file-card" style="margin-top: 14px;">
+      <div class="modal-file-card">
         <div>
           <strong>WebRPG_Installer_x64.zip</strong>
           <span>Windows 10/11 • 64-bit</span>
@@ -244,21 +245,18 @@
       </div>
       <div class="modal-actions">
         <button class="cp-btn-cyan" onclick="closeDownloadModal()">CLOSE</button>
-        <a href="WebRPG_Installer_v1.0.0_x64.zip" download class="cp-btn-magenta" onclick="triggerDownloadNotice(event)">
-          DOWNLOAD
-        </a>
+        <a href="WebRPG_Installer_v1.0.0_x64.zip" download class="cp-btn-magenta" onclick="triggerDownloadNotice(event)">DOWNLOAD</a>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: INFO -->
   <div id="info-modal" class="cp-modal hidden" onclick="if(event.target===this) closeInfoModal()">
     <div class="cp-modal-box">
       <span class="modal-micro" id="info-modal-tag"></span>
       <h3 id="info-modal-title"></h3>
       <p id="info-modal-body" style="margin: 14px 0 22px; line-height: 1.5; color: #EDE9F7;"></p>
       <div class="modal-actions">
-        <button class="cp-btn-cyan" onclick="closeInfoModal()">OK</button>
+        <button class="cp-btn-cyan" onclick="closeInfoModal()" style="grid-column: 1 / -1;">OK</button>
       </div>
     </div>
   </div>

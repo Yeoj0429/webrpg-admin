@@ -12,7 +12,6 @@
   <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
 
   <div class="dashboard-shell">
-    <!-- LEFT SIDEBAR -->
     <aside class="cp-sidebar">
       <div class="sidebar-brand">
         <div class="brand-pill">
@@ -52,23 +51,20 @@
         </nav>
 
         <div class="sidebar-bottom-card">
-          <div class="db-live-row" style="margin-top:0;">
+          <div class="db-live-row" style="margin:0;">
             <span class="pulse-dot"></span> TIDB ONLINE
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- MAIN WORKSPACE -->
     <main class="cp-workspace">
       <header class="cp-topbar">
         <h1 id="workspace-title">DASHBOARD OVERVIEW</h1>
         <div id="topbar-actions" class="topbar-right"></div>
       </header>
 
-      <!-- ==========================================================
-           WINDOW 1: DASHBOARD OVERVIEW (3-Row Designer Layout)
-           ========================================================== -->
+      <!-- WINDOW 1: DASHBOARD -->
       <div id="view-dashboard" class="view-window active">
         <section class="grid-row-1">
           <div class="cp-panel spline-panel">
@@ -119,9 +115,7 @@
           </div>
 
           <div class="cp-panel donut-panel">
-            <div class="panel-header">
-              <h3>AGE GROUPS</h3>
-            </div>
+            <div class="panel-header"><h3>AGE GROUPS</h3></div>
             <div class="donut-wrap">
               <svg viewBox="0 0 160 160" class="donut-svg">
                 <circle cx="80" cy="80" r="56" class="donut-track" />
@@ -130,10 +124,7 @@
                 <circle cx="80" cy="80" r="56" class="donut-seg seg-3" stroke-dasharray="88 352" stroke-dashoffset="-222" />
                 <circle cx="80" cy="80" r="56" class="donut-seg seg-4" stroke-dasharray="42 352" stroke-dashoffset="-310" />
               </svg>
-              <div class="donut-center">
-                <strong>08</strong>
-                <span>USERS</span>
-              </div>
+              <div class="donut-center"><strong>08</strong><span>USERS</span></div>
             </div>
             <div id="donut-legend" class="donut-legend"></div>
           </div>
@@ -141,133 +132,48 @@
 
         <section class="grid-row-2">
           <div class="grad-card grad-magenta">
-            <div class="grad-info">
-              <span>TOP LESSON RATE</span>
-              <strong id="card-l1-rate">90%</strong>
-              <small>Sector 01: Neo-Intramuros</small>
-            </div>
-            <div class="mini-bars">
-              <span style="height:45%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:95%"></span><span style="height:85%"></span>
-            </div>
+            <div class="grad-info"><span>TOP LESSON RATE</span><strong id="card-l1-rate">90%</strong><small>Sector 01</small></div>
+            <div class="mini-bars"><span style="height:45%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:95%"></span><span style="height:85%"></span></div>
           </div>
-
           <div class="grad-card grad-purple">
-            <div class="grad-info">
-              <span>TOTAL ASSESSMENTS</span>
-              <strong>35</strong>
-              <small>7 Quizzes Per Lesson</small>
-            </div>
-            <svg viewBox="0 0 100 40" class="mini-wave">
-              <path d="M0,30 Q20,5 40,22 T80,12 T100,18" fill="none" stroke="#8CEEF6" stroke-width="3" />
-            </svg>
+            <div class="grad-info"><span>TOTAL ASSESSMENTS</span><strong>35</strong><small>7 Quizzes/Lesson</small></div>
+            <svg viewBox="0 0 100 40" class="mini-wave"><path d="M0,30 Q20,5 40,22 T80,12 T100,18" fill="none" stroke="#8CEEF6" stroke-width="3" /></svg>
           </div>
-
           <div class="grad-card grad-cyan">
-            <div class="grad-info">
-              <span>QUESTION BANK</span>
-              <strong id="card-q-count">225</strong>
-              <small>45 Questions Per Lesson</small>
-            </div>
-            <svg viewBox="0 0 100 40" class="mini-wave">
-              <path d="M0,28 Q25,35 45,12 T85,20 T100,6" fill="none" stroke="#0A0E24" stroke-width="3" />
-            </svg>
+            <div class="grad-info"><span>QUESTION BANK</span><strong id="card-q-count">225</strong><small>45 Qs/Lesson</small></div>
+            <svg viewBox="0 0 100 40" class="mini-wave"><path d="M0,28 Q25,35 45,12 T85,20 T100,6" fill="none" stroke="#0A0E24" stroke-width="3" /></svg>
           </div>
-
           <div class="grad-card grad-indigo">
-            <div class="grad-info">
-              <span>MAX XP REWARD</span>
-              <strong id="card-total-xp">550 XP</strong>
-              <small>Across All Modules</small>
-            </div>
-            <div class="mini-bars">
-              <span style="height:35%"></span><span style="height:55%"></span><span style="height:75%"></span><span style="height:65%"></span><span style="height:100%"></span>
-            </div>
+            <div class="grad-info"><span>MAX XP REWARD</span><strong id="card-total-xp">550 XP</strong><small>All Modules</small></div>
+            <div class="mini-bars"><span style="height:35%"></span><span style="height:55%"></span><span style="height:75%"></span><span style="height:65%"></span><span style="height:100%"></span></div>
           </div>
         </section>
 
         <section class="grid-row-3">
           <div class="cp-panel timeline-panel">
-            <div class="panel-header">
-              <h3>LESSON MODULES</h3>
-              <button class="cp-notch-btn cyan-btn sm" onclick="switchView('lessons', document.querySelectorAll('.side-link')[2])">VIEW ALL</button>
-            </div>
+            <div class="panel-header"><h3>LESSONS</h3><button class="cp-notch-btn cyan-btn sm" onclick="switchView('lessons', document.querySelectorAll('.side-link')[2])">VIEW ALL</button></div>
             <div id="lesson-timeline-list" class="timeline-list"></div>
           </div>
-
           <div class="cp-panel table-panel">
-            <div class="panel-header wrap-header">
-              <h3>RECENT QUIZ QUESTIONS</h3>
-              <button class="cp-notch-btn magenta-btn sm" onclick="switchView('quizzes', document.querySelectorAll('.side-link')[3])">OPEN QUIZ MATRIX</button>
-            </div>
-            <div class="table-scroll">
-              <table class="cp-data-table">
-                <thead>
-                  <tr>
-                    <th>ORDER</th>
-                    <th>QUESTION PROMPT</th>
-                    <th>CORRECT ANSWER</th>
-                    <th>ACTION</th>
-                  </tr>
-                </thead>
-                <tbody id="dashboard-questions-preview"></tbody>
-              </table>
-            </div>
+            <div class="panel-header wrap-header"><h3>RECENT QUESTIONS</h3><button class="cp-notch-btn magenta-btn sm" onclick="switchView('quizzes', document.querySelectorAll('.side-link')[3])">OPEN MATRIX</button></div>
+            <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>QUESTION</th><th>ANSWER</th><th>ACTION</th></tr></thead><tbody id="dashboard-questions-preview"></tbody></table></div>
           </div>
         </section>
       </div>
 
-      <!-- ==========================================================
-           WINDOW 2: DEDICATED ANALYTICS VIEW
-           ========================================================== -->
+      <!-- WINDOW 2: ANALYTICS -->
       <div id="view-analytics" class="view-window">
         <div class="analytics-two-col">
-          <div class="cp-panel">
-            <div class="panel-header">
-              <h3>AGE GROUP PERFORMANCE</h3>
-            </div>
-            <div id="analytics-age-bars" class="bar-stack"></div>
-          </div>
-
-          <div class="cp-panel">
-            <div class="panel-header">
-              <h3>ASSESSMENT SCORE BREAKDOWN</h3>
-            </div>
-            <div id="analytics-score-bars" class="bar-stack"></div>
-          </div>
+          <div class="cp-panel"><div class="panel-header"><h3>AGE GROUP PERFORMANCE</h3></div><div id="analytics-age-bars" class="bar-stack"></div></div>
+          <div class="cp-panel"><div class="panel-header"><h3>ASSESSMENT SCORE BREAKDOWN</h3></div><div id="analytics-score-bars" class="bar-stack"></div></div>
         </div>
-
-        <div class="cp-panel">
-          <div class="panel-header">
-            <h3>LESSON COMPLETION & SCORE TELEMETRY</h3>
-          </div>
-          <div class="table-scroll">
-            <table class="cp-data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>SECTOR</th>
-                  <th>LESSON TITLE</th>
-                  <th>AVG QUIZ SCORE</th>
-                  <th>SUCCESS RATE</th>
-                  <th>XP REWARD</th>
-                </tr>
-              </thead>
-              <tbody id="analytics-lesson-tbody"></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="cp-panel"><div class="panel-header"><h3>LESSON COMPLETION TELEMETRY</h3></div><div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ID</th><th>SECTOR</th><th>TITLE</th><th>AVG QUIZ</th><th>SUCCESS</th><th>XP</th></tr></thead><tbody id="analytics-lesson-tbody"></tbody></table></div></div>
       </div>
 
-      <!-- ==========================================================
-           WINDOW 3: DEDICATED LESSON MODULES VIEW
-           ========================================================== -->
-      <div id="view-lessons" class="view-window">
-        <div id="full-lessons-grid" class="lessons-card-grid"></div>
-      </div>
+      <!-- WINDOW 3: LESSONS -->
+      <div id="view-lessons" class="view-window"><div id="full-lessons-grid" class="lessons-card-grid"></div></div>
 
-      <!-- ==========================================================
-           WINDOW 4: DEDICATED QUIZ MATRIX VIEW
-           ========================================================== -->
+      <!-- WINDOW 4: QUIZZES -->
       <div id="view-quizzes" class="view-window">
         <div class="cp-panel">
           <div class="panel-header wrap-header">
@@ -283,85 +189,43 @@
                 <option value="post_test">Post-Test (10 Qs)</option>
               </select>
             </div>
-
             <div class="table-filters">
-              <div class="search-box">
-                <span>⌕</span>
-                <input type="text" id="question-search" placeholder="Search questions..." oninput="renderQuestionTable()" />
-              </div>
-              <button class="cp-notch-btn magenta-btn sm" onclick="openAddQuestionModal()">+ NEW QUESTION</button>
+              <div class="search-box"><span>⌕</span><input type="text" id="question-search" placeholder="Search..." oninput="renderQuestionTable()" /></div>
+              <button class="cp-notch-btn magenta-btn sm" onclick="openAddQuestionModal()">+ NEW Q</button>
             </div>
           </div>
-
-          <div class="table-scroll">
-            <table class="cp-data-table">
-              <thead>
-                <tr>
-                  <th>ORDER</th>
-                  <th>QUESTION PROMPT</th>
-                  <th>CORRECT ANSWER</th>
-                  <th>POINTS</th>
-                  <th>ACTION</th>
-                </tr>
-              </thead>
-              <tbody id="questions-table-body"></tbody>
-            </table>
-          </div>
+          <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>PROMPT</th><th>CORRECT ANSWER</th><th>POINTS</th><th>ACTION</th></tr></thead><tbody id="questions-table-body"></tbody></table></div>
         </div>
       </div>
-
     </main>
   </div>
 
-  <!-- MODAL 1: LESSON CRUD -->
+  <!-- MODALS -->
   <div id="lesson-modal" class="cp-modal hidden" onclick="if(event.target===this) closeLessonModal()">
     <div class="cp-modal-box">
-      <div class="cp-modal-tag" id="modal-lesson-tag">LESSON MODULE</div>
+      <div class="cp-modal-tag" id="modal-lesson-tag">MODULE</div>
       <h3 id="modal-lesson-heading">EDIT LESSON</h3>
       <input type="hidden" id="edit-lesson-id" />
-      <label>TITLE</label>
-      <input type="text" id="edit-lesson-title" class="cp-input" />
-      <label>CONTENT</label>
-      <textarea id="edit-lesson-content" rows="5" class="cp-input"></textarea>
-      <label>XP REWARD</label>
-      <input type="number" id="edit-lesson-xp" class="cp-input" value="50" />
-      <div class="cp-modal-actions">
-        <button id="delete-lesson-btn" class="cp-notch-btn danger-btn" onclick="deleteLesson()">DELETE</button>
-        <div class="modal-right-btns">
-          <button class="cp-notch-btn ghost-btn" onclick="closeLessonModal()">CANCEL</button>
-          <button class="cp-notch-btn cyan-btn" onclick="saveLessonEdit()">SAVE</button>
-        </div>
-      </div>
+      <label>TITLE</label><input type="text" id="edit-lesson-title" class="cp-input" />
+      <label>CONTENT</label><textarea id="edit-lesson-content" rows="4" class="cp-input"></textarea>
+      <label>XP</label><input type="number" id="edit-lesson-xp" class="cp-input" />
+      <div class="cp-modal-actions"><button id="delete-lesson-btn" class="cp-notch-btn danger-btn" onclick="deleteLesson()">DELETE</button><div class="modal-right-btns"><button class="cp-notch-btn ghost-btn" onclick="closeLessonModal()">CANCEL</button><button class="cp-notch-btn cyan-btn" onclick="saveLessonEdit()">SAVE</button></div></div>
     </div>
   </div>
 
-  <!-- MODAL 2: QUESTION CRUD -->
   <div id="question-modal" class="cp-modal hidden" onclick="if(event.target===this) closeQuestionModal()">
     <div class="cp-modal-box">
-      <div class="cp-modal-tag" id="modal-question-tag">QUESTION EDITOR</div>
+      <div class="cp-modal-tag" id="modal-question-tag">QUESTION</div>
       <h3 id="modal-question-heading">EDIT QUESTION</h3>
       <input type="hidden" id="edit-question-index" />
-      <label>QUESTION PROMPT</label>
-      <textarea id="edit-question-text" rows="3" class="cp-input"></textarea>
-      <label>ANSWER CHOICES (SELECT CORRECT RADIO)</label>
-      <div id="modal-options-container" class="cp-options-stack"></div>
-      <div class="cp-modal-actions">
-        <button id="delete-question-btn" class="cp-notch-btn danger-btn" onclick="deleteQuestionModal()">DELETE</button>
-        <div class="modal-right-btns">
-          <button class="cp-notch-btn ghost-btn" onclick="closeQuestionModal()">CANCEL</button>
-          <button class="cp-notch-btn cyan-btn" onclick="saveQuestionModal()">SAVE</button>
-        </div>
-      </div>
+      <label>PROMPT</label><textarea id="edit-question-text" rows="3" class="cp-input"></textarea>
+      <label>CHOICES</label><div id="modal-options-container" class="cp-options-stack"></div>
+      <div class="cp-modal-actions"><button id="delete-question-btn" class="cp-notch-btn danger-btn" onclick="deleteQuestionModal()">DELETE</button><div class="modal-right-btns"><button class="cp-notch-btn ghost-btn" onclick="closeQuestionModal()">CANCEL</button><button class="cp-notch-btn cyan-btn" onclick="saveQuestionModal()">SAVE</button></div></div>
     </div>
   </div>
 
-  <!-- MODAL 3: NOTIFY -->
   <div id="notify-modal" class="cp-modal hidden" onclick="closeNotifyModal()">
-    <div class="cp-modal-box" style="max-width: 340px; text-align: center;">
-      <h3 id="notify-title" style="color: var(--pal-cyan-bright);">SAVED</h3>
-      <p id="notify-message" style="margin: 10px 0 18px;"></p>
-      <button class="cp-notch-btn cyan-btn" onclick="closeNotifyModal()">OK</button>
-    </div>
+    <div class="cp-modal-box" style="max-width: 340px; text-align: center;"><h3 id="notify-title" style="color: #4AD8F0;">SAVED</h3><p id="notify-message" style="margin: 10px 0 18px;"></p><button class="cp-notch-btn cyan-btn" onclick="closeNotifyModal()" style="width:100%;">OK</button></div>
   </div>
 
   <script src="admin.js"></script>
