@@ -53,6 +53,61 @@ app.get('/api/admin/lesson-progress', async (req, res) => {
   }
 });
 
+// GET Live Telemetry for Analytics, Donut Chart, and KPI Cards
+app.get('/api/admin/analytics', async (req, res) => {
+  try {
+    const [[{ totalLearners }]] = await pool.query(
+      `SELECT COUNT(*) AS totalLearners FROM users WHERE role = 'learner'`
+    );
+    const [[{ totalAssessments }]] = await pool.query(
+      `SELECT COUNT(*) AS totalAssessments FROM assessments`
+    );
+    const [[{ totalQuestions }]] = await pool.query(
+      `SELECT COUNT(*) AS totalQuestions FROM questions`
+    );
+
+    // Live Age Brackets from learner_profiles + assessment_attempts
+    const [ageRows] = await pool.query(`
+      SELECT 
+        CASE 
+          WHEN lp.age BETWEEN 13 AND 15 THEN '13 - 15 YRS'
+          WHEN lp.age BETWEEN 16 AND 18 THEN '16 - 18 YRS'
+          WHEN lp.age BETWEEN 19 AND 21 THEN '19 - 21 YRS'
+          ELSE '22+ YRS'
+        END AS age_group,
+        COUNT(DISTINCT lp.user_id) AS count,
+        COALESCE(ROUND(AVG(aa.score), 0), 0) AS avg_score
+      FROM learner_profiles lp
+      LEFT JOIN assessment_attempts aa ON lp.user_id = aa.user_id
+      GROUP BY age_group
+    `);
+
+    // Live Score Breakdown (Pre-Test vs Missions 1-5 vs Post-Test)
+    const [scoreRows] = await pool.query(`
+      SELECT 
+        CASE 
+          WHEN a.assessment_type = 'pre_test' THEN 'Pre-Test Exam'
+          WHEN a.assessment_type = 'post_test' THEN 'Post-Test Exam'
+          ELSE 'Mission 1 - 5 Quizzes'
+        END AS category,
+        COALESCE(ROUND(AVG(aa.score), 1), 0) AS avg_score
+      FROM assessments a
+      LEFT JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id
+      GROUP BY category
+    `);
+
+    res.json({
+      totalLearners,
+      totalAssessments,
+      totalQuestions,
+      ageRows,
+      scoreRows
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 2. POST Add Lesson
 app.post('/api/admin/lessons', async (req, res) => {
   try {

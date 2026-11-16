@@ -52,9 +52,6 @@
           <div class="db-live-row" style="margin-top:0;">
             <span class="pulse-dot"></span> TIDB ONLINE
           </div>
-          <button class="cp-notch-btn cyan-btn full-w" onclick="openAddLessonModal()">
-            + NEW LESSON
-          </button>
         </div>
       </div>
     </aside>
@@ -62,11 +59,8 @@
     <!-- MAIN WORKSPACE -->
     <main class="cp-workspace">
       <header class="cp-topbar">
-        <h1 id="workspace-title">DASHBOARD</h1>
-        <div class="topbar-right">
-          <button class="cp-notch-btn cyan-btn" onclick="openAddLessonModal()">+ NEW LESSON</button>
-          <button class="cp-notch-btn magenta-btn" onclick="openAddQuestionModal()">+ ADD QUESTION</button>
-        </div>
+        <h1 id="workspace-title">DASHBOARD OVERVIEW</h1>
+        <div id="topbar-actions" class="topbar-right"></div>
       </header>
 
       <!-- ==========================================================

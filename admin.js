@@ -1,26 +1,37 @@
 const state = {
-  lessons: [
-    { lesson_id: 1, location_name: "Sector 01: Neo-Intramuros", title: "Lesson 1: Neural Link & Fundamentals", content: "Welcome to Neo-Intramuros, Runner. Initialize your HUD, understand core system variables, and establish a stable neural handshake.", xp_reward: 50, success_rate: 90, avg_quiz: 87 },
-    { lesson_id: 2, location_name: "Sector 02: Cobalt Docks", title: "Lesson 2: Data Packet Routing & Logic", content: "Every terminal in Cobalt Docks communicates through conditional routing. Master IF/ELSE logic gates and packet inspection.", xp_reward: 75, success_rate: 86, avg_quiz: 83 },
-    { lesson_id: 3, location_name: "Sector 03: Violet Spire", title: "Lesson 3: Memory Allocation & Loops", content: "Inside the Violet Spire, repetitive decryption routines require iterative loops without triggering a buffer overflow.", xp_reward: 100, success_rate: 84, avg_quiz: 80 },
-    { lesson_id: 4, location_name: "Sector 04: Synth Bazaar", title: "Lesson 4: Cryptographic Arrays & Functions", content: "Brokers in the Synth Bazaar store cipher keys inside indexed data arrays. Build modular functions to validate signatures.", xp_reward: 125, success_rate: 81, avg_quiz: 76 },
-    { lesson_id: 5, location_name: "Sector 05: Blackwall Core", title: "Lesson 5: Autonomous AI Countermeasures", content: "Combine variables, control flow, loops, and modular functions to defeat the core guardian in the final evaluation.", xp_reward: 200, success_rate: 78, avg_quiz: 72 }
-  ],
-  demographics: [
-    { group: "16 - 18 YRS", percent: 38, avgScore: 86, color: "#4AD8F0" },
-    { group: "13 - 15 YRS", percent: 25, avgScore: 81, color: "#C84BF2" },
-    { group: "19 - 21 YRS", percent: 25, avgScore: 89, color: "#8B4DF2" },
-    { group: "22+ YRS", percent: 12, avgScore: 84, color: "#2696E8" }
-  ],
-  scoreBreakdown: [
-    { label: "Pre-Test Diagnostic Exam", score: 78 },
-    { label: "Mission 1 - 5 Quizzes", score: 84 },
-    { label: "Post-Test Evaluation Exam", score: 88 }
-  ],
+  activeView: 'dashboard',
+  totalLearners: 0,
+  totalAssessments: 0,
+  totalQuestions: 0,
+  lessons: [],
+  demographics: [],
+  scoreBreakdown: [],
   currentQuestions: []
 };
 
+const paletteColors = ['#4AD8F0', '#C84BF2', '#8B4DF2', '#2696E8'];
+
+function renderTopbarActions(viewName) {
+  const container = document.getElementById('topbar-actions');
+  if (!container) return;
+
+  if (viewName === 'lessons') {
+    container.innerHTML = `
+      <button class="cp-notch-btn cyan-btn" onclick="openAddLessonModal()">+ NEW LESSON</button>
+    `;
+  } else if (viewName === 'quizzes') {
+    container.innerHTML = `
+      <button class="cp-notch-btn magenta-btn" onclick="openAddQuestionModal()">+ ADD QUESTION</button>
+    `;
+  } else {
+    container.innerHTML = `
+      <button class="cp-notch-btn cyan-btn" onclick="initDashboard()">↻ SYNC LIVE DB</button>
+    `;
+  }
+}
+
 function switchView(viewName, btnEl) {
+  state.activeView = viewName;
   document.querySelectorAll('.view-window').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.side-link').forEach(b => b.classList.remove('active'));
 
@@ -34,6 +45,7 @@ function switchView(viewName, btnEl) {
     quizzes: 'QUIZ MATRIX'
   };
   document.getElementById('workspace-title').innerText = titles[viewName] || 'DASHBOARD';
+  renderTopbarActions(viewName);
   closeMobileMenu();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -59,21 +71,48 @@ function closeNotifyModal() {
 }
 
 async function initDashboard() {
+  renderTopbarActions(state.activeView);
+
   try {
-    const res = await fetch('/api/admin/lesson-progress');
-    if (res.ok) {
-      const dbLessons = await res.json();
-      if (dbLessons.length > 0) state.lessons = dbLessons;
+    const [lessonsRes, analyticsRes] = await Promise.all([
+      fetch('/api/admin/lesson-progress'),
+      fetch('/api/admin/analytics')
+    ]);
+
+    if (lessonsRes.ok) {
+      state.lessons = await lessonsRes.json();
     }
-  } catch (e) {}
+
+    if (analyticsRes.ok) {
+      const data = await analyticsRes.json();
+      state.totalLearners = data.totalLearners || 0;
+      state.totalAssessments = data.totalAssessments || 0;
+      state.totalQuestions = data.totalQuestions || 0;
+
+      const totalAgeCount = (data.ageRows || []).reduce((s, r) => s + Number(r.count), 0) || 1;
+      state.demographics = (data.ageRows || []).map((r, i) => ({
+        group: r.age_group,
+        percent: Math.round((Number(r.count) / totalAgeCount) * 100),
+        avgScore: r.avg_score,
+        color: paletteColors[i % paletteColors.length]
+      }));
+
+      state.scoreBreakdown = (data.scoreRows || []).map(r => ({
+        label: r.category,
+        score: Number(r.avg_score)
+      }));
+    }
+  } catch (e) {
+    console.error('Database sync error:', e);
+  }
 
   renderAll();
-  loadAssessmentQuestions();
+  await loadAssessmentQuestions();
 }
 
 function renderAll() {
   renderSplineChart();
-  renderDonutLegend();
+  renderDonutChart();
   renderGradientKPIs();
   renderLessonTimeline();
   renderAnalyticsView();
@@ -88,18 +127,29 @@ function renderSplineChart() {
   document.getElementById('hero-avg-success').innerText = `${avgSuccess}%`;
   document.getElementById('hero-total-lessons').innerText = String(lessons.length).padStart(2, '0');
 
+  // Update Bottom 4 Badges Dynamically from Score Breakdown
+  const pre = state.scoreBreakdown.find(s => s.label.includes('Pre-Test'))?.score || 0;
+  const mis = state.scoreBreakdown.find(s => s.label.includes('Mission'))?.score || 0;
+  const post = state.scoreBreakdown.find(s => s.label.includes('Post-Test'))?.score || 0;
+  const badgeEls = document.querySelectorAll('.spline-bottom-badges .badge-item strong');
+  if (badgeEls.length >= 3) {
+    badgeEls[0].innerText = `${pre}%`;
+    badgeEls[1].innerText = `${mis}%`;
+    badgeEls[2].innerText = `${post}%`;
+  }
+
   const width = 600;
   const height = 200;
   const stepX = lessons.length > 1 ? width / (lessons.length - 1) : width;
 
   const ptsSuccess = lessons.map((l, i) => ({
     x: Math.round(i * stepX),
-    y: Math.round(height - (Math.min(100, Math.max(10, Number(l.success_rate || 75))) / 100) * 165)
+    y: Math.round(height - (Math.min(100, Math.max(5, Number(l.success_rate || 0))) / 100) * 165)
   }));
 
   const ptsQuiz = lessons.map((l, i) => ({
     x: Math.round(i * stepX),
-    y: Math.round(height - (Math.min(100, Math.max(10, Number(l.avg_quiz || 70))) / 100) * 165)
+    y: Math.round(height - (Math.min(100, Math.max(5, Number(l.avg_quiz || 0))) / 100) * 165)
   }));
 
   const buildSmoothPath = (pts) => {
@@ -143,7 +193,24 @@ function renderSplineChart() {
     .join('');
 }
 
-function renderDonutLegend() {
+function renderDonutChart() {
+  const centerStrong = document.querySelector('.donut-center strong');
+  if (centerStrong) centerStrong.innerText = String(state.totalLearners).padStart(2, '0');
+
+  // Dynamically calculate SVG stroke-dasharray for the Donut segments
+  const circumference = 352;
+  let offset = 0;
+  const svg = document.querySelector('.donut-svg');
+  if (svg && state.demographics.length > 0) {
+    const circles = state.demographics.map((d, i) => {
+      const segLen = Math.round((d.percent / 100) * circumference);
+      const circleHtml = `<circle cx="80" cy="80" r="56" class="donut-seg seg-${(i % 4) + 1}" stroke-dasharray="${segLen} ${circumference}" stroke-dashoffset="-${offset}" />`;
+      offset += segLen;
+      return circleHtml;
+    }).join('');
+    svg.innerHTML = `<circle cx="80" cy="80" r="56" class="donut-track" />${circles}`;
+  }
+
   document.getElementById('donut-legend').innerHTML = state.demographics.map(d => `
     <div class="legend-box" style="border-left-color: ${d.color}">
       <strong style="color:${d.color}">${d.percent}%</strong>
@@ -153,10 +220,27 @@ function renderDonutLegend() {
 }
 
 function renderGradientKPIs() {
-  const topRate = state.lessons.length ? Math.max(...state.lessons.map(l => Number(l.success_rate || 0))) : 90;
+  const topLesson = state.lessons.reduce((best, cur) =>
+    Number(cur.success_rate || 0) >= Number(best?.success_rate || 0) ? cur : best
+  , state.lessons[0]);
+
   const totalXp = state.lessons.reduce((s, l) => s + Number(l.xp_reward || 0), 0);
 
-  document.getElementById('card-l1-rate').innerText = `${topRate}%`;
+  if (topLesson) {
+    document.getElementById('card-l1-rate').innerText = `${topLesson.success_rate}%`;
+    const smallEl = document.querySelector('.grad-magenta small');
+    if (smallEl) smallEl.innerText = topLesson.location_name || topLesson.title;
+  }
+
+  const assessCardStrong = document.querySelector('.grad-purple strong');
+  if (assessCardStrong && state.totalAssessments) {
+    assessCardStrong.innerText = String(state.totalAssessments);
+  }
+
+  if (state.totalQuestions) {
+    document.getElementById('card-q-count').innerText = String(state.totalQuestions);
+  }
+
   document.getElementById('card-total-xp').innerText = `${totalXp} XP`;
 }
 
@@ -182,7 +266,6 @@ function renderLessonTimeline() {
   }
 }
 
-// WINDOW 2: DEDICATED ANALYTICS VIEW
 function renderAnalyticsView() {
   document.getElementById('analytics-age-bars').innerHTML = state.demographics.map(d => `
     <div>
@@ -216,7 +299,6 @@ function renderAnalyticsView() {
   `).join('');
 }
 
-// WINDOW 3: DEDICATED LESSONS VIEW
 function renderLessonsView() {
   document.getElementById('full-lessons-grid').innerHTML = state.lessons.map(l => `
     <div class="cp-panel lesson-full-card">
@@ -282,96 +364,48 @@ async function saveLessonEdit() {
   }
 
   if (!rawId) {
-    let newId = state.lessons.length > 0 ? Math.max(...state.lessons.map(l => l.lesson_id)) + 1 : 1;
-    try {
-      const res = await fetch('/api/admin/lessons', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ location_id: 1, title, content, xp_reward })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.lesson_id) newId = data.lesson_id;
-      }
-    } catch (e) {}
-
-    state.lessons.push({
-      lesson_id: newId,
-      location_name: `Sector 0${newId}`,
-      title,
-      content,
-      xp_reward,
-      success_rate: 80,
-      avg_quiz: 78
+    await fetch('/api/admin/lessons', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ location_id: 1, title, content, xp_reward })
     });
-    showNotify('MODULE CREATED', `${title} added.`);
+    showNotify('MODULE CREATED', `${title} added to TiDB.`);
   } else {
     const id = parseInt(rawId);
-    const lesson = state.lessons.find(l => l.lesson_id === id);
-    if (lesson) {
-      lesson.title = title;
-      lesson.content = content;
-      lesson.xp_reward = xp_reward;
-    }
-
-    try {
-      await fetch(`/api/admin/lessons/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, xp_reward })
-      });
-    } catch (e) {}
-    showNotify('MODULE SAVED', `${title} updated.`);
+    await fetch(`/api/admin/lessons/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content, xp_reward })
+    });
+    showNotify('MODULE SAVED', `${title} updated in TiDB.`);
   }
 
-  renderAll();
   closeLessonModal();
+  await initDashboard();
 }
 
 async function deleteLesson() {
   const id = parseInt(document.getElementById('edit-lesson-id').value);
-  if (!id || !confirm('Delete this Lesson Module?')) return;
+  if (!id || !confirm('Delete this Lesson Module from the database?')) return;
 
-  try {
-    await fetch(`/api/admin/lessons/${id}`, { method: 'DELETE' });
-  } catch (e) {}
-
-  state.lessons = state.lessons.filter(l => l.lesson_id !== id);
-  renderAll();
+  await fetch(`/api/admin/lessons/${id}`, { method: 'DELETE' });
   closeLessonModal();
-  showNotify('MODULE DELETED', `Lesson #${id} removed.`);
+  showNotify('MODULE DELETED', `Lesson #${id} removed from TiDB.`);
+  await initDashboard();
 }
 
-// WINDOW 4: QUIZ MATRIX & DASHBOARD PREVIEW
+// QUIZ MATRIX CRUD
 async function loadAssessmentQuestions() {
-  const lessonId = document.getElementById('quiz-lesson-select').value || 1;
-  const type = document.getElementById('quiz-type-select').value;
-  const count = (type === 'pre_test' || type === 'post_test') ? 10 : 5;
+  const lessonId = document.getElementById('quiz-lesson-select').value || (state.lessons[0]?.lesson_id || 1);
+  const type = document.getElementById('quiz-type-select').value || 'pre_test';
 
   try {
     const res = await fetch(`/api/admin/questions?lessonId=${lessonId}&assessmentType=${type}`);
     if (res.ok) {
-      const dbQuestions = await res.json();
-      if (dbQuestions.length > 0) {
-        state.currentQuestions = dbQuestions;
-        renderQuestionTable();
-        return;
-      }
+      state.currentQuestions = await res.json();
     }
   } catch (e) {}
 
-  state.currentQuestions = Array.from({ length: count }, (_, i) => ({
-    question_id: i + 1,
-    question_order: i + 1,
-    points: 1,
-    question_text: `[L${lessonId} // ${type.toUpperCase()}] Verify system protocol response for node #${i + 1}?`,
-    options: [
-      { option_id: i * 4 + 1, option_text: `Option A: Execute primary neural protocol #${i + 1} (Correct)`, is_correct: 1 },
-      { option_id: i * 4 + 2, option_text: `Option B: Bypass firewall`, is_correct: 0 },
-      { option_id: i * 4 + 3, option_text: `Option C: Terminate packet`, is_correct: 0 },
-      { option_id: i * 4 + 4, option_text: `Option D: Flush buffer`, is_correct: 0 }
-    ]
-  }));
   renderQuestionTable();
 }
 
@@ -478,32 +512,15 @@ async function saveQuestionModal() {
       is_correct: oIdx === correctIdx ? 1 : 0
     }));
 
-    const newOrder = state.currentQuestions.length + 1;
-    let newQuestionId = Date.now();
-
-    try {
-      const res = await fetch('/api/admin/questions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lessonId, assessmentType, question_text, options })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.question_id) newQuestionId = data.question_id;
-      }
-    } catch (e) {}
-
-    state.currentQuestions.push({
-      question_id: newQuestionId,
-      question_order: newOrder,
-      points: 1,
-      question_text,
-      options
+    await fetch('/api/admin/questions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonId, assessmentType, question_text, options })
     });
 
-    renderQuestionTable();
     closeQuestionModal();
-    showNotify('QUESTION ADDED', `Question #${newOrder} added.`);
+    showNotify('QUESTION ADDED', 'Saved to TiDB Cloud.');
+    await initDashboard();
   } else {
     const idx = parseInt(rawIdx);
     const q = state.currentQuestions[idx];
@@ -514,33 +531,27 @@ async function saveQuestionModal() {
       opt.is_correct = (oIdx === correctIdx) ? 1 : 0;
     });
 
-    try {
-      await fetch(`/api/admin/questions/${q.question_id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question_text: q.question_text, options: q.options })
-      });
-    } catch (e) {}
+    await fetch(`/api/admin/questions/${q.question_id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question_text: q.question_text, options: q.options })
+    });
 
-    renderQuestionTable();
     closeQuestionModal();
-    showNotify('QUESTION SAVED', `Question #${q.question_order} updated.`);
+    showNotify('QUESTION SAVED', `Question #${q.question_order} updated in TiDB.`);
+    await loadAssessmentQuestions();
   }
 }
 
 async function deleteQuestionModal() {
   const idx = parseInt(document.getElementById('edit-question-index').value);
   const q = state.currentQuestions[idx];
-  if (!q || !confirm(`Delete Question #${q.question_order}?`)) return;
+  if (!q || !confirm(`Delete Question #${q.question_order} from the database?`)) return;
 
-  try {
-    await fetch(`/api/admin/questions/${q.question_id}`, { method: 'DELETE' });
-  } catch (e) {}
-
-  state.currentQuestions.splice(idx, 1);
-  renderQuestionTable();
+  await fetch(`/api/admin/questions/${q.question_id}`, { method: 'DELETE' });
   closeQuestionModal();
-  showNotify('QUESTION DELETED', `Question #${q.question_order} removed.`);
+  showNotify('QUESTION DELETED', `Question #${q.question_order} removed from TiDB.`);
+  await initDashboard();
 }
 
 initDashboard();
