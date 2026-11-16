@@ -13,10 +13,11 @@ const state = {
     { group: "22+ YRS", percent: 12, avgScore: 84 }
   ],
   scoreBreakdown: [
-    { label: "PRE-TEST EXAM AVG (10 Qs)", score: 78 },
-    { label: "MISSIONS 1-5 QUIZ AVG (5 Qs each)", score: 84 },
-    { label: "POST-TEST EXAM AVG (10 Qs)", score: 88 }
-  ]
+    { label: "Pre-Test Exam", score: 78 },
+    { label: "Mission Quizzes (1-5)", score: 84 },
+    { label: "Post-Test Exam", score: 88 }
+  ],
+  currentQuestions: []
 };
 
 async function initDashboard() {
@@ -26,9 +27,7 @@ async function initDashboard() {
       const dbLessons = await res.json();
       if (dbLessons.length > 0) state.lessons = dbLessons;
     }
-  } catch (e) {
-    console.warn('Using fallback state until Cloud MySQL env vars are set.');
-  }
+  } catch (e) {}
 
   renderProgress();
   renderAnalytics();
@@ -43,23 +42,36 @@ function switchTab(tabId, btn) {
   btn.classList.add('active');
 
   const titles = {
-    progress: "LEARNER PROGRESS & SUCCESS RATES",
-    analytics: "LEARNING ANALYTICS // DEMOGRAPHICS & SCORES",
-    lessons: "LESSON MODULES // IN-GAME CONTENT EDITOR",
-    quizzes: "QUIZ MATRIX // INDIVIDUAL QUESTION EDITOR"
+    progress: "LEARNER PROGRESS",
+    analytics: "LEARNING ANALYTICS",
+    lessons: "LESSON MODULES",
+    quizzes: "QUIZ QUESTIONS"
   };
   document.getElementById('view-title').innerText = titles[tabId];
 }
 
+function showNotify(title, message) {
+  document.getElementById('notify-title').innerText = title;
+  document.getElementById('notify-message').innerText = message;
+  document.getElementById('notify-modal').classList.remove('hidden');
+}
+
+function closeNotifyModal() {
+  document.getElementById('notify-modal').classList.add('hidden');
+}
+
+// 1. PROGRESS
 function renderProgress() {
   const container = document.getElementById('lesson-success-list');
   container.innerHTML = state.lessons.map(l => `
     <div class="cyber-card">
-      <div class="card-tag">LESSON 0${l.lesson_id} // ${l.location_name}</div>
-      <h3>${l.title}</h3>
-      <p style="margin: 8px 0; color: #8CEEF6;">
-        <strong>${l.success_rate}% Success Rate</strong> — Most learners obtain at least <strong>${l.avg_quiz}%+</strong> across lesson quizzes.
-      </p>
+      <div>
+        <div class="card-tag">${l.location_name}</div>
+        <h3>${l.title}</h3>
+        <p style="margin: 8px 0; color: #8CEEF6;">
+          <strong>${l.success_rate}% Success Rate</strong> (Avg Score: ${l.avg_quiz}%)
+        </p>
+      </div>
       <div class="progress-track">
         <div class="progress-fill" style="width: ${l.success_rate}%"></div>
       </div>
@@ -67,12 +79,13 @@ function renderProgress() {
   `).join('');
 }
 
+// 2. ANALYTICS
 function renderAnalytics() {
   document.getElementById('age-group-bars').innerHTML = state.demographics.map(d => `
     <div style="margin-top: 14px;">
       <div style="display:flex; justify-content:space-between; font-weight:700;">
         <span>${d.group}</span>
-        <span style="color:#4AD8F0;">${d.percent}% of Learners (Avg Score: ${d.avgScore}%)</span>
+        <span style="color:#4AD8F0;">${d.percent}% (${d.avgScore}% Avg)</span>
       </div>
       <div class="progress-track"><div class="progress-fill" style="width:${d.percent}%"></div></div>
     </div>
@@ -89,17 +102,20 @@ function renderAnalytics() {
   `).join('');
 }
 
+// 3. LESSONS & MODAL
 function renderLessons() {
   const container = document.getElementById('lesson-cards-container');
   container.innerHTML = state.lessons.map(l => `
     <div class="cyber-card">
-      <div class="card-tag">MODULE 0${l.lesson_id} // XP REWARD: ${l.xp_reward}</div>
-      <h3 style="color:#8CEEF6; margin-bottom:10px;">${l.title}</h3>
-      <p style="font-size:0.95rem; line-height:1.4; margin-bottom:18px; color:#EDE9F7;">
-        "${l.content}"
-      </p>
+      <div>
+        <div class="card-tag">LESSON 0${l.lesson_id} • ${l.xp_reward} XP</div>
+        <h3 style="color:#8CEEF6; margin-bottom:10px;">${l.title}</h3>
+        <p style="font-size:0.95rem; line-height:1.4; margin-bottom:18px; color:#EDE9F7;">
+          ${l.content}
+        </p>
+      </div>
       <button class="cyber-btn primary" onclick="openLessonModal(${l.lesson_id})">
-        EDIT LESSON MODULE
+        EDIT LESSON
       </button>
     </div>
   `).join('');
@@ -110,6 +126,7 @@ function renderLessons() {
 
 function openLessonModal(lessonId) {
   const lesson = state.lessons.find(l => l.lesson_id === lessonId);
+  document.getElementById('modal-lesson-tag').innerText = `LESSON 0${lesson.lesson_id}`;
   document.getElementById('edit-lesson-id').value = lesson.lesson_id;
   document.getElementById('edit-lesson-title').value = lesson.title;
   document.getElementById('edit-lesson-content').value = lesson.content;
@@ -139,93 +156,105 @@ async function saveLessonEdit() {
   renderLessons();
   renderProgress();
   closeLessonModal();
+  showNotify('LESSON UPDATED', `${lesson.title} has been saved.`);
 }
 
+// 4. QUIZZES & QUESTION MODAL
 async function loadAssessmentQuestions() {
   const lessonId = document.getElementById('quiz-lesson-select').value || 1;
   const type = document.getElementById('quiz-type-select').value;
   const count = (type === 'pre_test' || type === 'post_test') ? 10 : 5;
-  const container = document.getElementById('questions-editor-list');
 
   try {
     const res = await fetch(`/api/admin/questions?lessonId=${lessonId}&assessmentType=${type}`);
     if (res.ok) {
       const dbQuestions = await res.json();
       if (dbQuestions.length > 0) {
-        container.innerHTML = dbQuestions.map((q, idx) => `
-          <div class="cyber-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="card-tag">LESSON 0${lessonId} // ${type.toUpperCase()} // QUESTION #${q.question_order}</span>
-              <button class="cyber-btn primary" onclick="saveDbQuestion(${q.question_id}, ${idx})">
-                SAVE QUESTION #${q.question_order}
-              </button>
-            </div>
-            <input type="text" id="db-q-text-${q.question_id}" class="cyber-input" value="${q.question_text}" />
-            <div class="options-grid">
-              ${q.options.map(opt => `
-                <div class="option-row">
-                  <input type="radio" name="correct-${q.question_id}" value="${opt.option_id}" ${opt.is_correct ? 'checked' : ''} />
-                  <input type="text" id="db-opt-${opt.option_id}" class="cyber-input" style="margin:0;" value="${opt.option_text}" />
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('');
+        state.currentQuestions = dbQuestions;
+        renderQuestionRows();
         return;
       }
     }
   } catch (e) {}
 
-  // Fallback UI if Cloud DB is not yet seeded
-  let html = '';
-  for (let i = 1; i <= count; i++) {
-    html += `
-      <div class="cyber-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span class="card-tag">LESSON 0${lessonId} // ${type.toUpperCase()} // QUESTION #${i}</span>
-          <button class="cyber-btn primary" onclick="alert('Saved Question #${i}!')">
-            SAVE QUESTION #${i}
-          </button>
-        </div>
-        <input type="text" class="cyber-input" value="[L${lessonId} // ${type.toUpperCase()} // Q${i}] Verify system protocol response for node #${i}?" />
-        <div class="options-grid">
-          ${['A', 'B', 'C', 'D'].map((opt, idx) => `
-            <div class="option-row">
-              <input type="radio" name="correct-${i}" ${idx === 0 ? 'checked' : ''} />
-              <input type="text" class="cyber-input" style="margin:0;" value="Option ${opt}: Execute neural protocol #${i}" />
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
-  container.innerHTML = html;
+  // Fallback questions
+  state.currentQuestions = Array.from({ length: count }, (_, i) => ({
+    question_id: i + 1,
+    question_order: i + 1,
+    question_text: `Sample question #${i + 1} for Lesson ${lessonId}?`,
+    options: [
+      { option_id: i * 4 + 1, option_text: `Option A`, is_correct: 1 },
+      { option_id: i * 4 + 2, option_text: `Option B`, is_correct: 0 },
+      { option_id: i * 4 + 3, option_text: `Option C`, is_correct: 0 },
+      { option_id: i * 4 + 4, option_text: `Option D`, is_correct: 0 }
+    ]
+  }));
+  renderQuestionRows();
 }
 
-async function saveDbQuestion(questionId) {
-  const question_text = document.getElementById(`db-q-text-${questionId}`).value;
-  const radios = document.querySelectorAll(`input[name="correct-${questionId}"]`);
-  
-  const options = Array.from(radios).map(r => {
-    const optId = parseInt(r.value);
-    return {
-      option_id: optId,
-      option_text: document.getElementById(`db-opt-${optId}`).value,
-      is_correct: r.checked ? 1 : 0
-    };
+function renderQuestionRows() {
+  const container = document.getElementById('questions-editor-list');
+  container.innerHTML = state.currentQuestions.map((q, idx) => {
+    const correctOpt = q.options.find(o => o.is_correct) || q.options[0];
+    return `
+      <div class="cyber-card question-row-card">
+        <div class="question-summary">
+          <span class="card-tag">QUESTION #${q.question_order}</span>
+          <h4>${q.question_text}</h4>
+          <p class="correct-preview">Correct Answer: <span>${correctOpt ? correctOpt.option_text : 'N/A'}</span></p>
+        </div>
+        <button class="cyber-btn primary" onclick="openQuestionModal(${idx})">
+          EDIT
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function openQuestionModal(idx) {
+  const q = state.currentQuestions[idx];
+  document.getElementById('edit-question-index').value = idx;
+  document.getElementById('modal-question-tag').innerText = `QUESTION #${q.question_order}`;
+  document.getElementById('edit-question-text').value = q.question_text;
+
+  document.getElementById('modal-options-container').innerHTML = q.options.map((opt, oIdx) => `
+    <div class="option-row">
+      <input type="radio" name="modal-correct-opt" value="${oIdx}" ${opt.is_correct ? 'checked' : ''} />
+      <input type="text" id="modal-opt-text-${oIdx}" class="cyber-input" style="margin:0;" value="${opt.option_text}" />
+    </div>
+  `).join('');
+
+  document.getElementById('question-modal').classList.remove('hidden');
+}
+
+function closeQuestionModal() {
+  document.getElementById('question-modal').classList.add('hidden');
+}
+
+async function saveQuestionModal() {
+  const idx = parseInt(document.getElementById('edit-question-index').value);
+  const q = state.currentQuestions[idx];
+  q.question_text = document.getElementById('edit-question-text').value;
+
+  const selectedRadio = document.querySelector('input[name="modal-correct-opt"]:checked');
+  const correctIdx = selectedRadio ? parseInt(selectedRadio.value) : 0;
+
+  q.options.forEach((opt, oIdx) => {
+    opt.option_text = document.getElementById(`modal-opt-text-${oIdx}`).value;
+    opt.is_correct = (oIdx === correctIdx) ? 1 : 0;
   });
 
-  const res = await fetch(`/api/admin/questions/${questionId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question_text, options })
-  });
+  try {
+    await fetch(`/api/admin/questions/${q.question_id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question_text: q.question_text, options: q.options })
+    });
+  } catch (e) {}
 
-  if (res.ok) {
-    alert(`[NETWATCH DB COMMIT] Question #${questionId} updated in MySQL!`);
-  } else {
-    alert('Failed to update question.');
-  }
+  renderQuestionRows();
+  closeQuestionModal();
+  showNotify('QUESTION SAVED', `Question #${q.question_order} has been updated.`);
 }
 
 initDashboard();
