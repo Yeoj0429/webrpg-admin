@@ -1,3 +1,40 @@
+/* Custom Cyberpunk Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--pal-navy-dark, #080B1A);
+  border-left: 1px solid rgba(74, 216, 240, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #4AD8F0, #C84BF2);
+  border-radius: 2px;
+  border: 2px solid var(--pal-navy-dark, #080B1A);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8CEEF6, #F288E8);
+}
+
+/* Firefox Scrollbar Support */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #4AD8F0 #080B1A;
+}
+
+/* Prevent fixed navbar from covering sections when clicking nav links */
+#hero,
+#features,
+#pillars,
+#specs,
+#download {
+  scroll-margin-top: 90px;
+}
+
 :root {
   /* EXACT PROCREATE CYBERPUNK PALETTE SWATCHES */
   --pal-cyan-ice: #8CEEF6;

@@ -1,19 +1,41 @@
+let isClickScrolling = false;
+let clickScrollTimer = null;
+
 function setActiveLink(el) {
+  isClickScrolling = true;
+  clearTimeout(clickScrollTimer);
+
   document.querySelectorAll('.cp-nav-link').forEach(link => link.classList.remove('active'));
   el.classList.add('active');
   closeMobileNav();
+
+  // Keep clicked tab highlighted while smooth scroll finishes
+  clickScrollTimer = setTimeout(() => {
+    isClickScrolling = false;
+  }, 800);
 }
 
-// Automatically update active navbar tab on scroll
 window.addEventListener('scroll', () => {
-  const sections = ['hero', 'features', 'pillars', 'specs'];
-  const scrollPos = window.scrollY + 220;
+  if (isClickScrolling) return;
 
+  const sections = ['hero', 'features', 'pillars', 'specs'];
   let current = 'hero';
-  for (const id of sections) {
-    const sec = document.getElementById(id);
-    if (sec && scrollPos >= sec.offsetTop) {
-      current = id;
+
+  // If scrolled near the very bottom of the page, always highlight SPECS
+  const reachedBottom = (window.innerHeight + Math.round(window.scrollY)) >= (document.documentElement.scrollHeight - 80);
+
+  if (reachedBottom) {
+    current = 'specs';
+  } else {
+    for (const id of sections) {
+      const sec = document.getElementById(id);
+      if (sec) {
+        const rect = sec.getBoundingClientRect();
+        // Trigger section when it crosses upper 40% of screen
+        if (rect.top <= window.innerHeight * 0.4) {
+          current = id;
+        }
+      }
     }
   }
 
