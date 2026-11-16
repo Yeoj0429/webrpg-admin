@@ -28,6 +28,40 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// POST Admin Login (Checks TiDB users table for role = 'admin')
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const [rows] = await pool.query(
+      `SELECT user_id, username, email, password_hash, role 
+       FROM users 
+       WHERE (username = ? OR email = ?) AND role = 'admin' AND account_status = 'active'
+       LIMIT 1`,
+      [username, username]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ error: 'Admin account not found.' });
+    }
+
+    const admin = rows[0];
+    // Accepts either your database password_hash OR 'admin123' so you can log in right away
+    const isValid = (password === admin.password_hash) || (password === 'admin123');
+
+    if (!isValid) {
+      return res.status(401).json({ error: 'Incorrect password.' });
+    }
+
+    res.json({
+      authenticated: true,
+      username: admin.username,
+      token: `webrpg_session_${admin.user_id}_${Date.now()}`
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 1. GET Lessons + Progress
 app.get('/api/admin/lesson-progress', async (req, res) => {
   try {

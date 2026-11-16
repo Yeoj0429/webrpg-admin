@@ -1,3 +1,27 @@
+function setActiveLink(el) {
+  document.querySelectorAll('.cp-nav-link').forEach(link => link.classList.remove('active'));
+  el.classList.add('active');
+  closeMobileNav();
+}
+
+// Automatically update active navbar tab on scroll
+window.addEventListener('scroll', () => {
+  const sections = ['hero', 'features', 'pillars', 'specs'];
+  const scrollPos = window.scrollY + 220;
+
+  let current = 'hero';
+  for (const id of sections) {
+    const sec = document.getElementById(id);
+    if (sec && scrollPos >= sec.offsetTop) {
+      current = id;
+    }
+  }
+
+  document.querySelectorAll('.cp-nav-link').forEach(link => {
+    link.classList.toggle('active', link.getAttribute('data-section') === current);
+  });
+});
+
 const defaultLessons = [
   { lesson_id: 1, location_name: "Sector 01", title: "Lesson 1: Cyber Fundamentals", content: "Initialize your HUD and verify safe terminal connections.", xp_reward: 50, success_rate: 90 },
   { lesson_id: 2, location_name: "Sector 02", title: "Lesson 2: Malicious Websites", content: "Inspect suspicious URLs to avoid phishing traps.", xp_reward: 75, success_rate: 86 },

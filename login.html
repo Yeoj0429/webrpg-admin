@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEBRPG! // Admin Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pal-cyan-light: #8CEEF6;
+      --pal-cyan-bright: #4AD8F0;
+      --pal-blue-electric: #2696E8;
+      --pal-navy-deep: #1B2654;
+      --pal-navy-void: #080B1A;
+      --pal-purple-neon: #8B4DF2;
+      --pal-magenta-neon: #C84BF2;
+      --pal-pink-neon: #F288E8;
+      --pal-white-soft: #EDE9F7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--pal-navy-void);
+      background-image:
+        radial-gradient(rgba(74, 216, 240, 0.12) 1px, transparent 1px),
+        radial-gradient(circle at 85% 15%, rgba(200, 75, 242, 0.2), transparent 35%),
+        radial-gradient(circle at 15% 85%, rgba(38, 150, 232, 0.2), transparent 40%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
+      color: var(--pal-white-soft);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(180deg, rgba(27, 38, 84, 0.85), rgba(8, 11, 26, 0.96));
+      border: 2px solid var(--pal-cyan-bright);
+      padding: 36px 32px;
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+      box-shadow: 0 0 35px rgba(74, 216, 240, 0.2);
+    }
+
+    .brand-logo {
+      display: inline-block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--pal-navy-void);
+      background: var(--pal-cyan-light);
+      padding: 4px 14px;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 0px var(--pal-magenta-neon);
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+      margin-bottom: 18px;
+    }
+
+    .brand-logo span { color: var(--pal-purple-neon); }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      color: var(--pal-cyan-light);
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+
+    p.sub {
+      font-size: 0.92rem;
+      color: #a9b5d9;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--pal-cyan-light);
+      margin-bottom: 6px;
+    }
+
+    .cp-input {
+      width: 100%;
+      background: rgba(8, 11, 26, 0.9);
+      border: 1px solid var(--pal-blue-electric);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.05rem;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      outline: none;
+    }
+
+    .cp-input:focus {
+      border-color: var(--pal-cyan-light);
+      box-shadow: 0 0 12px rgba(74, 216, 240, 0.35);
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(255, 42, 109, 0.15);
+      border-left: 3px solid #ff2a6d;
+      color: #ff85a9;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .login-btn {
+      width: 100%;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, var(--pal-magenta-neon), var(--pal-purple-neon));
+      color: #fff;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+      transition: 0.2s;
+    }
+
+    .login-btn:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 18px rgba(200, 75, 242, 0.5);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: var(--pal-cyan-bright);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <div class="brand-logo">WEBRPG<span>!</span></div>
+    <h2>ADMIN PORTAL</h2>
+    <p class="sub">Sign in with your administrator credentials.</p>
+
+    <div id="login-error" class="error-msg">Invalid username or password.</div>
+
+    <form onsubmit="handleAdminLogin(event)">
+      <label>USERNAME OR EMAIL</label>
+      <input type="text" id="admin-user" class="cp-input" placeholder="admin_webrpg" required />
+
+      <label>PASSWORD</label>
+      <input type="password" id="admin-pass" class="cp-input" placeholder="••••••••" required />
+
+      <button type="submit" id="login-submit-btn" class="login-btn">SIGN IN</button>
+    </form>
+
+    <a href="index.html" class="back-link">← RETURN TO GAME WEBSITE</a>
+  </div>
+
+  <script>
+    // If already logged in, go straight to admin.html
+    if (sessionStorage.getItem('webrpg_admin_token')) {
+      window.location.href = 'admin.html';
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('login-submit-btn');
+      errBox.style.display = 'none';
+      btn.innerText = 'VERIFYING...';
+
+      const username = document.getElementById('admin-user').value.trim();
+      const password = document.getElementById('admin-pass').value;
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.authenticated) {
+          sessionStorage.setItem('webrpg_admin_token', data.token);
+          sessionStorage.setItem('webrpg_admin_user', data.username);
+          window.location.href = 'admin.html';
+          return;
+        } else {
+          errBox.innerText = data.error || 'Invalid administrator credentials.';
+          errBox.style.display = 'block';
+        }
+      } catch (err) {
+        errBox.innerText = 'Server connection error.';
+        errBox.style.display = 'block';
+      }
+      btn.innerText = 'SIGN IN';
+    }
+  </script>
+</body>
+</html>

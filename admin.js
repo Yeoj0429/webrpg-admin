@@ -1,3 +1,13 @@
+if (!sessionStorage.getItem('webrpg_admin_token')) {
+  window.location.href = 'login.html';
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem('webrpg_admin_token');
+  sessionStorage.removeItem('webrpg_admin_user');
+  window.location.href = 'login.html';
+}
+
 const state = {
   activeView: 'dashboard',
   totalLearners: 0,

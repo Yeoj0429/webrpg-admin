@@ -14,10 +14,10 @@
     <a href="#hero" class="cp-logo">WEBRPG<span>!</span></a>
 
     <nav id="cp-nav" class="cp-nav-bar">
-      <a href="#features" class="cp-nav-link" onclick="closeMobileNav()">FEATURES</a>
-      <a href="#pillars" class="cp-nav-link" onclick="closeMobileNav()">TOPICS</a>
-      <a href="#specs" class="cp-nav-link" onclick="closeMobileNav()">SPECS</a>
-      <a href="admin.html" class="cp-nav-link" style="color: var(--pal-cyan-light);">ADMIN</a>
+      <a href="#hero" class="cp-nav-link active" data-section="hero" onclick="setActiveLink(this)">HOME</a>
+      <a href="#features" class="cp-nav-link" data-section="features" onclick="setActiveLink(this)">FEATURES</a>
+      <a href="#pillars" class="cp-nav-link" data-section="pillars" onclick="setActiveLink(this)">TOPICS</a>
+      <a href="#specs" class="cp-nav-link" data-section="specs" onclick="setActiveLink(this)">SPECS</a>
       <a href="#download" class="cp-nav-cta" onclick="openDownloadModal()">DOWNLOAD</a>
     </nav>
 
