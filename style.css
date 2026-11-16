@@ -167,7 +167,6 @@ body {
   padding: 28px 36px;
   min-width: 0;
   width: 100%;
-  max-width: 1400px;
 }
 
 .cyber-topbar {
@@ -267,16 +266,21 @@ body {
 }
 
 /* RESPONSIVE GRIDS */
-.success-grid,
+.success-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 20px;
+}
+
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: 20px;
 }
 
 .lesson-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
   gap: 20px;
 }
 
