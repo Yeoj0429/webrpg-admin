@@ -81,8 +81,22 @@ function renderProgress() {
 
 // 2. ANALYTICS
 function renderAnalytics() {
+  const avgSuccess = Math.round(
+    state.lessons.reduce((sum, l) => sum + Number(l.success_rate), 0) / state.lessons.length
+  );
+  const avgQuizAll = Math.round(
+    state.lessons.reduce((sum, l) => sum + Number(l.avg_quiz), 0) / state.lessons.length
+  );
+
+  document.getElementById('analytics-kpis').innerHTML = `
+    <div class="kpi-card"><span>ACTIVE LEARNERS</span><strong>08</strong></div>
+    <div class="kpi-card"><span>AVG SUCCESS RATE</span><strong>${avgSuccess}%</strong></div>
+    <div class="kpi-card"><span>AVG QUIZ SCORE</span><strong>${avgQuizAll}%</strong></div>
+    <div class="kpi-card"><span>TOTAL QUESTIONS</span><strong>225</strong></div>
+  `;
+
   document.getElementById('age-group-bars').innerHTML = state.demographics.map(d => `
-    <div style="margin-top: 14px;">
+    <div style="margin-top: 12px;">
       <div style="display:flex; justify-content:space-between; font-weight:700;">
         <span>${d.group}</span>
         <span style="color:#4AD8F0;">${d.percent}% (${d.avgScore}% Avg)</span>
@@ -92,13 +106,23 @@ function renderAnalytics() {
   `).join('');
 
   document.getElementById('score-comparison-bars').innerHTML = state.scoreBreakdown.map(s => `
-    <div style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <div style="display:flex; justify-content:space-between; font-weight:700;">
         <span>${s.label}</span>
         <span style="color:#F288E8;">${s.score}%</span>
       </div>
       <div class="progress-track"><div class="progress-fill" style="width:${s.score}%"></div></div>
     </div>
+  `).join('');
+
+  document.getElementById('analytics-table-body').innerHTML = state.lessons.map(l => `
+    <tr>
+      <td><strong>${l.title}</strong></td>
+      <td style="color:#8CEEF6;">${l.location_name}</td>
+      <td>${l.avg_quiz}%</td>
+      <td style="color:#4AD8F0; font-weight:700;">${l.success_rate}%</td>
+      <td style="color:#F288E8;">${l.xp_reward} XP</td>
+    </tr>
   `).join('');
 }
 
@@ -255,6 +279,36 @@ async function saveQuestionModal() {
   renderQuestionRows();
   closeQuestionModal();
   showNotify('QUESTION SAVED', `Question #${q.question_order} has been updated.`);
+}
+
+function toggleMobileMenu() {
+  document.getElementById('sidebar-drawer').classList.toggle('open');
+  document.getElementById('burger-btn').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('open');
+}
+
+function closeMobileMenu() {
+  document.getElementById('sidebar-drawer')?.classList.remove('open');
+  document.getElementById('burger-btn')?.classList.remove('open');
+  document.getElementById('sidebar-backdrop')?.classList.remove('open');
+}
+
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tabId}`).classList.add('active');
+  btn.classList.add('active');
+
+  const titles = {
+    progress: "LEARNER PROGRESS",
+    analytics: "LEARNING ANALYTICS",
+    lessons: "LESSON MODULES",
+    quizzes: "QUIZ QUESTIONS"
+  };
+  document.getElementById('view-title').innerText = titles[tabId];
+
+  // Automatically close drawer on tablet/mobile after selecting a tab
+  closeMobileMenu();
 }
 
 initDashboard();

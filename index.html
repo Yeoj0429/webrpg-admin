@@ -11,31 +11,46 @@
   <div class="scanline-overlay"></div>
 
   <div class="admin-layout">
-    <!-- SIDEBAR -->
+    <!-- MOBILE BACKDROP OVERLAY -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
+
+    <!-- SIDEBAR / STICKY MOBILE NAVBAR -->
     <aside class="cyber-sidebar">
-      <div class="brand-box">
-        <h1>WEBRPG!</h1>
-        <p class="brand-sub">ADMIN CONSOLE</p>
+      <div class="sidebar-top-row">
+        <div class="brand-box">
+          <h1>WEBRPG!</h1>
+          <p class="brand-sub">ADMIN CONSOLE</p>
+        </div>
+
+        <!-- HAMBURGER BUTTON (Visible on Tablet/Mobile) -->
+        <button id="burger-btn" class="burger-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
 
-      <nav class="cyber-nav">
-        <button class="nav-btn active" onclick="switchTab('progress', this)">
-          <span class="nav-code">01</span> PROGRESS
-        </button>
-        <button class="nav-btn" onclick="switchTab('analytics', this)">
-          <span class="nav-code">02</span> ANALYTICS
-        </button>
-        <button class="nav-btn" onclick="switchTab('lessons', this)">
-          <span class="nav-code">03</span> LESSONS
-        </button>
-        <button class="nav-btn" onclick="switchTab('quizzes', this)">
-          <span class="nav-code">04</span> QUIZZES
-        </button>
-      </nav>
+      <!-- COLLAPSIBLE DRAWER ON MOBILE -->
+      <div id="sidebar-drawer" class="sidebar-drawer">
+        <nav class="cyber-nav">
+          <button class="nav-btn active" onclick="switchTab('progress', this)">
+            <span class="nav-code">01</span> PROGRESS
+          </button>
+          <button class="nav-btn" onclick="switchTab('analytics', this)">
+            <span class="nav-code">02</span> ANALYTICS
+          </button>
+          <button class="nav-btn" onclick="switchTab('lessons', this)">
+            <span class="nav-code">03</span> LESSONS
+          </button>
+          <button class="nav-btn" onclick="switchTab('quizzes', this)">
+            <span class="nav-code">04</span> QUIZZES
+          </button>
+        </nav>
 
-      <div class="sidebar-footer">
-        <div class="status-indicator">
-          <span class="pulse-dot"></span> ONLINE
+        <div class="sidebar-footer">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span> ONLINE
+          </div>
         </div>
       </div>
     </aside>
@@ -63,6 +78,8 @@
 
       <!-- TAB 2: LEARNING ANALYTICS -->
       <section id="tab-analytics" class="tab-panel">
+        <div id="analytics-kpis" class="kpi-grid"></div>
+
         <div class="analytics-grid">
           <div class="cyber-card">
             <h3>AGE GROUPS</h3>
@@ -73,6 +90,22 @@
             <h3>QUIZ & EXAM SCORES</h3>
             <div id="score-comparison-bars" class="bar-chart-list"></div>
           </div>
+        </div>
+
+        <div class="cyber-card" style="margin-top: 20px;">
+          <h3>LESSON PERFORMANCE BREAKDOWN</h3>
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>LESSON</th>
+                <th>LOCATION</th>
+                <th>AVG QUIZ SCORE</th>
+                <th>SUCCESS RATE</th>
+                <th>XP REWARD</th>
+              </tr>
+            </thead>
+            <tbody id="analytics-table-body"></tbody>
+          </table>
         </div>
       </section>
 
