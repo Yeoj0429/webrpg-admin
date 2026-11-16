@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WEBRPG! // NETWATCH ADMIN CONSOLE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scanline-overlay"></div>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="cyber-sidebar">
+      <div class="brand-box">
+        <span class="hud-micro">SYS.VER // 2.077</span>
+        <h1 class="glitch-text" data-text="WEBRPG!">WEBRPG!</h1>
+        <p class="brand-sub">ADMINISTRATION TERMINAL</p>
+      </div>
+
+      <nav class="cyber-nav">
+        <button class="nav-btn active" onclick="switchTab('progress', this)">
+          <span class="nav-code">01</span> LEARNER PROGRESS
+        </button>
+        <button class="nav-btn" onclick="switchTab('analytics', this)">
+          <span class="nav-code">02</span> LEARNING ANALYTICS
+        </button>
+        <button class="nav-btn" onclick="switchTab('lessons', this)">
+          <span class="nav-code">03</span> LESSON MODULES
+        </button>
+        <button class="nav-btn" onclick="switchTab('quizzes', this)">
+          <span class="nav-code">04</span> QUIZ MATRIX
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator">
+          <span class="pulse-dot"></span> MYSQL DB: CONNECTED
+        </div>
+        <div class="hud-micro">ADMIN: ADMIN_WEBRPG</div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="cyber-main">
+      <header class="cyber-topbar">
+        <div>
+          <span class="hud-micro">NETWATCH // TELEMETRY STREAM</span>
+          <h2 id="view-title">LEARNER PROGRESS & SUCCESS RATES</h2>
+        </div>
+        <div class="topbar-stats">
+          <div class="mini-stat">
+            <span>TOTAL LESSONS</span>
+            <strong>05</strong>
+          </div>
+          <div class="mini-stat">
+            <span>ACTIVE QUIZZES</span>
+            <strong>35</strong>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB 1: LEARNER PROGRESS TRACKING -->
+      <section id="tab-progress" class="tab-panel active">
+        <div class="panel-header-bar">
+          <span>LESSON SUCCESS RATE TELEMETRY (PASS THRESHOLD >= 70%)</span>
+          <span class="hud-micro">LIVE MYSQL AGGREGATION</span>
+        </div>
+        <div id="lesson-success-list" class="success-grid"></div>
+      </section>
+
+      <!-- TAB 2: LEARNING ANALYTICS -->
+      <section id="tab-analytics" class="tab-panel">
+        <div class="analytics-grid">
+          <div class="cyber-card">
+            <div class="card-tag">DEMOGRAPHICS // AGE GROUPS</div>
+            <h3>LEARNER AGE DISTRIBUTION</h3>
+            <div id="age-group-bars" class="bar-chart-list"></div>
+          </div>
+
+          <div class="cyber-card">
+            <div class="card-tag">ASSESSMENT // METRICS</div>
+            <h3>MISSION QUIZ VS EXAM SCORES (PRE/POST)</h3>
+            <div id="score-comparison-bars" class="bar-chart-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: LESSON MODULES (5 CARDS, EDIT ONLY) -->
+      <section id="tab-lessons" class="tab-panel">
+        <div class="panel-header-bar">
+          <span>IN-GAME EDUCATIONAL MODULES (EDIT ONLY // 5 TOTAL)</span>
+          <span class="hud-micro">TABLE: LESSONS</span>
+        </div>
+        <div id="lesson-cards-container" class="lesson-cards-grid"></div>
+      </section>
+
+      <!-- TAB 4: QUIZ QUESTIONS & ANSWERS -->
+      <section id="tab-quizzes" class="tab-panel">
+        <div class="quiz-controls">
+          <div class="selector-group">
+            <label>SELECT LESSON (1-5)</label>
+            <select id="quiz-lesson-select" class="cyber-select" onchange="loadAssessmentQuestions()"></select>
+          </div>
+          <div class="selector-group">
+            <label>SELECT ASSESSMENT TYPE (7 PER LESSON)</label>
+            <select id="quiz-type-select" class="cyber-select" onchange="loadAssessmentQuestions()">
+              <option value="pre_test">PRE-TEST (10 Questions)</option>
+              <option value="mission_1">MISSION 01 (5 Questions)</option>
+              <option value="mission_2">MISSION 02 (5 Questions)</option>
+              <option value="mission_3">MISSION 03 (5 Questions)</option>
+              <option value="mission_4">MISSION 04 (5 Questions)</option>
+              <option value="mission_5">MISSION 05 (5 Questions)</option>
+              <option value="post_test">POST-TEST (10 Questions)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="questions-editor-list" class="questions-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL FOR EDITING LESSON MODULE -->
+  <div id="lesson-modal" class="cyber-modal hidden">
+    <div class="cyber-modal-content">
+      <div class="card-tag">SYS.EDIT // LESSON_MODULE</div>
+      <h3 id="modal-lesson-header">EDIT LESSON</h3>
+      <input type="hidden" id="edit-lesson-id" />
+      <label>MODULE TITLE</label>
+      <input type="text" id="edit-lesson-title" class="cyber-input" />
+      <label>IN-GAME DIALOGUE / LESSON TEXT</label>
+      <textarea id="edit-lesson-content" rows="6" class="cyber-input"></textarea>
+      <label>XP REWARD</label>
+      <input type="number" id="edit-lesson-xp" class="cyber-input" />
+      <div class="modal-actions">
+        <button class="cyber-btn secondary" onclick="closeLessonModal()">CANCEL</button>
+        <button class="cyber-btn primary" onclick="saveLessonEdit()">COMMIT TO DATABASE</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
