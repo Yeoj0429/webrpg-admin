@@ -1,49 +1,3 @@
-let isClickScrolling = false;
-let clickScrollTimer = null;
-
-function setActiveLink(el) {
-  isClickScrolling = true;
-  clearTimeout(clickScrollTimer);
-
-  document.querySelectorAll('.cp-nav-link').forEach(link => link.classList.remove('active'));
-  el.classList.add('active');
-  closeMobileNav();
-
-  // Keep clicked tab highlighted while smooth scroll finishes
-  clickScrollTimer = setTimeout(() => {
-    isClickScrolling = false;
-  }, 800);
-}
-
-window.addEventListener('scroll', () => {
-  if (isClickScrolling) return;
-
-  const sections = ['hero', 'features', 'pillars', 'specs'];
-  let current = 'hero';
-
-  // If scrolled near the very bottom of the page, always highlight SPECS
-  const reachedBottom = (window.innerHeight + Math.round(window.scrollY)) >= (document.documentElement.scrollHeight - 80);
-
-  if (reachedBottom) {
-    current = 'specs';
-  } else {
-    for (const id of sections) {
-      const sec = document.getElementById(id);
-      if (sec) {
-        const rect = sec.getBoundingClientRect();
-        // Trigger section when it crosses upper 40% of screen
-        if (rect.top <= window.innerHeight * 0.4) {
-          current = id;
-        }
-      }
-    }
-  }
-
-  document.querySelectorAll('.cp-nav-link').forEach(link => {
-    link.classList.toggle('active', link.getAttribute('data-section') === current);
-  });
-});
-
 const defaultLessons = [
   { lesson_id: 1, location_name: "Sector 01", title: "Lesson 1: Cyber Fundamentals", content: "Initialize your HUD and verify safe terminal connections.", xp_reward: 50, success_rate: 90 },
   { lesson_id: 2, location_name: "Sector 02", title: "Lesson 2: Malicious Websites", content: "Inspect suspicious URLs to avoid phishing traps.", xp_reward: 75, success_rate: 86 },
@@ -74,13 +28,59 @@ const pillarDetails = [
   }
 ];
 
+// REQUIRED MOBILE NAV TOGGLE FUNCTIONS
 function toggleMobileNav() {
   document.getElementById('cp-nav').classList.toggle('open');
+  document.getElementById('landing-backdrop').classList.toggle('open');
 }
 
 function closeMobileNav() {
   document.getElementById('cp-nav')?.classList.remove('open');
+  document.getElementById('landing-backdrop')?.classList.remove('open');
 }
+
+let isClickScrolling = false;
+let clickScrollTimer = null;
+
+function setActiveLink(el) {
+  isClickScrolling = true;
+  clearTimeout(clickScrollTimer);
+
+  document.querySelectorAll('.cp-nav-link').forEach(link => link.classList.remove('active'));
+  el.classList.add('active');
+  closeMobileNav();
+
+  clickScrollTimer = setTimeout(() => {
+    isClickScrolling = false;
+  }, 800);
+}
+
+window.addEventListener('scroll', () => {
+  if (isClickScrolling) return;
+
+  const sections = ['hero', 'features', 'pillars', 'specs'];
+  let current = 'hero';
+
+  const reachedBottom = (window.innerHeight + Math.round(window.scrollY)) >= (document.documentElement.scrollHeight - 80);
+
+  if (reachedBottom) {
+    current = 'specs';
+  } else {
+    for (const id of sections) {
+      const sec = document.getElementById(id);
+      if (sec) {
+        const rect = sec.getBoundingClientRect();
+        if (rect.top <= window.innerHeight * 0.4) {
+          current = id;
+        }
+      }
+    }
+  }
+
+  document.querySelectorAll('.cp-nav-link').forEach(link => {
+    link.classList.toggle('active', link.getAttribute('data-section') === current);
+  });
+});
 
 async function initLandingPage() {
   let lessons = defaultLessons;
