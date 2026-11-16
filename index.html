@@ -3,30 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! // Official Game Download & Web-Safety Portal</title>
+  <title>WEBRPG! // Official Site</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="landing.css" />
 </head>
 <body>
 
-  <!-- FLOATING CYBERPUNK.NET TOP NAVBAR (Matches Screenshot 1) -->
+  <!-- TOP NAVBAR -->
   <header class="cp-header">
     <a href="#hero" class="cp-logo">WEBRPG<span>!</span></a>
 
     <nav id="cp-nav" class="cp-nav-bar">
-      <div class="cp-dropdown">
-        <a href="#features" class="cp-nav-link">GAME INFO ▾</a>
-        <div class="cp-dropdown-menu">
-          <a href="#features">- 3D ENVIRONMENT</a>
-          <a href="#pillars">- 4 SAFETY PILLARS</a>
-          <a href="#pillars">- LIVE SECTORS</a>
-          <a href="#specs">- SYSTEM SPECS</a>
-        </div>
-      </div>
-      <a href="#pillars" class="cp-nav-link" onclick="closeMobileNav()">CURRICULUM</a>
-      <a href="#researchers" class="cp-nav-link" onclick="closeMobileNav()">RESEARCH TEAM</a>
-      <a href="admin.html" class="cp-nav-link" style="color: var(--pal-cyan-light);">ADMIN CONSOLE</a>
-      <a href="#download" class="cp-nav-cta" onclick="openDownloadModal()">DOWNLOAD NOW</a>
+      <a href="#features" class="cp-nav-link" onclick="closeMobileNav()">FEATURES</a>
+      <a href="#pillars" class="cp-nav-link" onclick="closeMobileNav()">TOPICS</a>
+      <a href="#specs" class="cp-nav-link" onclick="closeMobileNav()">SPECS</a>
+      <a href="admin.html" class="cp-nav-link" style="color: var(--pal-cyan-light);">ADMIN</a>
+      <a href="#download" class="cp-nav-cta" onclick="openDownloadModal()">DOWNLOAD</a>
     </nav>
 
     <button id="cp-burger" class="cp-burger" onclick="toggleMobileNav()" aria-label="Menu">
@@ -34,313 +26,239 @@
     </button>
   </header>
 
-  <!-- ==========================================================
-       SECTION 1: HERO BANNER (Matches Screenshot 1 Layout)
-       ========================================================== -->
+  <!-- SECTION 1: HERO BANNER -->
   <section id="hero" class="cp-hero">
     <div class="cp-hero-grid">
       <div class="cp-hero-left">
-        <!-- 3 LAUREL BADGES -->
         <div class="cp-laurels">
           <div class="laurel-badge">
-            <span class="laurel-quote">"96% TEEN INTERNET USE"</span>
-            <span class="laurel-src">ACT FOR YOUTH</span>
+            <span class="laurel-quote">3D RPG</span>
+            <span class="laurel-src">UNITY ENGINE</span>
           </div>
           <div class="laurel-badge">
-            <span class="laurel-quote">"GAMIFIED E-LEARNING"</span>
-            <span class="laurel-src">3D UNITY RPG</span>
+            <span class="laurel-quote">5 SECTORS</span>
+            <span class="laurel-src">INTERACTIVE MAPS</span>
           </div>
           <div class="laurel-badge">
-            <span class="laurel-quote">"VALENZUELA CITY"</span>
-            <span class="laurel-src">PLV • CEIT BSIT 3-10</span>
+            <span class="laurel-quote">WEB SAFETY</span>
+            <span class="laurel-src">GAMIFIED LEARNING</span>
           </div>
         </div>
 
         <h1 class="cp-hero-title">
-          GET THE ULTIMATE<br />
-          WEBRPG! CYBER-SAFETY<br />
-          EXPERIENCE
+          MASTER THE WEB.<br />
+          OUTSMART EVERY<br />
+          DIGITAL THREAT.
         </h1>
 
         <p class="cp-hero-lead">
-          A 3D Gamified E-Learning Role-Playing Application regarding Web Browsing Safety for the Teenagers of Valenzuela City. Navigate interactive storylines, outsmart malicious traps, and master digital defense.
+          Explore a 3D cyberpunk world, complete interactive missions, and learn how to browse the web safely.
         </p>
 
-        <!-- DUAL NOTCHED OUTLINE BUTTONS -->
         <div class="cp-hero-btns">
           <button class="cp-btn-dark" onclick="openDownloadModal()">DOWNLOAD FOR PC</button>
-          <button class="cp-btn-dark" onclick="openTrailerModal()">GAME OVERVIEW</button>
+          <button class="cp-btn-dark" onclick="openTrailerModal()">ABOUT THE GAME</button>
         </div>
 
-        <!-- PLATFORM BADGES STRIP -->
         <div class="cp-platforms">
-          <span class="plat-pill"><strong>UNITY 3D</strong> ENGINE</span>
-          <span class="plat-pill"><strong>WINDOWS 10/11</strong> DESKTOP (.EXE)</span>
-          <span class="plat-pill"><strong>C#</strong> SCRIPTS</span>
-          <span class="plat-pill"><strong>MYSQL / TIDB</strong> CLOUD SYNC</span>
+          <span class="plat-pill"><strong>WINDOWS 10/11</strong></span>
+          <span class="plat-pill"><strong>UNITY 3D</strong></span>
+          <span class="plat-pill"><strong>FREE TO PLAY</strong></span>
         </div>
       </div>
 
-      <!-- RIGHT CYBER GUARDIAN HUD CARD -->
+      <!-- RIGHT STATS CARD -->
       <div class="cp-hero-right">
         <div class="hero-holo-card">
-          <div class="holo-tag">/// LIVE_SERVER_TELEMETRY</div>
-          <h3>VALENZUELA TEEN CYBER GRID</h3>
-          <p>Connected directly to the WebRPG! Cloud Database. Every lesson module and quiz edited by administrators updates inside the Unity 3D desktop game.</p>
-          <div class="holo-stats-grid">
+          <h3>GAME STATS</h3>
+          <div class="holo-stats-grid" style="margin-top: 14px;">
             <div class="holo-stat">
               <strong id="live-lesson-count">05</strong>
-              <span>EXPLORABLE SECTORS</span>
+              <span>LESSONS</span>
             </div>
             <div class="holo-stat">
               <strong id="live-quiz-count">35</strong>
-              <span>IN-GAME QUIZZES</span>
+              <span>QUIZZES</span>
             </div>
             <div class="holo-stat">
               <strong id="live-pass-rate">84%</strong>
-              <span>AVG PASS RATE</span>
+              <span>PASS RATE</span>
             </div>
             <div class="holo-stat">
-              <strong>v1.0.0</strong>
-              <span>DESKTOP BUILD</span>
+              <strong>v1.0</strong>
+              <span>RELEASE</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="cp-meta-strip">
-      <span>/// FEATURE_MODULE_HIGHLIGHT</span>
-      <span>URDO-RF-2026-001 // PLV CEIT</span>
-    </div>
   </section>
 
-  <!-- ==========================================================
-       SECTION 2: DARK DOT-MATRIX FEATURES & LIVE SECTORS (Screenshot 2)
-       ========================================================== -->
+  <!-- SECTION 2: GAME FEATURES & LIVE SECTORS -->
   <section id="features" class="cp-dark-matrix">
     <div class="cp-matrix-container">
-      <!-- LEFT FEATURED HIGHLIGHT FRAME -->
       <div class="cp-featured-frame">
         <div class="cp-featured-top">
-          <h4>3D INTERACTIVE LEARNING ENVIRONMENT</h4>
-          <span>ROLE-PLAYING GAMEPLAY MECHANICS</span>
+          <h4>GAMEPLAY</h4>
         </div>
         <div class="cp-featured-visual">
           <div class="visual-col">
             <span class="v-num">01</span>
-            <h5>3D EXPLORATION</h5>
-            <p>Unlock 5 distinct cyber-sectors across the game map as you earn Experience Points (XP).</p>
+            <h5>EXPLORE</h5>
+            <p>Unlock 5 game zones as you earn XP.</p>
           </div>
           <div class="visual-col">
             <span class="v-num">02</span>
-            <h5>NPC DIALOGUES</h5>
-            <p>Engage in choice-based conversations and real-world web-browsing threat scenarios.</p>
+            <h5>INTERACT</h5>
+            <p>Make choices through NPC dialogues.</p>
           </div>
           <div class="visual-col">
             <span class="v-num">03</span>
-            <h5>BOSS ASSESSMENTS</h5>
-            <p>Complete Pre-Tests, 5 Mission Tasks, and Post-Tests per lesson to level up your Runner.</p>
+            <h5>LEVEL UP</h5>
+            <p>Beat Pre-Tests, Missions, and Boss Quizzes.</p>
           </div>
         </div>
         <div class="cp-featured-bottom">
-          <h2>LEARN WEB SAFETY WITHOUT THE BORING LECTURES</h2>
-          <p>Built on research by Ratinho & Martins (2023) and Khaldi et al. (2023), WebRPG! combines points, levels, challenges, and storytelling to keep teenagers engaged.</p>
+          <h2>LEARN BY PLAYING</h2>
+          <p>Level up your character while mastering real-world cybersecurity skills.</p>
         </div>
       </div>
 
-      <!-- RIGHT 2x2 GRID (DYNAMICALLY LOADED FROM YOUR TIDB LESSONS!) -->
+      <!-- RIGHT 2x2 GRID (LIVE LESSONS) -->
       <div id="live-lessons-preview" class="cp-matrix-cards"></div>
-    </div>
-
-    <div style="text-align: center; margin-top: 40px;">
-      <a href="#pillars" class="cp-btn-cyan">EXPLORE THE 4 SAFETY PILLARS</a>
     </div>
   </section>
 
-  <!-- NOTCHED RAZOR DIVIDER -->
   <div class="cp-razor top-razor"></div>
 
-  <!-- ==========================================================
-       SECTION 3: 4 CORE WEB-SAFETY PILLARS (Screenshot 3 Poster Strip)
-       ========================================================== -->
+  <!-- SECTION 3: 4 CORE TOPICS -->
   <section id="pillars" class="cp-bright-section">
     <div class="cp-bright-intro">
-      <h2>WELCOME TO THE SAFER DIGITAL FUTURE</h2>
-      <p>
-        Nearly 96% of teenagers browse the Internet daily, yet daily familiarity does not guarantee protection against cyber threats. WebRPG! integrates four essential web-safety domains into one adventure:
-      </p>
+      <h2>WHAT YOU WILL LEARN</h2>
     </div>
 
-    <!-- TOP TECHNICAL BRACKET ┌ ┬ ┐ -->
     <div class="cp-brackets top-b"><span></span><span></span></div>
 
-    <!-- 4 VERTICAL POSTER CARDS (Matches Screenshot 3) -->
     <div class="cp-posters-grid">
-      <!-- PILLAR 1 -->
       <article class="cp-poster p-1">
         <div class="poster-top">
-          <span class="poster-badge">PILLAR 01 // FOUNDATION</span>
+          <span class="poster-badge">TOPIC 01</span>
           <h3>BASIC CYBERSECURITY</h3>
         </div>
         <div class="poster-bottom">
-          <div class="poster-logo">WEBRPG<span>!</span></div>
-          <div class="poster-sub">DEFENSE PROTOCOLS</div>
-          <p>Master strong authentication, password hygiene, secure connections, and situational awareness (Arishi et al., 2026).</p>
-          <button class="cp-btn-cyan full-w" onclick="openPillarModal(0)">LEARN MORE</button>
+          <p>Strong passwords, safe logins, and account protection.</p>
+          <button class="cp-btn-cyan full-w" onclick="openPillarModal(0)">DETAILS</button>
         </div>
       </article>
 
-      <!-- PILLAR 2 -->
       <article class="cp-poster p-2">
         <div class="poster-top">
-          <span class="poster-badge">PILLAR 02 // THREAT DETECTION</span>
+          <span class="poster-badge">TOPIC 02</span>
           <h3>MALICIOUS WEBSITES</h3>
         </div>
         <div class="poster-bottom">
-          <div class="poster-logo">WEBRPG<span>!</span></div>
-          <div class="poster-sub">PHISHING & EXPLOITS</div>
-          <p>Identify spoofed URLs, unsafe downloads, and risky teen browsing behaviors before compromising your device (McCloy et al., 2026).</p>
-          <button class="cp-btn-cyan full-w" onclick="openPillarModal(1)">LEARN MORE</button>
+          <p>Spot fake links, phishing pages, and unsafe downloads.</p>
+          <button class="cp-btn-cyan full-w" onclick="openPillarModal(1)">DETAILS</button>
         </div>
       </article>
 
-      <!-- PILLAR 3 -->
       <article class="cp-poster p-3">
         <div class="poster-top">
-          <span class="poster-badge">PILLAR 03 // ANTI-DECEPTION</span>
-          <h3>ADVERTISEMENT SCAMS</h3>
+          <span class="poster-badge">TOPIC 03</span>
+          <h3>AD SCAMS</h3>
         </div>
         <div class="poster-bottom">
-          <div class="poster-logo">WEBRPG<span>!</span></div>
-          <div class="poster-sub">FAKE ALERTS & FOMO</div>
-          <p>Spot manipulative scam language, FOMO clickbait, and rogue pop-up alerts designed to trick users (Park & Kang, 2026; Li et al., 2026).</p>
-          <button class="cp-btn-cyan full-w" onclick="openPillarModal(2)">LEARN MORE</button>
+          <p>Avoid clickbait traps, fake alerts, and scam pop-ups.</p>
+          <button class="cp-btn-cyan full-w" onclick="openPillarModal(2)">DETAILS</button>
         </div>
       </article>
 
-      <!-- PILLAR 4 -->
       <article class="cp-poster p-4">
         <div class="poster-top">
-          <span class="poster-badge">PILLAR 04 // ANONYMITY</span>
-          <h3>WEB PRIVACY & SAFETY</h3>
+          <span class="poster-badge">TOPIC 04</span>
+          <h3>WEB PRIVACY</h3>
         </div>
         <div class="poster-bottom">
-          <div class="poster-logo">WEBRPG<span>!</span></div>
-          <div class="poster-sub">VPNS & AD BLOCKERS</div>
-          <p>Understand how VPNs, ad blockers, and Privacy Enhancing Technologies (PET) protect your digital footprint (Siddharth & Madisetti, 2024).</p>
-          <button class="cp-btn-cyan full-w" onclick="openPillarModal(3)">LEARN MORE</button>
+          <p>Use VPNs, ad blockers, and privacy settings effectively.</p>
+          <button class="cp-btn-cyan full-w" onclick="openPillarModal(3)">DETAILS</button>
         </div>
       </article>
     </div>
 
-    <!-- BOTTOM TECHNICAL BRACKET └ ┴ ┘ -->
     <div class="cp-brackets bottom-b"><span></span><span></span></div>
   </section>
 
-  <!-- ==========================================================
-       SECTION 4: DOWNLOAD & LEARNER REGISTRATION STRIP (Screenshot 4)
-       ========================================================== -->
+  <!-- SECTION 4: DOWNLOAD & SPECS -->
   <section id="download" class="cp-download-section">
     <div class="cp-download-inner">
-      <h2>DOWNLOAD THE OFFICIAL WEBRPG! DESKTOP CLIENT</h2>
-      <p>Enter your learner email below or download the standalone Windows installer to start your training in Valenzuela City's cyber-grid.</p>
+      <h2>READY TO PLAY?</h2>
+      <p>Download the Windows desktop client and start your journey.</p>
 
-      <form class="cp-signup-row" onsubmit="handleQuickRegister(event)">
-        <input type="email" id="learner-email-input" class="cp-underline-input" placeholder="Enter your learner email address" required />
-        <button type="submit" class="cp-btn-dark">PRE-REGISTER & DOWNLOAD</button>
-      </form>
+      <div style="margin: 24px 0 44px;">
+        <button class="cp-btn-dark" onclick="openDownloadModal()">DOWNLOAD INSTALLER</button>
+      </div>
 
-      <!-- SYSTEM REQUIREMENTS & RESEARCH TEAM -->
       <div id="specs" class="cp-specs-grid">
         <div class="spec-box">
-          <h4>MINIMUM PC REQUIREMENTS</h4>
+          <h4>SYSTEM REQUIREMENTS</h4>
           <ul>
             <li><strong>OS:</strong> Windows 10 / 11 (64-bit)</li>
-            <li><strong>Engine:</strong> Unity 3D Runtime</li>
             <li><strong>Memory:</strong> 4 GB RAM</li>
             <li><strong>Storage:</strong> 1.5 GB available space</li>
-            <li><strong>Network:</strong> Broadband Internet (for MySQL Progress Sync)</li>
           </ul>
         </div>
 
         <div id="researchers" class="spec-box">
-          <h4>RESEARCHERS // BSIT 3-10 (A.Y. 2026–2027)</h4>
-          <p style="font-weight:700; margin-bottom:6px;">Pamantasan ng Lungsod ng Valenzuela — College of Engineering and Information Technology</p>
+          <h4>DEVELOPERS // BSIT 3-10</h4>
           <ul>
-            <li><strong>Salazar, Marcus Zander Yeoj M.</strong> (Lead / Representative)</li>
-            <li><strong>Beltran, Sophia Marielle C.</strong></li>
-            <li><strong>Matias, Persia Marnilyn V.</strong></li>
-            <li><strong>Niar, Agatha Eunice B.</strong></li>
+            <li>Salazar, Marcus Zander Yeoj M.</li>
+            <li>Beltran, Sophia Marielle C.</li>
+            <li>Matias, Persia Marnilyn V.</li>
+            <li>Niar, Agatha Eunice B.</li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- BOTTOM RAZOR DIVIDER -->
   <div class="cp-razor bottom-razor"></div>
 
-  <!-- FOOTER (Matches Screenshot 4 Footer) -->
+  <!-- FOOTER -->
   <footer class="cp-footer">
-    <div class="cp-footer-top">
-      <div class="footer-socials">
-        <span>PAMANTASAN NG LUNGSOD NG VALENZUELA // URDO-RF-2026-001</span>
-      </div>
-      <div class="footer-badges">
-        <span class="tech-badge">UNITY HUB</span>
-        <span class="tech-badge">VISUAL STUDIO C#</span>
-        <span class="tech-badge">MYSQL // TIDB</span>
-        <span class="tech-badge">VERCEL CLOUD</span>
-      </div>
-    </div>
-
-    <div class="cp-footer-links">
-      <a href="#hero">Home</a>
-      <a href="#features">Game Features</a>
-      <a href="#pillars">Safety Curriculum</a>
-      <a href="#specs">System Requirements</a>
-      <a href="admin.html">Administrator Login</a>
-    </div>
-
-    <div class="cp-footer-copy">
+    <div class="cp-footer-copy" style="border:none; padding-top:0;">
       <div class="cp-logo">WEBRPG<span>!</span></div>
-      <p>© 2026–2027 WebRPG! Research Team (Beltran, Matias, Niar, Salazar) • BSIT 3-10 • College of Engineering and Information Technology.</p>
+      <p>© 2026 WebRPG! Team • Pamantasan ng Lungsod ng Valenzuela</p>
     </div>
   </footer>
 
-  <!-- MODAL 1: DOWNLOAD INSTALLER MODAL -->
+  <!-- MODAL 1: DOWNLOAD -->
   <div id="download-modal" class="cp-modal hidden" onclick="if(event.target===this) closeDownloadModal()">
     <div class="cp-modal-box">
-      <span class="modal-micro">/// DESKTOP_INSTALLER_V1.0</span>
-      <h3>DOWNLOAD WEBRPG! FOR WINDOWS</h3>
-      <p style="margin: 10px 0 18px; color: #EDE9F7;">
-        Package includes the 3D Unity Desktop Client (<code>WebRPG_Setup_x64.zip</code>) pre-configured to sync learner XP and quiz attempts with the Cloud MySQL Server.
-      </p>
-      <div class="modal-file-card">
+      <h3>DOWNLOAD WEBRPG!</h3>
+      <div class="modal-file-card" style="margin-top: 14px;">
         <div>
-          <strong>WebRPG_Installer_v1.0.0_x64.zip</strong>
-          <span>Windows 10/11 • Unity 3D Build • Verified Safe</span>
+          <strong>WebRPG_Installer_x64.zip</strong>
+          <span>Windows 10/11 • 64-bit</span>
         </div>
-        <span class="file-tag">READY</span>
+        <span class="file-tag">v1.0</span>
       </div>
       <div class="modal-actions">
         <button class="cp-btn-cyan" onclick="closeDownloadModal()">CLOSE</button>
         <a href="WebRPG_Installer_v1.0.0_x64.zip" download class="cp-btn-magenta" onclick="triggerDownloadNotice(event)">
-          START DOWNLOAD (.ZIP)
+          DOWNLOAD
         </a>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: PILLAR / TRAILER INFO MODAL -->
+  <!-- MODAL 2: INFO -->
   <div id="info-modal" class="cp-modal hidden" onclick="if(event.target===this) closeInfoModal()">
     <div class="cp-modal-box">
-      <span class="modal-micro" id="info-modal-tag">/// MODULE_BRIEFING</span>
-      <h3 id="info-modal-title">CURRICULUM DETAILS</h3>
+      <span class="modal-micro" id="info-modal-tag"></span>
+      <h3 id="info-modal-title"></h3>
       <p id="info-modal-body" style="margin: 14px 0 22px; line-height: 1.5; color: #EDE9F7;"></p>
       <div class="modal-actions">
-        <button class="cp-btn-cyan" onclick="closeInfoModal()">GOT IT</button>
+        <button class="cp-btn-cyan" onclick="closeInfoModal()">OK</button>
       </div>
     </div>
   </div>
