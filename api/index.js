@@ -144,36 +144,43 @@ app.get('/api/admin/analytics', async (req, res) => {
 
 // GET Full Learner & Assessment Dataset for Excel (.xlsx) Export
 app.get('/api/admin/export-data', async (req, res) => {
+  let learners = [];
+  let lessonStats = [];
+  let questionBank = [];
+  const errors = [];
+
+  // 1. Real Learner Telemetry from TiDB
   try {
-    // 1. Individual Learner Telemetry (Profile + Pre/Mission/Post Averages)
-    const [learners] = await pool.query(`
+    const [rows] = await pool.query(`
       SELECT 
         u.user_id,
         u.username,
-        CONCAT(lp.first_name, ' ', lp.last_name) AS full_name,
-        lp.age,
-        lp.sex,
-        lp.total_xp,
-        lp.current_level,
+        u.email,
+        ANY_VALUE(lp.age) AS age,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type = 'pre_test' THEN aa.score END), 1), 0) AS pre_test_avg,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type LIKE 'mission_%' THEN aa.score END), 1), 0) AS mission_avg,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type = 'post_test' THEN aa.score END), 1), 0) AS post_test_avg,
         COALESCE(ROUND(AVG(aa.score), 1), 0) AS overall_avg,
         COUNT(aa.attempt_id) AS total_attempts
       FROM users u
-      JOIN learner_profiles lp ON u.user_id = lp.user_id
+      LEFT JOIN learner_profiles lp ON u.user_id = lp.user_id
       LEFT JOIN assessment_attempts aa ON u.user_id = aa.user_id
       LEFT JOIN assessments a ON aa.assessment_id = a.assessment_id
       WHERE u.role = 'learner'
-      GROUP BY u.user_id, u.username, lp.first_name, lp.last_name, lp.age, lp.sex, lp.total_xp, lp.current_level
+      GROUP BY u.user_id, u.username, u.email
       ORDER BY u.user_id ASC
     `);
+    learners = rows;
+  } catch (err) {
+    errors.push(`learners: ${err.message}`);
+  }
 
-    // 2. Lesson-by-Lesson Pre-Test vs Mission vs Post-Test Breakdown
-    const [lessonStats] = await pool.query(`
+  // 2. Real Lesson-by-Lesson Breakdown from TiDB
+  try {
+    const [rows] = await pool.query(`
       SELECT 
         l.lesson_id,
-        loc.location_name,
+        ANY_VALUE(loc.location_name) AS location_name,
         l.title,
         l.xp_reward,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type = 'pre_test' THEN aa.score END), 1), 0) AS pre_avg,
@@ -184,12 +191,17 @@ app.get('/api/admin/export-data', async (req, res) => {
       LEFT JOIN locations loc ON l.location_id = loc.location_id
       LEFT JOIN assessments a ON l.lesson_id = a.lesson_id
       LEFT JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id
-      GROUP BY l.lesson_id, loc.location_name, l.title, l.xp_reward
+      GROUP BY l.lesson_id, l.title, l.xp_reward, l.lesson_order
       ORDER BY l.lesson_order ASC
     `);
+    lessonStats = rows;
+  } catch (err) {
+    errors.push(`lessonStats: ${err.message}`);
+  }
 
-    // 3. Full Quiz & Question Bank (Includes any newly added lessons/questions)
-    const [questionBank] = await pool.query(`
+  // 3. Real Quiz & Question Bank from TiDB
+  try {
+    const [rows] = await pool.query(`
       SELECT 
         l.lesson_id,
         l.title AS lesson_title,
@@ -202,14 +214,15 @@ app.get('/api/admin/export-data', async (req, res) => {
       JOIN assessments a ON q.assessment_id = a.assessment_id
       JOIN lessons l ON a.lesson_id = l.lesson_id
       LEFT JOIN answer_options ao ON q.question_id = ao.question_id
-      GROUP BY l.lesson_id, l.title, a.assessment_type, q.question_id, q.question_order, q.question_text, q.points
+      GROUP BY q.question_id, l.lesson_id, l.title, l.lesson_order, a.assessment_id, a.assessment_type, q.question_order, q.question_text, q.points
       ORDER BY l.lesson_order ASC, a.assessment_id ASC, q.question_order ASC
     `);
-
-    res.json({ learners, lessonStats, questionBank });
+    questionBank = rows;
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    errors.push(`questionBank: ${err.message}`);
   }
+
+  res.json({ learners, lessonStats, questionBank, errors });
 });
 
 // 2. POST Add Lesson
