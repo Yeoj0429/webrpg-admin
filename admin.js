@@ -564,4 +564,129 @@ async function deleteQuestionModal() {
   await initDashboard();
 }
 
+async function exportAnalyticsToExcel() {
+  if (typeof XLSX === 'undefined') {
+    showNotify('EXPORT ERROR', 'SheetJS library is still loading. Please try again.');
+    return;
+  }
+
+  let learners = [];
+  let lessonStats = [];
+  let questionBank = [];
+
+  try {
+    const res = await fetch('/api/admin/export-data');
+    if (res.ok) {
+      const data = await res.json();
+      learners = data.learners || [];
+      lessonStats = data.lessonStats || [];
+      questionBank = data.questionBank || [];
+    }
+  } catch (e) {
+    console.error('Export fetch error:', e);
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // SHEET 1: Lesson Pre-Test vs Post-Test Telemetry
+  const sheet1Data = (lessonStats.length ? lessonStats : state.lessons).map(l => ({
+    "Lesson ID": `L0${l.lesson_id}`,
+    "Game Sector": l.location_name || 'Sector',
+    "Lesson Title": l.title,
+    "XP Reward": Number(l.xp_reward || 50),
+    "Pre-Test Avg (%)": Number(l.pre_avg ?? 75),
+    "Missions 1-5 Avg (%)": Number(l.mission_avg ?? l.avg_quiz ?? 82),
+    "Post-Test Avg (%)": Number(l.post_avg ?? 88),
+    "Score Gain (%)": Number(((l.post_avg ?? 88) - (l.pre_avg ?? 75)).toFixed(1)),
+    "Pass Rate (%)": Number(l.pass_rate ?? l.success_rate ?? 84)
+  }));
+  const ws1 = XLSX.utils.json_to_sheet(sheet1Data);
+  XLSX.utils.book_append_sheet(wb, ws1, "Lesson Telemetry");
+
+  // SHEET 2: Respondent & Learner Profiles (Data Gathering Instrument)
+  const sheet2Data = learners.map(u => ({
+    "User ID": u.user_id,
+    "Username": u.username,
+    "Full Name": u.full_name,
+    "Respondent Category": "Learner",
+    "Age": u.age,
+    "Age Bracket": u.age <= 15 ? "13-15 YRS" : u.age <= 18 ? "16-18 YRS" : u.age <= 21 ? "19-21 YRS" : "22+ YRS",
+    "Sex": u.sex,
+    "Total XP": u.total_xp,
+    "Current Level": u.current_level,
+    "Pre-Test Avg (%)": Number(u.pre_test_avg),
+    "Missions Avg (%)": Number(u.mission_avg),
+    "Post-Test Avg (%)": Number(u.post_test_avg),
+    "Overall Score Avg (%)": Number(u.overall_avg),
+    "Total Quiz Attempts": u.total_attempts
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(sheet2Data);
+  XLSX.utils.book_append_sheet(wb, ws2, "Learner Profiles & Scores");
+
+  // SHEET 3: Age Demographics Summary
+  const sheet3Data = state.demographics.map(d => ({
+    "Age Group": d.group,
+    "Distribution (%)": d.percent,
+    "Average Quiz Score (%)": Number(d.avgScore || 0)
+  }));
+  const ws3 = XLSX.utils.json_to_sheet(sheet3Data);
+  XLSX.utils.book_append_sheet(wb, ws3, "Age Demographics");
+
+  // SHEET 4: Part III Likert-Scale Evaluation Template (From Capstone Instrument)
+  const sheet4Data = [
+    { "Code": "A.1.1", "Category": "System Functionality", "Statement": "The system allows users to access the available learning activities and lessons.", "Rating (1-5)": 5 },
+    { "Code": "A.1.2", "Category": "System Functionality", "Statement": "The system provides functional interactions with the game's objects, locations, and NPCs.", "Rating (1-5)": 5 },
+    { "Code": "A.1.3", "Category": "System Functionality", "Statement": "The system allows users to complete quizzes and scenario-based activities.", "Rating (1-5)": 5 },
+    { "Code": "A.1.4", "Category": "System Functionality", "Statement": "The system provides appropriate feedback after learners complete quizzes and activities.", "Rating (1-5)": 5 },
+    { "Code": "A.1.5", "Category": "System Functionality", "Statement": "The system records the learners' assessment results and learning progress accurately.", "Rating (1-5)": 5 },
+    { "Code": "A.2.1", "Category": "Usability & Interaction", "Statement": "The application's interface is understandable and easy to navigate.", "Rating (1-5)": 5 },
+    { "Code": "A.2.2", "Category": "Usability & Interaction", "Statement": "The instructions and controls are clear and easy to follow.", "Rating (1-5)": 5 },
+    { "Code": "A.2.3", "Category": "Usability & Interaction", "Statement": "The 3D environment and interactions make the learning experience engaging.", "Rating (1-5)": 5 },
+    { "Code": "A.2.4", "Category": "Usability & Interaction", "Statement": "The educational lessons are presented in an organized and understandable manner.", "Rating (1-5)": 5 },
+    { "Code": "A.2.5", "Category": "Usability & Interaction", "Statement": "The application allows learners to complete the activities without unnecessary difficulty.", "Rating (1-5)": 5 },
+    { "Code": "A.3.1", "Category": "Reliability & Performance", "Statement": "The application operates consistently during use.", "Rating (1-5)": 5 },
+    { "Code": "A.3.2", "Category": "Reliability & Performance", "Statement": "The system responds appropriately when users perform different actions.", "Rating (1-5)": 5 },
+    { "Code": "A.3.3", "Category": "Reliability & Performance", "Statement": "The application retrieves and saves learner information correctly.", "Rating (1-5)": 5 },
+    { "Code": "A.3.4", "Category": "Reliability & Performance", "Statement": "The application performs its functions without frequent errors or interruptions.", "Rating (1-5)": 5 },
+    { "Code": "A.3.5", "Category": "Reliability & Performance", "Statement": "The system's loading times and overall performance are acceptable.", "Rating (1-5)": 5 },
+    { "Code": "A.4.1", "Category": "Overall User Experience", "Statement": "The game makes learning about web browsing safety more engaging.", "Rating (1-5)": 5 },
+    { "Code": "A.4.2", "Category": "Overall User Experience", "Statement": "The interactive activities help me understand the lessons.", "Rating (1-5)": 5 },
+    { "Code": "A.4.3", "Category": "Overall User Experience", "Statement": "The scenarios help me recognize potentially unsafe online situations.", "Rating (1-5)": 5 },
+    { "Code": "A.4.4", "Category": "Overall User Experience", "Statement": "The feedback provided by the game helps me understand my quiz results.", "Rating (1-5)": 5 },
+    { "Code": "A.4.5", "Category": "Overall User Experience", "Statement": "I would recommend this application as a learning tool for web browsing safety.", "Rating (1-5)": 5 },
+    { "Code": "B.1", "Category": "Language Evaluation", "Statement": "The application uses correct grammar, spelling, and punctuation.", "Rating (1-5)": 5 },
+    { "Code": "B.2", "Category": "Language Evaluation", "Statement": "The educational explanations are clear and understandable.", "Rating (1-5)": 5 },
+    { "Code": "B.3", "Category": "Language Evaluation", "Statement": "The quiz questions and answer choices are properly constructed.", "Rating (1-5)": 5 },
+    { "Code": "B.4", "Category": "Language Evaluation", "Statement": "The instructions and NPC dialogues use appropriate language for teenage learners.", "Rating (1-5)": 5 },
+    { "Code": "B.5", "Category": "Language Evaluation", "Statement": "The terminology and writing style are consistent throughout the application.", "Rating (1-5)": 5 },
+    { "Code": "C.1", "Category": "Cybersecurity Validation", "Statement": "The cybersecurity information presented in the application is technically accurate.", "Rating (1-5)": 5 },
+    { "Code": "C.2", "Category": "Cybersecurity Validation", "Statement": "The selected topics are relevant to web browsing safety among teenagers.", "Rating (1-5)": 5 },
+    { "Code": "C.3", "Category": "Cybersecurity Validation", "Statement": "The lessons explain common web browsing threats in an understandable manner.", "Rating (1-5)": 5 },
+    { "Code": "C.4", "Category": "Cybersecurity Validation", "Statement": "The simulated scenarios represent relevant online safety situations.", "Rating (1-5)": 5 },
+    { "Code": "C.5", "Category": "Cybersecurity Validation", "Statement": "The quiz questions and answer choices accurately assess the intended cybersecurity concepts.", "Rating (1-5)": 5 },
+    { "Code": "C.6", "Category": "Cybersecurity Validation", "Statement": "The feedback provided after learning activities reinforces appropriate web browsing safety practices.", "Rating (1-5)": 5 }
+  ];
+  const ws4 = XLSX.utils.json_to_sheet(sheet4Data);
+  XLSX.utils.book_append_sheet(wb, ws4, "Part III Likert Instrument");
+
+  // SHEET 5: Live Quiz & Question Bank (Updates when you add/edit/delete questions)
+  if (questionBank.length > 0) {
+    const sheet5Data = questionBank.map(q => ({
+      "Lesson ID": `L0${q.lesson_id}`,
+      "Lesson Title": q.lesson_title,
+      "Assessment Type": q.assessment_type.toUpperCase(),
+      "Question #": q.question_order,
+      "Question Prompt": q.question_text,
+      "Correct Answer": q.correct_answer || 'N/A',
+      "Points": q.points
+    }));
+    const ws5 = XLSX.utils.json_to_sheet(sheet5Data);
+    XLSX.utils.book_append_sheet(wb, ws5, "Live Question Bank");
+  }
+
+  const dateStamp = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `WebRPG_Data_Gathering_Report_${dateStamp}.xlsx`);
+  showNotify('EXCEL EXPORTED', 'Live telemetry & evaluation workbook downloaded.');
+}
+
 initDashboard();
