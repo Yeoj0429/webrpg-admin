@@ -35,6 +35,7 @@ function renderTopbarActions(viewName) {
     `;
   } else {
     container.innerHTML = `
+      <button class="cp-notch-btn magenta-btn" onclick="exportAnalyticsToExcel()">⬇ EXPORT EXCEL (.XLSX)</button>
       <button class="cp-notch-btn cyan-btn" onclick="initDashboard()">↻ SYNC LIVE DB</button>
     `;
   }
