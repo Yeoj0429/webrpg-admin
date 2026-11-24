@@ -574,7 +574,8 @@ if (process.env.NODE_ENV !== 'production') {
 // ==========================================
 app.get('/api/player/dashboard', async (req, res) => {
   try {
-    const userId = req.query.user_id || 2; // Default to demo learner if not passed
+    const userId = req.query.user_id;
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized.' });
 
     const [[user]] = await pool.query(
       `SELECT user_id, username, email, role FROM users WHERE user_id = ? LIMIT 1`,

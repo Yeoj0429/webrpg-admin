@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Cyberpunk Dashboard Custom Extensions */
     :root {
       --cp-bg: #121212;
       --cp-surface: #1e1e1e;
@@ -23,124 +22,59 @@
       font-family: 'Rajdhani', sans-serif;
       margin: 0;
       padding: 0;
+      visibility: hidden; /* Hidden until auth check passes */
     }
-    .player-shell {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
-    }
+    .player-shell { max-width: 1200px; margin: 0 auto; padding: 24px; }
     .player-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--cp-cyan);
-      padding-bottom: 16px;
-      margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 2px solid var(--cp-cyan); padding-bottom: 16px; margin-bottom: 24px;
     }
     .player-header h1 {
-      font-family: 'Orbitron', sans-serif;
-      margin: 0;
-      font-size: 1.8rem;
-      color: var(--cp-cyan);
-      letter-spacing: 1px;
+      font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.8rem;
+      color: var(--cp-cyan); letter-spacing: 1px;
     }
-    .player-grid {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 24px;
-    }
-    @media (max-width: 900px) {
-      .player-grid { grid-template-columns: 1fr; }
-    }
+    .player-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+    @media (max-width: 900px) { .player-grid { grid-template-columns: 1fr; } }
     .cp-card {
-      background: var(--cp-surface);
-      border: 1px solid var(--cp-border);
-      border-left: 4px solid var(--cp-cyan);
-      padding: 20px;
-      margin-bottom: 20px;
+      background: var(--cp-surface); border: 1px solid var(--cp-border);
+      border-left: 4px solid var(--cp-cyan); padding: 20px; margin-bottom: 20px;
     }
     .cp-card.magenta { border-left-color: var(--cp-magenta); }
     .cp-card.yellow { border-left-color: var(--cp-yellow); }
     .cp-card h3 {
-      font-family: 'Orbitron', sans-serif;
-      margin-top: 0;
-      font-size: 1.1rem;
-      letter-spacing: 0.5px;
-      color: #fff;
+      font-family: 'Orbitron', sans-serif; margin-top: 0; font-size: 1.1rem;
+      letter-spacing: 0.5px; color: #fff;
     }
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0;
-      font-size: 1.1rem;
-    }
-    .stat-row strong {
-      font-family: 'Orbitron', sans-serif;
-    }
+    .stat-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 1.1rem; }
+    .stat-row strong { font-family: 'Orbitron', sans-serif; }
     .progress-bar-wrap {
-      background: #0a0e24;
-      border: 1px solid #444;
-      height: 14px;
-      width: 100%;
-      margin-top: 8px;
-      overflow: hidden;
+      background: #0a0e24; border: 1px solid #444; height: 14px;
+      width: 100%; margin-top: 8px; overflow: hidden;
     }
     .progress-bar-fill {
       background: linear-gradient(90deg, var(--cp-cyan), var(--cp-magenta));
-      height: 100%;
-      width: 0%;
-      transition: width 0.5s ease;
+      height: 100%; width: 0%; transition: width 0.5s ease;
     }
     .modules-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;
     }
-    .module-item {
-      background: #181818;
-      border: 1px solid #333;
-      padding: 14px;
-      border-radius: 4px;
-    }
+    .module-item { background: #181818; border: 1px solid #333; padding: 14px; border-radius: 4px; }
     .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
-      text-transform: uppercase;
+      display: inline-block; padding: 2px 8px; font-size: 0.75rem;
+      font-weight: 700; font-family: 'Orbitron', sans-serif; text-transform: uppercase;
     }
     .badge-cyan { background: rgba(74, 216, 240, 0.15); color: var(--cp-cyan); border: 1px solid var(--cp-cyan); }
     .badge-green { background: rgba(62, 242, 168, 0.15); color: var(--cp-green); border: 1px solid var(--cp-green); }
-    .cp-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+    .cp-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     .cp-table th, .cp-table td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #333;
-      font-size: 0.95rem;
+      padding: 10px; text-align: left; border-bottom: 1px solid #333; font-size: 0.95rem;
     }
-    .cp-table th {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--cp-cyan);
-      font-size: 0.85rem;
-    }
+    .cp-table th { font-family: 'Orbitron', sans-serif; color: var(--cp-cyan); font-size: 0.85rem; }
     .logout-btn {
-      background: transparent;
-      border: 1px solid #ff2a6d;
-      color: #ff2a6d;
-      padding: 8px 16px;
-      font-family: 'Orbitron', sans-serif;
-      cursor: pointer;
-      font-weight: 700;
+      background: transparent; border: 1px solid #ff2a6d; color: #ff2a6d;
+      padding: 8px 16px; font-family: 'Orbitron', sans-serif; cursor: pointer; font-weight: 700;
     }
-    .logout-btn:hover {
-      background: #ff2a6d;
-      color: #fff;
-    }
+    .logout-btn:hover { background: #ff2a6d; color: #fff; }
   </style>
 </head>
 <body>
@@ -160,18 +94,18 @@
         <div class="cp-card">
           <h3>OPERATIVE ID CARD</h3>
           <div style="text-align: center; margin: 15px 0;">
-            <div id="player-avatar" style="width: 70px; height: 70px; background: var(--cp-cyan); color: #121212; font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto; border-radius: 50%;">OP</div>
-            <h2 id="player-username" style="margin: 10px 0 2px; font-family: 'Orbitron', sans-serif; color: #fff;">LOADING...</h2>
+            <div id="player-avatar" style="width: 70px; height: 70px; background: var(--cp-cyan); color: #121212; font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto; border-radius: 50%;">--</div>
+            <h2 id="player-username" style="margin: 10px 0 2px; font-family: 'Orbitron', sans-serif; color: #fff;">—</h2>
             <span id="player-email" style="color: #aaa; font-size: 0.9rem;">—</span>
           </div>
           <div class="stat-row"><span>Age Group:</span> <strong id="player-age">—</strong></div>
-          <div class="stat-row"><span>Current Level:</span> <strong id="player-level" style="color: var(--cp-cyan);">1</strong></div>
-          <div class="stat-row"><span>Total XP:</span> <strong id="player-xp" style="color: var(--cp-yellow);">0 XP</strong></div>
-          
+          <div class="stat-row"><span>Current Level:</span> <strong id="player-level" style="color: var(--cp-cyan);">—</strong></div>
+          <div class="stat-row"><span>Total XP:</span> <strong id="player-xp" style="color: var(--cp-yellow);">—</strong></div>
+
           <div style="margin-top: 15px;">
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
               <span>RANK PROGRESS</span>
-              <span id="xp-to-next">0 / 500 XP</span>
+              <span id="xp-to-next">— / 500 XP</span>
             </div>
             <div class="progress-bar-wrap">
               <div id="xp-progress-bar" class="progress-bar-fill"></div>
@@ -185,7 +119,7 @@
             Institutional passing standard anchored to PLV MST 4: <strong>75.00%</strong> required to clear mission assessments.
           </p>
           <div class="stat-row"><span>Overall Average:</span> <strong id="player-overall-avg" style="color: var(--cp-magenta);">—</strong></div>
-          <div class="stat-row"><span>Completed Modules:</span> <strong id="player-completed-count">0 / 5</strong></div>
+          <div class="stat-row"><span>Completed Modules:</span> <strong id="player-completed-count">— / 5</strong></div>
         </div>
       </div>
 
@@ -193,13 +127,11 @@
       <div>
         <div class="cp-card yellow">
           <h3>MST 4 MODULE MASTERY GRID</h3>
-          <div id="modules-container" class="modules-grid">
-            <div class="module-item">Loading curriculum modules...</div>
-          </div>
+          <div id="modules-container" class="modules-grid"></div>
         </div>
 
         <div class="cp-card">
-          <h3>ASSESSMENT ATTEMPT HISTORY (TI-DB TELEMETRY)</h3>
+          <h3>ASSESSMENT ATTEMPT HISTORY</h3>
           <div style="overflow-x: auto;">
             <table class="cp-table">
               <thead>
@@ -211,9 +143,7 @@
                   <th>DATE</th>
                 </tr>
               </thead>
-              <tbody id="attempts-table-body">
-                <tr><td colspan="5" style="text-align:center; color:#888;">Loading telemetry records...</td></tr>
-              </tbody>
+              <tbody id="attempts-table-body"></tbody>
             </table>
           </div>
         </div>
@@ -222,99 +152,116 @@
   </div>
 
   <script>
-    const API_BASE = '/api/player/dashboard'; // Connects to player backend route
+    // 1. STRICT AUTH GUARD: Block unauthenticated access immediately
+    const userId = localStorage.getItem('user_id');
+    const token = localStorage.getItem('token') || localStorage.getItem('webrpg_token');
+    const role = localStorage.getItem('role');
+
+    if (!userId || !token) {
+      window.location.replace('login.html');
+    } else if (role === 'admin') {
+      window.location.replace('admin.html');
+    } else {
+      document.body.style.visibility = 'visible';
+    }
 
     function getAuthHeaders() {
-      const token = localStorage.getItem('token') || localStorage.getItem('webrpg_token') || '';
-      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+      return {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      };
     }
 
     async function loadPlayerDashboard() {
-      // For testing preview without live session, fallback to user_id 2 (runner_kiro) if no token
-      const userId = localStorage.getItem('user_id') || '2'; 
+      if (!userId || !token) return;
 
       try {
-        const res = await fetch(`/api/player/dashboard?user_id=${userId}`, { headers: getAuthHeaders() });
+        const res = await fetch(`/api/player/dashboard?user_id=${encodeURIComponent(userId)}`, {
+          headers: getAuthHeaders()
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          logoutPlayer();
+          return;
+        }
+
         const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message || 'Failed to load profile.');
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'Unable to load learner data.');
+        }
 
         const { user, profile, modules, attempts } = data;
 
-        // Populate Header & Profile Card
+        // Populate Profile Card from real DB values only
         document.getElementById('player-username').textContent = user.username.toUpperCase();
         document.getElementById('player-email').textContent = user.email;
         document.getElementById('player-avatar').textContent = user.username.substring(0, 2).toUpperCase();
-        document.getElementById('player-age').textContent = profile.age ? `${profile.age} Yrs Old` : 'N/A';
-        document.getElementById('player-level').textContent = profile.current_level || 1;
-        document.getElementById('player-xp').textContent = `${profile.total_xp || 0} XP`;
+        document.getElementById('player-age').textContent = profile?.age ? `${profile.age} Yrs Old` : '—';
+        document.getElementById('player-level').textContent = profile?.current_level ?? 1;
+        document.getElementById('player-xp').textContent = `${profile?.total_xp ?? 0} XP`;
 
-        // XP Progress bar calculation (assuming 500 XP per level rank)
-        const xp = profile.total_xp || 0;
+        const xp = profile?.total_xp ?? 0;
         const currentLevelXP = xp % 500;
-        const xpPercent = Math.min(100, (currentLevelXP / 500) * 100);
-        document.getElementById('xp-progress-bar').style.width = `${xpPercent}%`;
+        document.getElementById('xp-progress-bar').style.width = `${Math.min(100, (currentLevelXP / 500) * 100)}%`;
         document.getElementById('xp-to-next').textContent = `${currentLevelXP} / 500 XP`;
 
-        // Overall Stats
-        const avgScore = attempts.length ? (attempts.reduce((acc, a) => acc + Number(a.score), 0) / attempts.length).toFixed(1) : 0;
-        document.getElementById('player-overall-avg').textContent = `${avgScore}%`;
+        const avgScore = attempts.length
+          ? `${(attempts.reduce((acc, a) => acc + Number(a.score), 0) / attempts.length).toFixed(1)}%`
+          : '—';
+        document.getElementById('player-overall-avg').textContent = avgScore;
 
         // Render Modules Grid
         const modContainer = document.getElementById('modules-container');
         let completedCount = 0;
-        modContainer.innerHTML = modules.map(m => {
-          const isPassed = m.best_score >= 75;
-          if (isPassed) completedCount++;
-          return `
-            <div class="module-item">
-              <span class="badge ${isPassed ? 'badge-green' : 'badge-cyan'}">${isPassed ? 'CLEARED' : 'IN PROGRESS'}</span>
-              <h4 style="margin: 8px 0 4px; font-size: 0.95rem; color:#fff;">${m.title}</h4>
-              <small style="color: #aaa;">Best Score: <strong>${m.best_score !== null ? m.best_score + '%' : 'None'}</strong></small>
-            </div>
-          `;
-        }).join('');
-        document.getElementById('player-completed-count').textContent = `${completedCount} / 5`;
+        modContainer.innerHTML = modules.length
+          ? modules.map(m => {
+              const hasScore = m.best_score !== null && m.best_score !== undefined;
+              const isPassed = hasScore && Number(m.best_score) >= 75;
+              if (isPassed) completedCount++;
+              return `
+                <div class="module-item">
+                  <span class="badge ${isPassed ? 'badge-green' : 'badge-cyan'}">
+                    ${isPassed ? 'CLEARED' : hasScore ? 'IN PROGRESS' : 'NOT STARTED'}
+                  </span>
+                  <h4 style="margin: 8px 0 4px; font-size: 0.95rem; color:#fff;">${m.title}</h4>
+                  <small style="color: #aaa;">Best Score: <strong>${hasScore ? m.best_score + '%' : '—'}</strong></small>
+                </div>
+              `;
+            }).join('')
+          : `<div class="module-item">No modules available.</div>`;
+
+        document.getElementById('player-completed-count').textContent = `${completedCount} / ${modules.length || 5}`;
 
         // Render Attempts Table
         const tbody = document.getElementById('attempts-table-body');
-        tbody.innerHTML = attempts.length ? attempts.map(a => `
-          <tr>
-            <td>${a.assessment_title}</td>
-            <td><span style="opacity:0.8; font-size:0.85rem;">${a.assessment_type.toUpperCase()}</span></td>
-            <td><strong>${a.score}%</strong></td>
-            <td style="color:${Number(a.score) >= 75 ? 'var(--cp-green)' : '#ff2a6d'}; font-weight:700;">
-              ${Number(a.score) >= 75 ? 'PASSED' : 'FAILED'}
-            </td>
-            <td>${new Date(a.attempted_at).toLocaleDateString()}</td>
-          </tr>
-        `).join('') : `<tr><td colspan="5" style="text-align:center; color:#888;">No quiz attempts logged yet.</td></tr>`;
+        tbody.innerHTML = attempts.length
+          ? attempts.map(a => `
+              <tr>
+                <td>${a.assessment_title}</td>
+                <td><span style="opacity:0.8; font-size:0.85rem;">${a.assessment_type.toUpperCase()}</span></td>
+                <td><strong>${a.score}%</strong></td>
+                <td style="color:${Number(a.score) >= 75 ? 'var(--cp-green)' : '#ff2a6d'}; font-weight:700;">
+                  ${Number(a.score) >= 75 ? 'PASSED' : 'FAILED'}
+                </td>
+                <td>${new Date(a.attempted_at).toLocaleDateString()}</td>
+              </tr>
+            `).join('')
+          : `<tr><td colspan="5" style="text-align:center; color:#888;">No quiz attempts recorded yet.</td></tr>`;
 
       } catch (err) {
-        console.error(err);
-        document.getElementById('player-username').textContent = 'DEMO OPERATIVE';
-        document.getElementById('player-email').textContent = 'kiro@webrpg.com';
-        document.getElementById('player-age').textContent = '14 Yrs Old';
-        document.getElementById('player-level').textContent = '4';
-        document.getElementById('player-xp').textContent = '450 XP';
-        document.getElementById('xp-progress-bar').style.width = '90%';
-        document.getElementById('xp-to-next').textContent = '450 / 500 XP';
-        document.getElementById('player-overall-avg').textContent = '84.2%';
-        document.getElementById('player-completed-count').textContent = '3 / 5';
-        document.getElementById('modules-container').innerHTML = `
-          <div class="module-item"><span class="badge badge-green">CLEARED</span><h4 style="margin:8px 0 4px;color:#fff;">Lesson 1: Safe Web Browsing</h4><small>Best Score: <strong>90%</strong></small></div>
-          <div class="module-item"><span class="badge badge-green">CLEARED</span><h4 style="margin:8px 0 4px;color:#fff;">Lesson 2: Phishing & Scams</h4><small>Best Score: <strong>85%</strong></small></div>
-          <div class="module-item"><span class="badge badge-cyan">IN PROGRESS</span><h4 style="margin:8px 0 4px;color:#fff;">Lesson 4: Data Privacy Act</h4><small>Best Score: <strong>60%</strong></small></div>
-        `;
-        document.getElementById('attempts-table-body').innerHTML = `
-          <tr><td>Lesson 2 - Mission 01 Task</td><td>MISSION_1</td><td>85.00%</td><td style="color:var(--cp-green); font-weight:700;">PASSED</td><td>11/24/2026</td></tr>
-          <tr><td>Lesson 1 - Pre-Test Diagnostic</td><td>PRE_TEST</td><td>90.00%</td><td style="color:var(--cp-green); font-weight:700;">PASSED</td><td>11/23/2026</td></tr>
-        `;
+        document.getElementById('modules-container').innerHTML =
+          `<div class="module-item" style="color:#ff2a6d;">${err.message}</div>`;
+        document.getElementById('attempts-table-body').innerHTML =
+          `<tr><td colspan="5" style="text-align:center; color:#ff2a6d;">${err.message}</td></tr>`;
       }
     }
 
     function logoutPlayer() {
-      localStorage.clear();
-      window.location.href = 'index.html';
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('token');
+      localStorage.removeItem('webrpg_token');
+      localStorage.removeItem('role');
+      window.location.replace('login.html');
     }
 
     window.addEventListener('DOMContentLoaded', loadPlayerDashboard);
