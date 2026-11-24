@@ -569,4 +569,61 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
 }
 
+// ==========================================
+// PLAYER DASHBOARD API ROUTE
+// ==========================================
+app.get('/api/player/dashboard', async (req, res) => {
+  try {
+    const userId = req.query.user_id || 2; // Default to demo learner if not passed
+
+    const [[user]] = await pool.query(
+      `SELECT user_id, username, email, role FROM users WHERE user_id = ? LIMIT 1`,
+      [userId]
+    );
+    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+
+    const [[profile]] = await pool.query(
+      `SELECT first_name, last_name, age, sex, total_xp, current_level FROM learner_profiles WHERE user_id = ? LIMIT 1`,
+      [userId]
+    );
+
+    const [modules] = await pool.query(`
+      SELECT 
+        l.lesson_id,
+        l.title,
+        MAX(aa.score) AS best_score
+      FROM lessons l
+      LEFT JOIN assessments a ON l.lesson_id = a.lesson_id
+      LEFT JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id AND aa.user_id = ?
+      GROUP BY l.lesson_id, l.title, l.lesson_order
+      ORDER BY l.lesson_order ASC
+    `, [userId]);
+
+    const [attempts] = await pool.query(`
+      SELECT 
+        aa.attempt_id,
+        a.title AS assessment_title,
+        a.assessment_type,
+        aa.score,
+        aa.attempted_at
+      FROM assessment_attempts aa
+      JOIN assessments a ON aa.assessment_id = a.assessment_id
+      WHERE aa.user_id = ?
+      ORDER BY aa.attempted_at DESC
+      LIMIT 15
+    `, [userId]);
+
+    res.json({
+      success: true,
+      user,
+      profile: profile || { total_xp: 0, current_level: 1, age: 15 },
+      modules: modules || [],
+      attempts: attempts || []
+    });
+  } catch (err) {
+    console.error('GET /api/player/dashboard error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = app;
