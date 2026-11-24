@@ -21,6 +21,7 @@
       <a href="#features" class="cp-nav-link" data-section="features" onclick="setActiveLink(this)">FEATURES</a>
       <a href="#pillars" class="cp-nav-link" data-section="pillars" onclick="setActiveLink(this)">TOPICS</a>
       <a href="#specs" class="cp-nav-link" data-section="specs" onclick="setActiveLink(this)">SPECS</a>
+      <a href="login.html" id="nav-auth-link" class="cp-nav-link" style="color: var(--pal-cyan-light);">LOGIN</a>
       <a href="#download" class="cp-nav-cta" onclick="openDownloadModal()">DOWNLOAD</a>
     </nav>
 
@@ -60,6 +61,7 @@
 
         <div class="cp-hero-btns">
           <button class="cp-btn-dark" onclick="openDownloadModal()">DOWNLOAD FOR PC</button>
+          <a href="login.html?mode=register" id="hero-auth-btn" class="cp-btn-dark">CREATE ACCOUNT</a>
           <button class="cp-btn-dark" onclick="openTrailerModal()">ABOUT THE GAME</button>
         </div>
 
@@ -262,5 +264,22 @@
   </div>
 
   <script src="landing.js"></script>
+  <script>
+    // Automatically switch navbar & hero button if user is already logged in
+    (function syncNavAuthState() {
+      const role = localStorage.getItem('role');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('webrpg_admin_token');
+      const navLink = document.getElementById('nav-auth-link');
+      const heroBtn = document.getElementById('hero-auth-btn');
+
+      if (token && (role === 'admin' || sessionStorage.getItem('webrpg_admin_token'))) {
+        if (navLink) { navLink.textContent = 'ADMIN CONSOLE'; navLink.href = 'admin.html'; }
+        if (heroBtn) { heroBtn.textContent = 'OPEN ADMIN CONSOLE'; heroBtn.href = 'admin.html'; }
+      } else if (token && role === 'learner') {
+        if (navLink) { navLink.textContent = 'DASHBOARD'; navLink.href = 'player-dashboard.html'; }
+        if (heroBtn) { heroBtn.textContent = 'OPEN DASHBOARD'; heroBtn.href = 'player-dashboard.html'; }
+      }
+    })();
+  </script>
 </body>
 </html>
