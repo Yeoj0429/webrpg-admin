@@ -389,19 +389,12 @@ app.delete('/api/admin/questions/:questionId', async (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
-}
-
-module.exports = app;
-
 // ==========================================
-// ADMIN: USERS MANAGEMENT ROUTES
+// 9. ADMIN: USERS MANAGEMENT ROUTES
 // ==========================================
 
-// 1. GET ALL USERS (with search, role, & age bracket filters)
-app.get('/api/admin/users', verifyAdmin, async (req, res) => {
+// GET All Users (Search + Role, Age Bracket & Status Filters)
+app.get('/api/admin/users', async (req, res) => {
   try {
     const { q = '', role = 'all', age_bracket = 'all', status = 'all' } = req.query;
 
@@ -411,11 +404,18 @@ app.get('/api/admin/users', verifyAdmin, async (req, res) => {
         u.username,
         u.email,
         u.role,
-        COALESCE(u.status, 'active') AS status,
+        COALESCE(u.account_status, 'active') AS status,
         u.created_at,
-        COALESCE(lp.age_bracket, 'N/A') AS age_bracket,
-        COALESCE(lp.level, 1) AS level,
-        COALESCE(lp.xp, 0) AS xp,
+        ANY_VALUE(lp.age) AS age,
+        CASE 
+          WHEN ANY_VALUE(lp.age) BETWEEN 13 AND 15 THEN '13-15'
+          WHEN ANY_VALUE(lp.age) BETWEEN 16 AND 18 THEN '16-18'
+          WHEN ANY_VALUE(lp.age) BETWEEN 19 AND 21 THEN '19-21'
+          WHEN ANY_VALUE(lp.age) >= 22 THEN '22+'
+          ELSE 'N/A'
+        END AS age_bracket,
+        COALESCE(ANY_VALUE(lp.level), 1) AS level,
+        COALESCE(ANY_VALUE(lp.xp), 0) AS xp,
         COUNT(aa.attempt_id) AS total_attempts,
         ROUND(AVG(aa.score), 1) AS avg_score
       FROM users u
@@ -433,45 +433,52 @@ app.get('/api/admin/users', verifyAdmin, async (req, res) => {
       sql += ` AND u.role = ?`;
       params.push(role);
     }
-    if (age_bracket !== 'all') {
-      sql += ` AND lp.age_bracket = ?`;
-      params.push(age_bracket);
-    }
     if (status !== 'all') {
-      sql += ` AND COALESCE(u.status, 'active') = ?`;
+      sql += ` AND COALESCE(u.account_status, 'active') = ?`;
       params.push(status);
     }
+    if (age_bracket === '13-15') sql += ` AND lp.age BETWEEN 13 AND 15`;
+    else if (age_bracket === '16-18') sql += ` AND lp.age BETWEEN 16 AND 18`;
+    else if (age_bracket === '19-21') sql += ` AND lp.age BETWEEN 19 AND 21`;
+    else if (age_bracket === '22+') sql += ` AND lp.age >= 22`;
 
     sql += `
-      GROUP BY 
-        u.user_id, u.username, u.email, u.role, u.status, 
-        u.created_at, lp.age_bracket, lp.level, lp.xp
-      ORDER BY u.created_at DESC
+      GROUP BY u.user_id, u.username, u.email, u.role, u.account_status, u.created_at
+      ORDER BY u.user_id DESC
     `;
 
     const [rows] = await pool.query(sql, params);
     res.json({ success: true, users: rows });
   } catch (err) {
     console.error('GET /api/admin/users error:', err);
-    res.status(500).json({ success: false, message: 'Failed to fetch users.' });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// 2. GET SINGLE USER DETAILS + ATTEMPT HISTORY (for Inline Modal)
-app.get('/api/admin/users/:id', verifyAdmin, async (req, res) => {
+// GET Single User Details + Attempt History (for Inline Modal)
+app.get('/api/admin/users/:id', async (req, res) => {
   try {
     const userId = req.params.id;
 
     const [[user]] = await pool.query(`
       SELECT 
         u.user_id, u.username, u.email, u.role,
-        COALESCE(u.status, 'active') AS status, u.created_at,
-        COALESCE(lp.age_bracket, 'N/A') AS age_bracket,
+        COALESCE(u.account_status, 'active') AS status,
+        u.created_at,
+        lp.age,
+        CASE 
+          WHEN lp.age BETWEEN 13 AND 15 THEN '13-15'
+          WHEN lp.age BETWEEN 16 AND 18 THEN '16-18'
+          WHEN lp.age BETWEEN 19 AND 21 THEN '19-21'
+          WHEN lp.age >= 22 THEN '22+'
+          ELSE 'N/A'
+        END AS age_bracket,
         COALESCE(lp.level, 1) AS level,
         COALESCE(lp.xp, 0) AS xp
       FROM users u
       LEFT JOIN learner_profiles lp ON u.user_id = lp.user_id
       WHERE u.user_id = ?
+      LIMIT 1
     `, [userId]);
 
     if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
@@ -494,55 +501,47 @@ app.get('/api/admin/users/:id', verifyAdmin, async (req, res) => {
     res.json({ success: true, user, attempts });
   } catch (err) {
     console.error('GET /api/admin/users/:id error:', err);
-    res.status(500).json({ success: false, message: 'Failed to load user details.' });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// 3. UPDATE USER ROLE / STATUS / AGE BRACKET
-app.put('/api/admin/users/:id', verifyAdmin, async (req, res) => {
+// PUT Update User Role, Status & Age Bracket
+app.put('/api/admin/users/:id', async (req, res) => {
   try {
     const userId = Number(req.params.id);
     const { role, status, age_bracket } = req.body;
 
-    // Prevent admin from locking themselves out
-    if (req.user && req.user.user_id === userId && (role !== 'admin' || status === 'inactive')) {
-      return res.status(400).json({
-        success: false,
-        message: 'You cannot demote or deactivate your own active admin account.'
-      });
-    }
-
     await pool.query(
-      `UPDATE users SET role = ?, status = ? WHERE user_id = ?`,
+      `UPDATE users SET role = ?, account_status = ? WHERE user_id = ?`,
       [role, status, userId]
     );
 
-    if (age_bracket && age_bracket !== 'N/A') {
+    const ageMap = { '13-15': 14, '16-18': 17, '19-21': 20, '22+': 22 };
+    if (ageMap[age_bracket]) {
       await pool.query(
-        `UPDATE learner_profiles SET age_bracket = ? WHERE user_id = ?`,
-        [age_bracket, userId]
+        `UPDATE learner_profiles SET age = ? WHERE user_id = ?`,
+        [ageMap[age_bracket], userId]
       );
     }
 
     res.json({ success: true, message: 'User updated successfully.' });
   } catch (err) {
     console.error('PUT /api/admin/users/:id error:', err);
-    res.status(500).json({ success: false, message: 'Failed to update user.' });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// 4. DELETE USER (Safely removes dependent records in a transaction)
-app.delete('/api/admin/users/:id', verifyAdmin, async (req, res) => {
+// DELETE User (Safely clears dependent records in a transaction)
+app.delete('/api/admin/users/:id', async (req, res) => {
   const conn = await pool.getConnection();
   try {
     const userId = Number(req.params.id);
 
-    if (req.user && req.user.user_id === userId) {
-      conn.release();
-      return res.status(400).json({ success: false, message: 'Cannot delete your own account.' });
-    }
-
     await conn.beginTransaction();
+    await conn.query(
+      `DELETE FROM learner_answers WHERE attempt_id IN (SELECT attempt_id FROM assessment_attempts WHERE user_id = ?)`,
+      [userId]
+    );
     await conn.query(`DELETE FROM assessment_attempts WHERE user_id = ?`, [userId]);
     await conn.query(`DELETE FROM learner_profiles WHERE user_id = ?`, [userId]);
     const [result] = await conn.query(`DELETE FROM users WHERE user_id = ?`, [userId]);
@@ -555,8 +554,15 @@ app.delete('/api/admin/users/:id', verifyAdmin, async (req, res) => {
   } catch (err) {
     await conn.rollback();
     console.error('DELETE /api/admin/users/:id error:', err);
-    res.status(500).json({ success: false, message: 'Failed to delete user.' });
+    res.status(500).json({ success: false, message: err.message });
   } finally {
     conn.release();
   }
 });
+
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
+}
+
+module.exports = app;
