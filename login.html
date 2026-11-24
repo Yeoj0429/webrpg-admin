@@ -3,204 +3,250 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! // Access Terminal</title>
+  <title>WEBRPG! // Access Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
   <style>
     :root {
-      --cp-bg: #0b0e1a;
-      --cp-surface: #14192d;
-      --cp-cyan: #4AD8F0;
-      --cp-magenta: #C84BF2;
-      --cp-yellow: #FCEE0A;
-      --cp-red: #ff2a6d;
+      --pal-cyan-light: #8CEEF6;
+      --pal-cyan-bright: #4AD8F0;
+      --pal-blue-electric: #2696E8;
+      --pal-navy-deep: #1B2654;
+      --pal-navy-void: #080B1A;
+      --pal-purple-neon: #8B4DF2;
+      --pal-magenta-neon: #C84BF2;
+      --pal-pink-neon: #F288E8;
+      --pal-white-soft: #EDE9F7;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #18203c 0%, var(--cp-bg) 70%);
-      color: #f2f4f3;
+      background-color: var(--pal-navy-void);
+      background-image:
+        radial-gradient(rgba(74, 216, 240, 0.12) 1px, transparent 1px),
+        radial-gradient(circle at 85% 15%, rgba(200, 75, 242, 0.2), transparent 35%),
+        radial-gradient(circle at 15% 85%, rgba(38, 150, 232, 0.2), transparent 40%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
+      color: var(--pal-white-soft);
       font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
-    .auth-card {
+
+    .login-card {
       width: 100%;
-      max-width: 480px;
-      background: var(--cp-surface);
-      border: 1px solid #2b355c;
-      border-top: 4px solid var(--cp-cyan);
-      padding: 28px;
-      box-shadow: 0 0 30px rgba(74, 216, 240, 0.12);
+      max-width: 460px;
+      background: linear-gradient(180deg, rgba(27, 38, 84, 0.85), rgba(8, 11, 26, 0.96));
+      border: 2px solid var(--pal-cyan-bright);
+      padding: 34px 30px;
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+      box-shadow: 0 0 35px rgba(74, 216, 240, 0.2);
+      transition: max-width 0.25s ease;
     }
-    .auth-brand {
-      text-align: center;
-      margin-bottom: 20px;
+
+    .login-card.register-mode {
+      max-width: 540px;
     }
-    .auth-brand h1 {
+
+    .brand-logo {
+      display: inline-block;
       font-family: 'Orbitron', sans-serif;
-      margin: 0;
-      font-size: 1.9rem;
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--pal-navy-void);
+      background: var(--pal-cyan-light);
+      padding: 4px 14px;
       letter-spacing: 2px;
-      color: #fff;
+      text-shadow: 2px 2px 0px var(--pal-magenta-neon);
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+      margin-bottom: 18px;
     }
-    .auth-brand h1 span { color: var(--cp-magenta); }
-    .auth-brand p {
-      margin: 4px 0 0;
-      color: #9aa7cc;
-      font-size: 0.95rem;
-    }
-    .auth-tabs {
+
+    .brand-logo span { color: var(--pal-purple-neon); }
+
+    .mode-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 20px;
     }
-    .tab-btn {
-      background: #0d1122;
-      border: 1px solid #2b355c;
-      color: #9aa7cc;
+
+    .mode-tab {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
       padding: 10px;
+      background: rgba(8, 11, 26, 0.85);
+      border: 1px solid var(--pal-blue-electric);
+      color: #a9b5d9;
+      cursor: pointer;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+      transition: 0.2s;
+    }
+
+    .mode-tab.active {
+      background: rgba(74, 216, 240, 0.16);
+      border-color: var(--pal-cyan-light);
+      color: var(--pal-cyan-light);
+      box-shadow: 0 0 12px rgba(74, 216, 240, 0.25);
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      color: var(--pal-cyan-light);
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+
+    p.sub {
+      font-size: 0.92rem;
+      color: #a9b5d9;
+      margin-bottom: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 14px;
+    }
+
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--pal-cyan-light);
+      margin-bottom: 6px;
+    }
+
+    .cp-input {
+      width: 100%;
+      background: rgba(8, 11, 26, 0.9);
+      border: 1px solid var(--pal-blue-electric);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.05rem;
+      padding: 11px 14px;
+      margin-bottom: 16px;
+      outline: none;
+    }
+
+    .cp-input:focus {
+      border-color: var(--pal-cyan-light);
+      box-shadow: 0 0 12px rgba(74, 216, 240, 0.35);
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(255, 42, 109, 0.15);
+      border-left: 3px solid #ff2a6d;
+      color: #ff85a9;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .login-btn {
+      width: 100%;
       font-family: 'Orbitron', sans-serif;
       font-size: 0.85rem;
       font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .tab-btn.active {
-      background: rgba(74, 216, 240, 0.15);
-      border-color: var(--cp-cyan);
-      color: var(--cp-cyan);
-    }
-    .field-group { margin-bottom: 14px; }
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
-    label {
-      display: block;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.72rem;
-      color: var(--cp-cyan);
-      margin-bottom: 5px;
-      letter-spacing: 0.5px;
-    }
-    .auth-input {
-      width: 100%;
-      box-sizing: border-box;
-      background: #0b0e1a;
-      border: 1px solid #2f3b66;
-      color: #fff;
-      padding: 10px 12px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1rem;
-    }
-    .auth-input:focus {
-      outline: none;
-      border-color: var(--cp-cyan);
-    }
-    .submit-btn {
-      width: 100%;
-      margin-top: 8px;
-      padding: 12px;
-      background: var(--cp-cyan);
-      color: #0b0e1a;
+      letter-spacing: 2px;
+      padding: 14px;
       border: none;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 0.95rem;
-      letter-spacing: 1px;
       cursor: pointer;
-    }
-    .submit-btn.magenta {
-      background: var(--cp-magenta);
+      background: linear-gradient(90deg, var(--pal-magenta-neon), var(--pal-purple-neon));
       color: #fff;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+      transition: 0.2s;
+      margin-top: 4px;
     }
-    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .status-banner {
-      display: none;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-      font-size: 0.92rem;
-      border-left: 3px solid var(--cp-red);
-      background: rgba(255, 42, 109, 0.12);
-      color: #ff80a8;
+
+    .login-btn:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 18px rgba(200, 75, 242, 0.5);
     }
+
     .back-link {
       display: block;
       text-align: center;
-      margin-top: 16px;
-      color: #9aa7cc;
+      margin-top: 20px;
+      color: var(--pal-cyan-bright);
       text-decoration: none;
+      font-weight: 700;
       font-size: 0.9rem;
+      letter-spacing: 1px;
     }
-    .back-link:hover { color: var(--cp-cyan); }
   </style>
 </head>
 <body>
 
-  <div class="auth-card">
-    <div class="auth-brand">
-      <h1>WEBRPG<span>!</span></h1>
-      <p>Valenzuela City Youth Cyber-Safety Terminal</p>
+  <div id="portal-card" class="login-card">
+    <div class="brand-logo">WEBRPG<span>!</span></div>
+
+    <div class="mode-tabs">
+      <button type="button" id="tab-login" class="mode-tab active" onclick="switchMode('login')">SIGN IN</button>
+      <button type="button" id="tab-register" class="mode-tab" onclick="switchMode('register')">REGISTER</button>
     </div>
 
-    <div class="auth-tabs">
-      <button type="button" id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">SIGN IN</button>
-      <button type="button" id="tab-register" class="tab-btn" onclick="switchAuthTab('register')">NEW OPERATIVE</button>
-    </div>
+    <h2 id="portal-heading">ACCESS PORTAL</h2>
+    <p id="portal-sub" class="sub">Sign in with your learner or administrator credentials.</p>
 
-    <div id="auth-alert" class="status-banner"></div>
+    <div id="login-error" class="error-msg">Invalid username or password.</div>
 
-    <!-- LOGIN FORM -->
-    <form id="login-form">
-      <div class="field-group">
-        <label>USERNAME OR EMAIL</label>
-        <input type="text" id="login-identifier" class="auth-input" placeholder="Enter username or email" required />
-      </div>
-      <div class="field-group">
-        <label>PASSWORD</label>
-        <input type="password" id="login-password" class="auth-input" placeholder="••••••••" required />
-      </div>
-      <button type="submit" id="login-submit" class="submit-btn">INITIALIZE SESSION</button>
+    <!-- SIGN IN FORM -->
+    <form id="login-form" onsubmit="handleUnifiedLogin(event)">
+      <label>USERNAME OR EMAIL</label>
+      <input type="text" id="login-user" class="cp-input" placeholder="Enter username or email" required />
+
+      <label>PASSWORD</label>
+      <input type="password" id="login-pass" class="cp-input" placeholder="••••••••" required />
+
+      <button type="submit" id="login-submit-btn" class="login-btn">SIGN IN</button>
     </form>
 
-    <!-- REGISTER FORM -->
-    <form id="register-form" style="display: none;">
-      <div class="field-row">
-        <div class="field-group">
+    <!-- LEARNER REGISTRATION FORM -->
+    <form id="register-form" style="display: none;" onsubmit="handleLearnerRegister(event)">
+      <div class="form-grid">
+        <div>
           <label>FIRST NAME</label>
-          <input type="text" id="reg-first" class="auth-input" placeholder="Juan" required />
+          <input type="text" id="reg-first" class="cp-input" placeholder="Juan" required />
         </div>
-        <div class="field-group">
+        <div>
           <label>LAST NAME</label>
-          <input type="text" id="reg-last" class="auth-input" placeholder="Dela Cruz" required />
+          <input type="text" id="reg-last" class="cp-input" placeholder="Dela Cruz" required />
         </div>
       </div>
 
-      <div class="field-row">
-        <div class="field-group">
+      <div class="form-grid">
+        <div>
           <label>USERNAME</label>
-          <input type="text" id="reg-username" class="auth-input" placeholder="cyber_juan" required />
+          <input type="text" id="reg-username" class="cp-input" placeholder="runner_juan" required />
         </div>
-        <div class="field-group">
-          <label>EMAIL ADDRESS</label>
-          <input type="email" id="reg-email" class="auth-input" placeholder="juan@email.com" required />
+        <div>
+          <label>EMAIL</label>
+          <input type="email" id="reg-email" class="cp-input" placeholder="juan@email.com" required />
         </div>
       </div>
 
-      <div class="field-row">
-        <div class="field-group">
+      <div class="form-grid">
+        <div>
           <label>AGE</label>
-          <input type="number" id="reg-age" class="auth-input" min="10" max="99" placeholder="15" required />
+          <input type="number" id="reg-age" class="cp-input" min="10" max="99" placeholder="15" required />
         </div>
-        <div class="field-group">
+        <div>
           <label>SEX</label>
-          <select id="reg-sex" class="auth-input">
+          <select id="reg-sex" class="cp-input">
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="prefer_not_to_say">Prefer not to say</option>
@@ -208,46 +254,43 @@
         </div>
       </div>
 
-      <div class="field-group">
-        <label>BARANGAY (VALENZUELA CITY)</label>
-        <select id="reg-location" class="auth-input">
-          <option value="">Loading barangays...</option>
-        </select>
-      </div>
+      <label>BARANGAY (VALENZUELA CITY)</label>
+      <select id="reg-location" class="cp-input">
+        <option value="">Loading barangays...</option>
+      </select>
 
-      <div class="field-group">
-        <label>PASSWORD (MIN. 6 CHARACTERS)</label>
-        <input type="password" id="reg-password" class="auth-input" minlength="6" placeholder="••••••••" required />
-      </div>
+      <label>PASSWORD (MIN. 6 CHARACTERS)</label>
+      <input type="password" id="reg-pass" class="cp-input" minlength="6" placeholder="••••••••" required />
 
-      <button type="submit" id="reg-submit" class="submit-btn magenta">CREATE OPERATIVE ACCOUNT</button>
+      <button type="submit" id="reg-submit-btn" class="login-btn">CREATE ACCOUNT</button>
     </form>
 
-    <a href="index.html" class="back-link">← Return to Main Portal</a>
+    <a href="index.html" class="back-link">← RETURN TO GAME WEBSITE</a>
   </div>
 
   <script>
-    const alertBox = document.getElementById('auth-alert');
-
-    function showAlert(msg) {
-      alertBox.textContent = msg;
-      alertBox.style.display = 'block';
+    // Redirect if already authenticated
+    if (sessionStorage.getItem('webrpg_admin_token') || localStorage.getItem('role') === 'admin') {
+      window.location.href = 'admin.html';
+    } else if (localStorage.getItem('token') && localStorage.getItem('role') === 'learner') {
+      window.location.href = 'player-dashboard.html';
     }
 
-    function hideAlert() {
-      alertBox.style.display = 'none';
-    }
-
-    function switchAuthTab(mode) {
-      hideAlert();
+    function switchMode(mode) {
       const isLogin = mode === 'login';
+      document.getElementById('login-error').style.display = 'none';
       document.getElementById('tab-login').classList.toggle('active', isLogin);
       document.getElementById('tab-register').classList.toggle('active', !isLogin);
       document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
       document.getElementById('register-form').style.display = isLogin ? 'none' : 'block';
+      document.getElementById('portal-card').classList.toggle('register-mode', !isLogin);
+      document.getElementById('portal-heading').innerText = isLogin ? 'ACCESS PORTAL' : 'LEARNER REGISTRATION';
+      document.getElementById('portal-sub').innerText = isLogin
+        ? 'Sign in with your learner or administrator credentials.'
+        : 'Create your Valenzuela City learner operative profile.';
     }
 
-    function saveSessionAndRedirect(data) {
+    function completeAuthRedirect(data) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('webrpg_token', data.token);
       localStorage.setItem('user_id', String(data.user.user_id));
@@ -255,14 +298,14 @@
       localStorage.setItem('role', data.user.role);
 
       if (data.user.role === 'admin') {
-        localStorage.setItem('adminToken', data.token);
-        window.location.replace('admin.html');
+        sessionStorage.setItem('webrpg_admin_token', data.token);
+        sessionStorage.setItem('webrpg_admin_user', data.user.username);
+        window.location.href = 'admin.html';
       } else {
-        window.location.replace('player-dashboard.html');
+        window.location.href = 'player-dashboard.html';
       }
     }
 
-    // Load Valenzuela Barangays from TiDB
     async function loadLocations() {
       const select = document.getElementById('reg-location');
       try {
@@ -270,97 +313,91 @@
         const data = await res.json();
         if (data.success && data.locations.length) {
           select.innerHTML =
-            `<option value="">Select your Barangay</option>` +
+            `<option value="">Select Barangay (Valenzuela City)</option>` +
             data.locations
-              .map((l) => `<option value="${l.location_id}">${l.barangay_name}, ${l.city_name}</option>`)
+              .map(l => `<option value="${l.location_id}">${l.barangay_name}</option>`)
               .join('');
         } else {
-          select.innerHTML = `<option value="">Valenzuela City (General)</option>`;
+          select.innerHTML = `<option value="">Valenzuela City</option>`;
         }
       } catch {
-        select.innerHTML = `<option value="">Valenzuela City (General)</option>`;
+        select.innerHTML = `<option value="">Valenzuela City</option>`;
       }
     }
 
-    // Handle Login
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
+    async function handleUnifiedLogin(e) {
       e.preventDefault();
-      hideAlert();
-      const btn = document.getElementById('login-submit');
-      btn.disabled = true;
-      btn.textContent = 'AUTHENTICATING...';
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('login-submit-btn');
+      errBox.style.display = 'none';
+      btn.innerText = 'VERIFYING...';
+
+      const identifier = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value;
 
       try {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            identifier: document.getElementById('login-identifier').value,
-            password: document.getElementById('login-password').value
-          })
+          body: JSON.stringify({ identifier, password })
         });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          showAlert(data.message || 'Login failed.');
-          return;
-        }
-        saveSessionAndRedirect(data);
-      } catch {
-        showAlert('Network error connecting to authentication server.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'INITIALIZE SESSION';
-      }
-    });
 
-    // Handle Registration
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        const data = await res.json();
+        if (res.ok && data.success) {
+          completeAuthRedirect(data);
+          return;
+        } else {
+          errBox.innerText = data.message || 'Invalid credentials.';
+          errBox.style.display = 'block';
+        }
+      } catch (err) {
+        errBox.innerText = 'Server connection error.';
+        errBox.style.display = 'block';
+      }
+      btn.innerText = 'SIGN IN';
+    }
+
+    async function handleLearnerRegister(e) {
       e.preventDefault();
-      hideAlert();
-      const btn = document.getElementById('reg-submit');
-      btn.disabled = true;
-      btn.textContent = 'CREATING ACCOUNT...';
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('reg-submit-btn');
+      errBox.style.display = 'none';
+      btn.innerText = 'REGISTERING...';
 
       try {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            first_name: document.getElementById('reg-first').value,
-            last_name: document.getElementById('reg-last').value,
-            username: document.getElementById('reg-username').value,
-            email: document.getElementById('reg-email').value,
+            first_name: document.getElementById('reg-first').value.trim(),
+            last_name: document.getElementById('reg-last').value.trim(),
+            username: document.getElementById('reg-username').value.trim(),
+            email: document.getElementById('reg-email').value.trim(),
             age: document.getElementById('reg-age').value,
             sex: document.getElementById('reg-sex').value,
             location_id: document.getElementById('reg-location').value || null,
-            password: document.getElementById('reg-password').value
+            password: document.getElementById('reg-pass').value
           })
         });
+
         const data = await res.json();
-        if (!res.ok || !data.success) {
-          showAlert(data.message || 'Registration failed.');
+        if (res.ok && data.success) {
+          completeAuthRedirect(data);
           return;
+        } else {
+          errBox.innerText = data.message || 'Registration failed.';
+          errBox.style.display = 'block';
         }
-        saveSessionAndRedirect(data);
-      } catch {
-        showAlert('Network error while creating account.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'CREATE OPERATIVE ACCOUNT';
+      } catch (err) {
+        errBox.innerText = 'Server connection error.';
+        errBox.style.display = 'block';
       }
-    });
-
-    // Redirect if already logged in
-    const existingRole = localStorage.getItem('role');
-    const existingToken = localStorage.getItem('token');
-    if (existingToken && existingRole === 'admin') window.location.replace('admin.html');
-    if (existingToken && existingRole === 'learner') window.location.replace('player-dashboard.html');
-
-    // Open register tab directly if ?mode=register is in URL
-    if (new URLSearchParams(window.location.search).get('mode') === 'register') {
-      switchAuthTab('register');
+      btn.innerText = 'CREATE ACCOUNT';
     }
 
+    if (new URLSearchParams(window.location.search).get('mode') === 'register') {
+      switchMode('register');
+    }
     loadLocations();
   </script>
 </body>
