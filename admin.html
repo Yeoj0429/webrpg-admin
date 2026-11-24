@@ -45,6 +45,9 @@
           <button type="button" class="side-link" onclick="switchView('quizzes', this)">
             <span class="side-icon">⚡</span> QUIZ MATRIX
           </button>
+          <button type="button" class="side-link" onclick="switchView('users', this); window.loadAdminUsers?.()">
+            <span class="side-icon">◎</span> USERS MANAGEMENT
+          </button>
           <button type="button" class="side-link" onclick="logoutAdmin()" style="color: #ff2a6d;">
             <span class="side-icon" style="color: #ff2a6d;">⏻</span> LOGOUT
           </button>
@@ -109,7 +112,7 @@
               </div>
               <div class="badge-item">
                 <div class="badge-icon blue">❖</div>
-                <div><span>PASSING</span><strong>70.0%</strong></div>
+                <div><span>PASSING</span><strong>75.0%</strong></div>
               </div>
             </div>
           </div>
@@ -197,6 +200,60 @@
           <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>PROMPT</th><th>CORRECT ANSWER</th><th>POINTS</th><th>ACTION</th></tr></thead><tbody id="questions-table-body"></tbody></table></div>
         </div>
       </div>
+
+      <!-- WINDOW 5: USERS MANAGEMENT -->
+      <div id="view-users" class="view-window">
+        <div class="cp-panel">
+          <div class="panel-header wrap-header">
+            <div class="table-filters">
+              <select id="filter-user-role" class="cp-select">
+                <option value="all">All Roles</option>
+                <option value="learner">Learners</option>
+                <option value="admin">Admins (ICTO)</option>
+              </select>
+              <select id="filter-user-age" class="cp-select">
+                <option value="all">All Age Brackets</option>
+                <option value="13-15">13–15</option>
+                <option value="16-18">16–18</option>
+                <option value="19-21">19–21</option>
+                <option value="22+">22+</option>
+              </select>
+              <select id="filter-user-status" class="cp-select">
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="table-filters">
+              <div class="search-box">
+                <span>⌕</span>
+                <input type="text" id="user-search-input" placeholder="Search user or email..." />
+              </div>
+              <button type="button" id="btn-refresh-users" class="cp-notch-btn cyan-btn sm">↻ REFRESH</button>
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="cp-data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>USER / EMAIL</th>
+                  <th>ROLE</th>
+                  <th>AGE GROUP</th>
+                  <th>LEVEL / XP</th>
+                  <th>AVG SCORE</th>
+                  <th>STATUS</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr><td colspan="8" style="text-align:center; padding:20px;">Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -224,11 +281,65 @@
     </div>
   </div>
 
+  <!-- USER MANAGEMENT MODAL -->
+  <div id="user-modal" class="cp-modal hidden" onclick="if(event.target===this) closeUserModal()">
+    <div class="cp-modal-box" style="max-width: 620px;">
+      <div class="cp-modal-tag" id="modal-user-tag">ACCOUNT</div>
+      <h3 id="modal-user-heading">MANAGE USER</h3>
+      <input type="hidden" id="edit-user-id" />
+
+      <label>ROLE</label>
+      <select id="edit-user-role" class="cp-input">
+        <option value="learner">Learner</option>
+        <option value="admin">Admin (ICTO)</option>
+      </select>
+
+      <label>ACCOUNT STATUS</label>
+      <select id="edit-user-status" class="cp-input">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      <label>AGE BRACKET</label>
+      <select id="edit-user-age" class="cp-input">
+        <option value="13-15">13–15</option>
+        <option value="16-18">16–18</option>
+        <option value="19-21">19–21</option>
+        <option value="22+">22+</option>
+      </select>
+
+      <label style="margin-top: 14px;">RECENT QUIZ ATTEMPTS (75% PASSING STANDARD)</label>
+      <div class="table-scroll" style="max-height: 180px; margin-bottom: 14px;">
+        <table class="cp-data-table">
+          <thead>
+            <tr>
+              <th>ASSESSMENT</th>
+              <th>TYPE</th>
+              <th>SCORE</th>
+              <th>RESULT</th>
+              <th>DATE</th>
+            </tr>
+          </thead>
+          <tbody id="modal-user-attempts-body"></tbody>
+        </table>
+      </div>
+
+      <div class="cp-modal-actions">
+        <button type="button" id="delete-user-btn" class="cp-notch-btn danger-btn" onclick="deleteUserAccount()">DELETE</button>
+        <div class="modal-right-btns">
+          <button type="button" class="cp-notch-btn ghost-btn" onclick="closeUserModal()">CANCEL</button>
+          <button type="button" class="cp-notch-btn cyan-btn" onclick="saveUserChanges()">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="notify-modal" class="cp-modal hidden" onclick="closeNotifyModal()">
     <div class="cp-modal-box" style="max-width: 340px; text-align: center;"><h3 id="notify-title" style="color: #4AD8F0;">SAVED</h3><p id="notify-message" style="margin: 10px 0 18px;"></p><button class="cp-notch-btn cyan-btn" onclick="closeNotifyModal()" style="width:100%;">OK</button></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="admin.js"></script>
+  <script src="admin-users.js"></script>
 </body>
 </html>
