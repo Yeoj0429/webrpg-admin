@@ -1,98 +1,172 @@
 (() => {
   const API_BASE = '/api/admin/users';
-  const getAuthHeaders = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-  });
+
+  function getAuthHeaders() {
+    const token =
+      localStorage.getItem('token') ||
+      localStorage.getItem('adminToken') ||
+      localStorage.getItem('webrpg_token') ||
+      '';
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+  }
+
+  function escapeHtml(str = '') {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function notifyUser(title, message) {
+    const modal = document.getElementById('notify-modal');
+    const titleEl = document.getElementById('notify-title');
+    const msgEl = document.getElementById('notify-message');
+    if (modal && titleEl && msgEl) {
+      titleEl.textContent = title;
+      msgEl.textContent = message;
+      modal.classList.remove('hidden');
+    } else {
+      alert(`${title}: ${message}`);
+    }
+  }
 
   const tbody = document.getElementById('users-table-body');
-  const searchInput = document.getElementById('user-search');
-  const roleFilter = document.getElementById('filter-role');
-  const ageFilter = document.getElementById('filter-age');
-  const statusFilter = document.getElementById('filter-status');
+  const searchInput = document.getElementById('user-search-input');
+  const roleFilter = document.getElementById('filter-user-role');
+  const ageFilter = document.getElementById('filter-user-age');
+  const statusFilter = document.getElementById('filter-user-status');
+  const refreshBtn = document.getElementById('btn-refresh-users');
+  const userModal = document.getElementById('user-modal');
+  const attemptsBody = document.getElementById('modal-user-attempts-body');
 
-  const modal = document.getElementById('user-modal');
-  const attemptsBody = document.getElementById('modal-attempts-body');
+  async function loadAdminUsers() {
+    const titleEl = document.getElementById('workspace-title');
+    if (titleEl && document.getElementById('view-users')?.classList.contains('active')) {
+      titleEl.textContent = 'USERS MANAGEMENT';
+    }
 
-  async function loadUsers() {
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px;">Loading users...</td></tr>`;
+
     const params = new URLSearchParams({
-      q: searchInput.value,
-      role: roleFilter.value,
-      age_bracket: ageFilter.value,
-      status: statusFilter.value
+      q: searchInput?.value || '',
+      role: roleFilter?.value || 'all',
+      age_bracket: ageFilter?.value || 'all',
+      status: statusFilter?.value || 'all'
     });
 
     try {
-      const res = await fetch(`${API_BASE}?${params}`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}?${params.toString()}`, {
+        headers: getAuthHeaders()
+      });
       const data = await res.json();
-      if (!data.success) throw new Error(data.message);
-      renderUsersTable(data.users);
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Unable to load users.');
+      }
+      renderUsersTable(data.users || []);
     } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="8" style="color:#ff4d6d;text-align:center;">Error loading users: ${err.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ff2a6d; padding:18px;">${escapeHtml(err.message)}</td></tr>`;
     }
   }
 
   function renderUsersTable(users) {
     if (!users.length) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No matching users found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:18px;">No matching users found.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = users.map(u => `
-      <tr>
-        <td>#${u.user_id}</td>
-        <td>
-          <strong>${u.username}</strong><br/>
-          <small style="opacity:0.75;">${u.email || '—'}</small>
-        </td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-magenta' : 'badge-cyan'}">${u.role.toUpperCase()}</span></td>
-        <td>${u.age_bracket}</td>
-        <td>Lv. ${u.level} <small>(${u.xp} XP)</small></td>
-        <td>${u.avg_score !== null ? `${u.avg_score}%` : 'No attempts'}</td>
-        <td><span class="badge ${u.status === 'active' ? 'badge-green' : 'badge-red'}">${u.status.toUpperCase()}</span></td>
-        <td>
-          <button class="cp-notch-btn btn-sm" onclick="window.openUserModal(${u.user_id})">Manage</button>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = users
+      .map((u) => {
+        const isAdmin = u.role === 'admin';
+        const status = (u.status || 'active').toLowerCase();
+        const statusColor =
+          status === 'active' ? '#3ef2a8' : status === 'suspended' ? '#fcee0a' : '#ff2a6d';
+        const avgDisplay =
+          u.avg_score !== null && u.avg_score !== undefined ? `${u.avg_score}%` : '—';
+
+        return `
+          <tr>
+            <td>#${u.user_id}</td>
+            <td>
+              <strong>${escapeHtml(u.username)}</strong><br />
+              <small style="opacity:0.75;">${escapeHtml(u.email || '—')}</small>
+            </td>
+            <td style="color:${isAdmin ? '#C84BF2' : '#4AD8F0'}; font-weight:700;">
+              ${escapeHtml((u.role || 'learner').toUpperCase())}
+            </td>
+            <td>${escapeHtml(u.age_bracket || 'N/A')}</td>
+            <td>Lv. ${u.level ?? 1} <small style="opacity:0.75;">(${u.xp ?? 0} XP)</small></td>
+            <td>${avgDisplay}</td>
+            <td style="color:${statusColor}; font-weight:700;">
+              ${escapeHtml(status.toUpperCase())}
+            </td>
+            <td>
+              <button type="button" class="cp-notch-btn cyan-btn sm" onclick="openUserModal(${u.user_id})">
+                MANAGE
+              </button>
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
   }
 
-  window.openUserModal = async (userId) => {
+  async function openUserModal(userId) {
     try {
-      const res = await fetch(`${API_BASE}/${userId}`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/${userId}`, {
+        headers: getAuthHeaders()
+      });
       const data = await res.json();
-      if (!data.success) return alert(data.message);
+      if (!res.ok || !data.success) {
+        return notifyUser('ERROR', data.message || 'Failed to load user details.');
+      }
 
-      const { user, attempts } = data;
-      document.getElementById('modal-username').textContent = `${user.username} (#${user.user_id})`;
+      const { user, attempts = [] } = data;
+      document.getElementById('modal-user-tag').textContent = `USER #${user.user_id}`;
+      document.getElementById('modal-user-heading').textContent = (user.username || 'USER').toUpperCase();
       document.getElementById('edit-user-id').value = user.user_id;
-      document.getElementById('edit-user-role').value = user.role;
-      document.getElementById('edit-user-status').value = user.status;
-      if (user.age_bracket !== 'N/A') {
-        document.getElementById('edit-user-age').value = user.age_bracket;
+      document.getElementById('edit-user-role').value = user.role || 'learner';
+      document.getElementById('edit-user-status').value = user.status || 'active';
+
+      const ageSelect = document.getElementById('edit-user-age');
+      if (user.age_bracket && [...ageSelect.options].some((o) => o.value === user.age_bracket)) {
+        ageSelect.value = user.age_bracket;
       }
 
       attemptsBody.innerHTML = attempts.length
-        ? attempts.map(a => `
-            <tr>
-              <td>${a.assessment_title}</td>
-              <td>${a.assessment_type}</td>
-              <td>${a.score}%</td>
-              <td style="color:${a.result_status === 'PASSED' ? '#3ef2a8' : '#ff4d6d'}">${a.result_status}</td>
-              <td>${new Date(a.completed_at).toLocaleDateString()}</td>
-            </tr>
-          `).join('')
-        : `<tr><td colspan="5" style="text-align:center;">No quiz attempts recorded yet.</td></tr>`;
+        ? attempts
+            .map(
+              (a) => `
+              <tr>
+                <td>${escapeHtml(a.assessment_title)}</td>
+                <td>${escapeHtml(a.assessment_type)}</td>
+                <td>${a.score}%</td>
+                <td style="color:${a.result_status === 'PASSED' ? '#3ef2a8' : '#ff2a6d'}; font-weight:700;">
+                  ${escapeHtml(a.result_status)}
+                </td>
+                <td>${a.completed_at ? new Date(a.completed_at).toLocaleDateString() : '—'}</td>
+              </tr>
+            `
+            )
+            .join('')
+        : `<tr><td colspan="5" style="text-align:center; padding:12px;">No quiz attempts recorded yet.</td></tr>`;
 
-      modal.style.display = 'flex';
+      userModal.classList.remove('hidden');
     } catch (err) {
-      alert('Failed to load user details.');
+      notifyUser('ERROR', 'Could not fetch user profile.');
     }
-  };
+  }
 
-  // Save edits
-  document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  function closeUserModal() {
+    userModal?.classList.add('hidden');
+  }
+
+  async function saveUserChanges() {
     const id = document.getElementById('edit-user-id').value;
     const payload = {
       role: document.getElementById('edit-user-role').value,
@@ -100,47 +174,59 @@
       age_bracket: document.getElementById('edit-user-age').value
     };
 
-    const res = await fetch(`${API_BASE}/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    alert(data.message);
-    if (data.success) {
-      modal.style.display = 'none';
-      loadUsers();
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return notifyUser('ERROR', data.message || 'Update failed.');
+      }
+      closeUserModal();
+      notifyUser('UPDATED', data.message || 'User account updated.');
+      loadAdminUsers();
+    } catch (err) {
+      notifyUser('ERROR', 'Network error while saving user.');
     }
-  });
+  }
 
-  // Delete user
-  document.getElementById('btn-delete-user').addEventListener('click', async () => {
+  async function deleteUserAccount() {
     const id = document.getElementById('edit-user-id').value;
-    if (!confirm('Permanently delete this account and all its quiz attempts?')) return;
+    if (!confirm('Permanently delete this user and all associated quiz attempts?')) return;
 
-    const res = await fetch(`${API_BASE}/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    });
-    const data = await res.json();
-    alert(data.message);
-    if (data.success) {
-      modal.style.display = 'none';
-      loadUsers();
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return notifyUser('ERROR', data.message || 'Delete failed.');
+      }
+      closeUserModal();
+      notifyUser('DELETED', data.message || 'User account deleted.');
+      loadAdminUsers();
+    } catch (err) {
+      notifyUser('ERROR', 'Network error while deleting user.');
     }
-  });
+  }
 
-  // Event bindings
-  document.getElementById('close-user-modal').addEventListener('click', () => (modal.style.display = 'none'));
-  document.getElementById('btn-refresh-users').addEventListener('click', loadUsers);
-  [roleFilter, ageFilter, statusFilter].forEach(el => el.addEventListener('change', loadUsers));
+  // Filter & Search Listeners
+  [roleFilter, ageFilter, statusFilter].forEach((el) => el?.addEventListener('change', loadAdminUsers));
+  refreshBtn?.addEventListener('click', loadAdminUsers);
 
   let debounceTimer;
-  searchInput.addEventListener('input', () => {
+  searchInput?.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(loadUsers, 300);
+    debounceTimer = setTimeout(loadAdminUsers, 280);
   });
 
-  // Load when tab is opened
-  document.querySelector('[data-view="users-view"]')?.addEventListener('click', loadUsers);
+  // Expose handlers for inline onclick attributes
+  window.loadAdminUsers = loadAdminUsers;
+  window.openUserModal = openUserModal;
+  window.closeUserModal = closeUserModal;
+  window.saveUserChanges = saveUserChanges;
+  window.deleteUserAccount = deleteUserAccount;
 })();
