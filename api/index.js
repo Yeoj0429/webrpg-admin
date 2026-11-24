@@ -456,13 +456,16 @@ app.get('/api/admin/users', async (req, res) => {
 });
 
 // GET Single User Details + Attempt History (for Inline Modal)
-app.get('/api/admin/users/:id', async (req, res) => {
+app.get('/api/admin/users', async (req, res) => {
   try {
-    const userId = req.params.id;
+    const { q = '', role = 'all', age_bracket = 'all', status = 'all' } = req.query;
 
-    const [[user]] = await pool.query(`
+    let sql = `
       SELECT 
-        u.user_id, u.username, u.email, u.role,
+        u.user_id,
+        u.username,
+        u.email,
+        u.role,
         COALESCE(u.account_status, 'active') AS status,
         u.created_at,
         lp.age,
@@ -474,33 +477,44 @@ app.get('/api/admin/users/:id', async (req, res) => {
           ELSE 'N/A'
         END AS age_bracket,
         COALESCE(lp.current_level, 1) AS level,
-        COALESCE(lp.total_xp, 0) AS xp
+        COALESCE(lp.total_xp, 0) AS xp,
+        COUNT(aa.attempt_id) AS total_attempts,
+        ROUND(AVG(aa.score), 1) AS avg_score
       FROM users u
       LEFT JOIN learner_profiles lp ON u.user_id = lp.user_id
-      WHERE u.user_id = ?
-      LIMIT 1
-    `, [userId]);
+      LEFT JOIN assessment_attempts aa ON u.user_id = aa.user_id
+      WHERE 1=1
+    `;
+    const params = [];
 
-    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (q.trim()) {
+      sql += ` AND (u.username LIKE ? OR u.email LIKE ?)`;
+      params.push(`%${q.trim()}%`, `%${q.trim()}%`);
+    }
+    if (role !== 'all') {
+      sql += ` AND u.role = ?`;
+      params.push(role);
+    }
+    if (status !== 'all') {
+      sql += ` AND COALESCE(u.account_status, 'active') = ?`;
+      params.push(status);
+    }
+    if (age_bracket === '13-15') sql += ` AND lp.age BETWEEN 13 AND 15`;
+    else if (age_bracket === '16-18') sql += ` AND lp.age BETWEEN 16 AND 18`;
+    else if (age_bracket === '19-21') sql += ` AND lp.age BETWEEN 19 AND 21`;
+    else if (age_bracket === '22+') sql += ` AND lp.age >= 22`;
 
-    const [attempts] = await pool.query(`
-      SELECT 
-        aa.attempt_id,
-        a.title AS assessment_title,
-        a.assessment_type,
-        aa.score,
-        CASE WHEN aa.score >= 75 THEN 'PASSED' ELSE 'FAILED' END AS result_status,
-        aa.attempted_at AS completed_at
-      FROM assessment_attempts aa
-      JOIN assessments a ON aa.assessment_id = a.assessment_id
-      WHERE aa.user_id = ?
-      ORDER BY aa.attempted_at DESC
-      LIMIT 20
-    `, [userId]);
+    sql += `
+      GROUP BY 
+        u.user_id, u.username, u.email, u.role, u.account_status, u.created_at,
+        lp.age, lp.current_level, lp.total_xp
+      ORDER BY u.user_id DESC
+    `;
 
-    res.json({ success: true, user, attempts });
+    const [rows] = await pool.query(sql, params);
+    res.json({ success: true, users: rows });
   } catch (err) {
-    console.error('GET /api/admin/users/:id error:', err);
+    console.error('GET /api/admin/users error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
