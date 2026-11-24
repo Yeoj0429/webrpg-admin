@@ -414,8 +414,8 @@ app.get('/api/admin/users', async (req, res) => {
           WHEN ANY_VALUE(lp.age) >= 22 THEN '22+'
           ELSE 'N/A'
         END AS age_bracket,
-        COALESCE(ANY_VALUE(lp.level), 1) AS level,
-        COALESCE(ANY_VALUE(lp.xp), 0) AS xp,
+        COALESCE(ANY_VALUE(lp.current_level), 1) AS level,
+        COALESCE(ANY_VALUE(lp.total_xp), 0) AS xp,
         COUNT(aa.attempt_id) AS total_attempts,
         ROUND(AVG(aa.score), 1) AS avg_score
       FROM users u
@@ -473,8 +473,8 @@ app.get('/api/admin/users/:id', async (req, res) => {
           WHEN lp.age >= 22 THEN '22+'
           ELSE 'N/A'
         END AS age_bracket,
-        COALESCE(lp.level, 1) AS level,
-        COALESCE(lp.xp, 0) AS xp
+        COALESCE(lp.current_level, 1) AS level,
+        COALESCE(lp.total_xp, 0) AS xp
       FROM users u
       LEFT JOIN learner_profiles lp ON u.user_id = lp.user_id
       WHERE u.user_id = ?
@@ -490,11 +490,11 @@ app.get('/api/admin/users/:id', async (req, res) => {
         a.assessment_type,
         aa.score,
         CASE WHEN aa.score >= 75 THEN 'PASSED' ELSE 'FAILED' END AS result_status,
-        aa.completed_at
+        aa.attempted_at AS completed_at
       FROM assessment_attempts aa
       JOIN assessments a ON aa.assessment_id = a.assessment_id
       WHERE aa.user_id = ?
-      ORDER BY aa.completed_at DESC
+      ORDER BY aa.attempted_at DESC
       LIMIT 20
     `, [userId]);
 
@@ -543,6 +543,8 @@ app.delete('/api/admin/users/:id', async (req, res) => {
       [userId]
     );
     await conn.query(`DELETE FROM assessment_attempts WHERE user_id = ?`, [userId]);
+    await conn.query(`DELETE FROM learner_lesson_progress WHERE user_id = ?`, [userId]);
+    await conn.query(`DELETE FROM xp_transactions WHERE user_id = ?`, [userId]);
     await conn.query(`DELETE FROM learner_profiles WHERE user_id = ?`, [userId]);
     const [result] = await conn.query(`DELETE FROM users WHERE user_id = ?`, [userId]);
     await conn.commit();
@@ -559,10 +561,5 @@ app.delete('/api/admin/users/:id', async (req, res) => {
     conn.release();
   }
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
-}
 
 module.exports = app;
