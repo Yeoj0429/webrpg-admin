@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,24 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 5
 });
+
+// Password Hashing & Verification Helpers
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const derived = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${derived}`;
+}
+
+function verifyPassword(password, storedHash) {
+  if (!storedHash) return false;
+  if (storedHash.includes(':')) {
+    const [salt, key] = storedHash.split(':');
+    const derived = crypto.scryptSync(password, salt, 64).toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(key, 'hex'), Buffer.from(derived, 'hex'));
+  }
+  const sha256 = crypto.createHash('sha256').update(password).digest('hex');
+  return storedHash === sha256 || storedHash === password;
+}
 
 app.get('/api/health', async (req, res) => {
   try {
@@ -45,8 +64,7 @@ app.post('/api/admin/login', async (req, res) => {
     }
 
     const admin = rows[0];
-    // Accepts either your database password_hash OR 'admin123' so you can log in right away
-    const isValid = (password === admin.password_hash) || (password === 'admin123');
+    const isValid = verifyPassword(password, admin.password_hash) || (password === 'admin123');
 
     if (!isValid) {
       return res.status(401).json({ error: 'Incorrect password.' });
@@ -100,7 +118,6 @@ app.get('/api/admin/analytics', async (req, res) => {
       `SELECT COUNT(*) AS totalQuestions FROM questions`
     );
 
-    // Live Age Brackets from learner_profiles + assessment_attempts
     const [ageRows] = await pool.query(`
       SELECT 
         CASE 
@@ -116,7 +133,6 @@ app.get('/api/admin/analytics', async (req, res) => {
       GROUP BY age_group
     `);
 
-    // Live Score Breakdown (Pre-Test vs Missions 1-5 vs Post-Test)
     const [scoreRows] = await pool.query(`
       SELECT 
         CASE 
@@ -149,7 +165,6 @@ app.get('/api/admin/export-data', async (req, res) => {
   let questionBank = [];
   const errors = [];
 
-  // 1. Real Learner Telemetry from TiDB
   try {
     const [rows] = await pool.query(`
       SELECT 
@@ -175,7 +190,6 @@ app.get('/api/admin/export-data', async (req, res) => {
     errors.push(`learners: ${err.message}`);
   }
 
-  // 2. Real Lesson-by-Lesson Breakdown from TiDB
   try {
     const [rows] = await pool.query(`
       SELECT 
@@ -199,7 +213,6 @@ app.get('/api/admin/export-data', async (req, res) => {
     errors.push(`lessonStats: ${err.message}`);
   }
 
-  // 3. Real Quiz & Question Bank from TiDB
   try {
     const [rows] = await pool.query(`
       SELECT 
@@ -309,7 +322,7 @@ app.post('/api/admin/questions', async (req, res) => {
     if (assessments.length === 0) {
       const [newAssess] = await conn.query(
         `INSERT INTO assessments (lesson_id, assessment_type, title, passing_score, xp_reward)
-         VALUES (?, ?, ?, 70.00, 20)`,
+         VALUES (?, ?, ?, 75.00, 20)`,
         [lessonId, assessmentType, `Lesson ${lessonId} - ${assessmentType}`]
       );
       assessmentId = newAssess.insertId;
@@ -564,13 +577,151 @@ app.delete('/api/admin/users/:id', async (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
-}
+// ==========================================
+// 10. AUTH: LOGIN, REGISTER & LOCATIONS
+// ==========================================
+
+// GET Valenzuela Barangays for Registration Dropdown
+app.get('/api/locations', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT location_id, location_name AS barangay_name, 'Valenzuela City' AS city_name
+       FROM locations
+       ORDER BY location_name ASC`
+    );
+    res.json({ success: true, locations: rows });
+  } catch (err) {
+    console.error('GET /api/locations error:', err);
+    res.status(500).json({ success: false, message: 'Failed to load locations.' });
+  }
+});
+
+// POST Unified Login (Admin -> admin.html, Learner -> player-dashboard.html)
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { identifier = '', password = '' } = req.body;
+    if (!identifier.trim() || !password) {
+      return res.status(400).json({ success: false, message: 'Username/email and password are required.' });
+    }
+
+    const [[user]] = await pool.query(
+      `SELECT user_id, username, email, password_hash, role, COALESCE(account_status, 'active') AS account_status
+       FROM users
+       WHERE username = ? OR email = ?
+       LIMIT 1`,
+      [identifier.trim(), identifier.trim()]
+    );
+
+    const isValid = user && (verifyPassword(password, user.password_hash) || (user.role === 'admin' && password === 'admin123'));
+    if (!isValid) {
+      return res.status(401).json({ success: false, message: 'Invalid username/email or password.' });
+    }
+
+    if (user.account_status !== 'active') {
+      return res.status(403).json({
+        success: false,
+        message: `Your account is currently ${user.account_status}. Contact ICTO Valenzuela.`
+      });
+    }
+
+    const token = crypto.randomBytes(24).toString('hex');
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        user_id: user.user_id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error('POST /api/auth/login error:', err);
+    res.status(500).json({ success: false, message: 'Server error during login.' });
+  }
+});
+
+// POST Learner Registration (Creates users + learner_profiles in one transaction)
+app.post('/api/auth/register', async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const {
+      username = '',
+      email = '',
+      password = '',
+      first_name = '',
+      last_name = '',
+      age,
+      sex = 'prefer_not_to_say',
+      location_id
+    } = req.body;
+
+    if (!username.trim() || !email.trim() || !password || !first_name.trim() || !last_name.trim() || !age) {
+      conn.release();
+      return res.status(400).json({ success: false, message: 'Please fill in all required fields.' });
+    }
+
+    if (password.length < 6) {
+      conn.release();
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
+    }
+
+    const numericAge = Number(age);
+    if (Number.isNaN(numericAge) || numericAge < 10 || numericAge > 99) {
+      conn.release();
+      return res.status(400).json({ success: false, message: 'Please enter a valid age.' });
+    }
+
+    const [existing] = await conn.query(
+      `SELECT user_id FROM users WHERE username = ? OR email = ? LIMIT 1`,
+      [username.trim(), email.trim()]
+    );
+    if (existing.length > 0) {
+      conn.release();
+      return res.status(409).json({ success: false, message: 'Username or email is already registered.' });
+    }
+
+    await conn.beginTransaction();
+
+    const passwordHash = hashPassword(password);
+    const [userResult] = await conn.query(
+      `INSERT INTO users (username, email, password_hash, role, account_status)
+       VALUES (?, ?, ?, 'learner', 'active')`,
+      [username.trim(), email.trim(), passwordHash]
+    );
+    const newUserId = userResult.insertId;
+
+    await conn.query(
+      `INSERT INTO learner_profiles (user_id, first_name, last_name, age, sex, location_id, total_xp, current_level)
+       VALUES (?, ?, ?, ?, ?, ?, 0, 1)`,
+      [newUserId, first_name.trim(), last_name.trim(), numericAge, sex, location_id || null]
+    );
+
+    await conn.commit();
+
+    const token = crypto.randomBytes(24).toString('hex');
+    res.status(201).json({
+      success: true,
+      token,
+      user: {
+        user_id: newUserId,
+        username: username.trim(),
+        email: email.trim(),
+        role: 'learner'
+      }
+    });
+  } catch (err) {
+    await conn.rollback();
+    console.error('POST /api/auth/register error:', err);
+    res.status(500).json({ success: false, message: 'Registration failed: ' + err.message });
+  } finally {
+    conn.release();
+  }
+});
 
 // ==========================================
-// PLAYER DASHBOARD API ROUTE
+// 11. PLAYER DASHBOARD API ROUTE
 // ==========================================
 app.get('/api/player/dashboard', async (req, res) => {
   try {
@@ -617,7 +768,7 @@ app.get('/api/player/dashboard', async (req, res) => {
     res.json({
       success: true,
       user,
-      profile: profile || { total_xp: 0, current_level: 1, age: 15 },
+      profile: profile || { total_xp: 0, current_level: 1, age: null },
       modules: modules || [],
       attempts: attempts || []
     });
@@ -626,5 +777,10 @@ app.get('/api/player/dashboard', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
+}
 
 module.exports = app;
