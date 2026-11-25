@@ -24,6 +24,28 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    @keyframes cpCardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes cpModalPop {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     body {
       background-color: var(--navy-void);
       background-image:
@@ -148,15 +170,21 @@
     .side-dot { width: 8px; height: 8px; background: var(--muted); transform: rotate(45deg); flex-shrink: 0; }
     .side-link.active .side-dot { background: var(--cyan-light); box-shadow: 0 0 8px var(--cyan); }
 
-    .view-window { display: none; flex-direction: column; gap: 20px; min-width: 0; }
+    .view-window { display: none; flex-direction: column; gap: 22px; min-width: 0; }
     .view-window.active { display: flex; }
 
     .cp-panel {
       background: rgba(16, 22, 48, 0.9);
       border: 1px solid var(--border);
-      padding: 22px 24px;
+      padding: 24px 26px;
       clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
       min-width: 0;
+      animation: cpCardReveal 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .cp-panel:hover {
+      border-color: rgba(74, 216, 240, 0.45);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(74, 216, 240, 0.12);
     }
 
     .panel-header {
@@ -192,10 +220,10 @@
     .ghost-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .ghost-btn:hover { color: #fff; border-color: var(--cyan); }
 
-    .grid-row-1 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
-    .grid-row-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .grid-row-3 { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
-    .analytics-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-row-1 { display: grid; grid-template-columns: 1.55fr 1.15fr; gap: 22px; }
+    .grid-row-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .grid-row-3 { display: grid; grid-template-columns: 1fr 1.6fr; gap: 22px; }
+    .analytics-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 
     .chart-legend { display: flex; gap: 14px; font-size: 0.85rem; color: var(--muted); }
     .dot-cyan, .dot-magenta { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
@@ -230,30 +258,34 @@
     .badge-icon.cyan { color: var(--cyan); }
     .badge-icon.blue { color: var(--blue); }
 
-    .donut-wrap { 
-      position: relative; 
-      width: 150px; 
-      height: 150px; 
-      margin: 8px auto 14px; 
+    .donut-wrap {
+      position: relative;
+      width: 176px;
+      height: 176px;
+      margin: 10px auto 16px;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .donut-panel:hover .donut-wrap {
+      transform: scale(1.03);
     }
     .donut-wrap canvas {
       width: 100% !important;
       height: 100% !important;
     }
     .donut-center {
-      position: absolute; 
-      inset: 0; 
-      display: flex; 
+      position: absolute;
+      inset: 0;
+      display: flex;
       flex-direction: column;
-      align-items: center; 
+      align-items: center;
       justify-content: center;
       pointer-events: none;
       z-index: 2;
     }
-    .donut-center strong { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #fff; }
+    .donut-center strong { font-family: 'Orbitron', sans-serif; font-size: 1.55rem; color: #fff; }
     .donut-center span { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: var(--muted); }
     .donut-legend { display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; }
 
@@ -261,12 +293,23 @@
       background: var(--navy-panel);
       border: 1px solid var(--border);
       border-left: 3px solid var(--cyan);
-      padding: 16px;
+      padding: 20px 18px;
+      min-height: 106px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      gap: 10px;
+      gap: 12px;
+      animation: cpCardReveal 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
+    .grad-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--cyan);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 0 14px rgba(74, 216, 240, 0.18);
+    }
+    .grad-card:nth-child(2) { animation-delay: 0.05s; }
+    .grad-card:nth-child(3) { animation-delay: 0.1s; }
+    .grad-card:nth-child(4) { animation-delay: 0.15s; }
     .grad-magenta { border-left-color: var(--magenta); }
     .grad-purple { border-left-color: var(--purple); }
     .grad-cyan { border-left-color: var(--cyan); }
@@ -279,7 +322,7 @@
     .mini-wave { width: 64px; height: 30px; }
 
     .timeline-list, .bar-stack { display: flex; flex-direction: column; gap: 12px; }
-    .lessons-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+    .lessons-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }
 
     .table-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .cp-select, .cp-input {
@@ -350,6 +393,7 @@
       border: 2px solid var(--cyan);
       padding: 24px;
       clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      animation: cpModalPop 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
     .cp-modal-tag { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; color: var(--magenta); letter-spacing: 1.5px; margin-bottom: 4px; }
     .cp-modal-box h3 { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; color: var(--cyan-light); margin-bottom: 16px; }
@@ -383,13 +427,22 @@
       background: rgba(16, 22, 48, 0.9);
       border: 1px solid var(--border);
       border-top: 2px solid var(--cyan);
-      padding: 18px;
+      padding: 22px;
+      min-height: 195px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+      animation: cpCardReveal 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
     }
+    .lesson-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--cyan-light);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(74, 216, 240, 0.2);
+    }
+
     .timeline-item {
       display: flex;
       justify-content: space-between;
@@ -398,11 +451,17 @@
       padding: 10px 12px;
       background: var(--navy-void);
       border-left: 3px solid var(--cyan);
+      transition: transform 0.18s ease, background 0.18s ease;
     }
+    .timeline-item:hover {
+      transform: translateX(4px);
+      background: rgba(21, 29, 64, 0.85);
+    }
+
     .bar-row { display: flex; flex-direction: column; gap: 6px; }
     .bar-meta { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text); }
     .bar-track { width: 100%; height: 10px; background: var(--navy-void); border: 1px solid var(--border); overflow: hidden; }
-    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--magenta)); }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--magenta)); transition: width 0.5s ease; }
     .donut-legend-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(74, 216, 240, 0.1); }
     .option-row { display: flex; align-items: center; gap: 10px; }
     .option-row input[type="text"] { flex: 1; margin-bottom: 0; }
@@ -438,6 +497,7 @@
       .page-header h1 { font-size: 1.25rem; }
       .grid-row-2 { grid-template-columns: 1fr; }
       .cp-panel { padding: 16px; }
+      .donut-wrap { width: 150px; height: 150px; }
       .search-box input { width: 130px; }
     }
   </style>
@@ -757,23 +817,28 @@
           position: 'fixed',
           pointerEvents: 'none',
           zIndex: '9999',
-          background: 'rgba(8, 11, 26, 0.96)',
+          minWidth: '172px',
+          background: 'linear-gradient(180deg, rgba(21, 29, 64, 0.97), rgba(8, 11, 26, 0.98))',
           border: '1px solid #4AD8F0',
-          boxShadow: '0 0 16px rgba(74, 216, 240, 0.35)',
-          padding: '8px 12px',
+          borderLeft: '3px solid #C84BF2',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.55), 0 0 18px rgba(74, 216, 240, 0.32)',
+          padding: '12px 15px',
           color: '#EDE9F7',
           fontFamily: "'Rajdhani', sans-serif",
-          fontSize: '0.88rem',
-          lineHeight: '1.35',
+          fontSize: '0.95rem',
+          lineHeight: '1.4',
           whiteSpace: 'nowrap',
-          clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
-          transition: 'opacity 0.12s ease'
+          opacity: '0',
+          transform: 'translate3d(0, 6px, 0) scale(0.92)',
+          clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
+          transition: 'opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), left 0.16s ease-out, top 0.16s ease-out'
         });
         document.body.appendChild(el);
       }
 
       if (tooltip.opacity === 0) {
         el.style.opacity = '0';
+        el.style.transform = 'translate3d(0, 6px, 0) scale(0.92)';
         return;
       }
 
@@ -781,42 +846,42 @@
       const lines = (tooltip.body || []).map((b, i) => {
         const colors = tooltip.labelColors?.[i];
         const swatch = colors && i === 0
-          ? `<span style="display:inline-block;width:9px;height:9px;margin-right:6px;background:${colors.backgroundColor};border:1px solid ${colors.borderColor || '#fff'};vertical-align:middle;"></span>`
+          ? `<span style="display:inline-block;width:10px;height:10px;margin-right:7px;background:${colors.backgroundColor};border:1px solid ${colors.borderColor || '#fff'};vertical-align:middle;"></span>`
           : '';
-        return `<div>${swatch}${(b.lines || []).join(' ')}</div>`;
+        return `<div style="margin-top:2px;">${swatch}${(b.lines || []).join(' ')}</div>`;
       }).join('');
 
       el.innerHTML = `
-        <div style="font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:700;color:#8CEEF6;letter-spacing:1px;margin-bottom:3px;">
+        <div style="font-family:'Orbitron',sans-serif;font-size:0.76rem;font-weight:700;color:#8CEEF6;letter-spacing:1.2px;padding-bottom:5px;margin-bottom:5px;border-bottom:1px solid rgba(74,216,240,0.2);">
           ${title}
         </div>
         ${lines}
       `;
-      el.style.opacity = '1';
 
-      // Push tooltip outward beyond the outer radius of the donut ring
       const rect = chart.canvas.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dx = tooltip.caretX - rect.width / 2;
       const dy = tooltip.caretY - rect.height / 2;
       const angle = Math.atan2(dy, dx);
-      const outerDist = rect.width / 2 + 12;
+      const outerDist = rect.width / 2 + 14;
 
       const anchorX = cx + Math.cos(angle) * outerDist;
       const anchorY = cy + Math.sin(angle) * outerDist;
       const isRightSide = Math.cos(angle) >= 0;
 
-      const tipRect = el.getBoundingClientRect();
-      let left = isRightSide ? anchorX : anchorX - tipRect.width;
-      let top = anchorY - tipRect.height / 2;
+      const tipW = el.offsetWidth;
+      const tipH = el.offsetHeight;
+      let left = isRightSide ? anchorX : anchorX - tipW;
+      let top = anchorY - tipH / 2;
 
-      // Clamp inside viewport on smaller screens
-      left = Math.max(8, Math.min(window.innerWidth - tipRect.width - 8, left));
-      top = Math.max(8, Math.min(window.innerHeight - tipRect.height - 8, top));
+      left = Math.max(10, Math.min(window.innerWidth - tipW - 10, left));
+      top = Math.max(10, Math.min(window.innerHeight - tipH - 10, top));
 
       el.style.left = `${left}px`;
       el.style.top = `${top}px`;
+      el.style.opacity = '1';
+      el.style.transform = 'translate3d(0, 0, 0) scale(1)';
     }
 
     Chart.register({
