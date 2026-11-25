@@ -1,12 +1,20 @@
 if (!sessionStorage.getItem('webrpg_admin_token')) {
-  window.location.href = 'login.html';
+  window.location.replace('login.html');
 }
 
 function logoutAdmin() {
   sessionStorage.removeItem('webrpg_admin_token');
   sessionStorage.removeItem('webrpg_admin_user');
-  window.location.href = 'login.html';
+  localStorage.removeItem('token');
+  localStorage.removeItem('webrpg_token');
+  localStorage.removeItem('role');
+  localStorage.removeItem('user_id');
+  localStorage.removeItem('username');
+  window.location.replace('login.html');
 }
+
+let splineChartInstance = null;
+let donutChartInstance = null;
 
 const state = {
   activeView: 'dashboard',
@@ -53,7 +61,8 @@ function switchView(viewName, btnEl) {
     dashboard: 'DASHBOARD OVERVIEW',
     analytics: 'LEARNING ANALYTICS',
     lessons: 'LESSON MODULES',
-    quizzes: 'QUIZ MATRIX'
+    quizzes: 'QUIZ MATRIX',
+    users: 'USERS MANAGEMENT'
   };
   document.getElementById('workspace-title').innerText = titles[viewName] || 'DASHBOARD';
   renderTopbarActions(viewName);
@@ -138,7 +147,6 @@ function renderSplineChart() {
   document.getElementById('hero-avg-success').innerText = `${avgSuccess}%`;
   document.getElementById('hero-total-lessons').innerText = String(lessons.length).padStart(2, '0');
 
-  // Update Bottom 4 Badges Dynamically from Score Breakdown
   const pre = state.scoreBreakdown.find(s => s.label.includes('Pre-Test'))?.score || 0;
   const mis = state.scoreBreakdown.find(s => s.label.includes('Mission'))?.score || 0;
   const post = state.scoreBreakdown.find(s => s.label.includes('Post-Test'))?.score || 0;
@@ -149,85 +157,144 @@ function renderSplineChart() {
     badgeEls[2].innerText = `${post}%`;
   }
 
-  const width = 600;
-  const height = 200;
-  const stepX = lessons.length > 1 ? width / (lessons.length - 1) : width;
+  const canvas = document.getElementById('spline-chart');
+  if (!canvas || typeof Chart === 'undefined') return;
+  if (splineChartInstance) splineChartInstance.destroy();
 
-  const ptsSuccess = lessons.map((l, i) => ({
-    x: Math.round(i * stepX),
-    y: Math.round(height - (Math.min(100, Math.max(5, Number(l.success_rate || 0))) / 100) * 165)
-  }));
+  const ctx = canvas.getContext('2d');
+  const cyanGrad = ctx.createLinearGradient(0, 0, 0, 190);
+  cyanGrad.addColorStop(0, 'rgba(74, 216, 240, 0.28)');
+  cyanGrad.addColorStop(1, 'rgba(74, 216, 240, 0.0)');
 
-  const ptsQuiz = lessons.map((l, i) => ({
-    x: Math.round(i * stepX),
-    y: Math.round(height - (Math.min(100, Math.max(5, Number(l.avg_quiz || 0))) / 100) * 165)
-  }));
+  const magentaGrad = ctx.createLinearGradient(0, 0, 0, 190);
+  magentaGrad.addColorStop(0, 'rgba(200, 75, 242, 0.24)');
+  magentaGrad.addColorStop(1, 'rgba(200, 75, 242, 0.0)');
 
-  const buildSmoothPath = (pts) => {
-    if (pts.length === 1) return `M 0,${pts[0].y} L ${width},${pts[0].y}`;
-    let d = `M ${pts[0].x},${pts[0].y}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const midX = (pts[i].x + pts[i + 1].x) / 2;
-      d += ` C ${midX},${pts[i].y} ${midX},${pts[i + 1].y} ${pts[i + 1].x},${pts[i + 1].y}`;
+  splineChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: lessons.map(l => `L0${l.lesson_id}`),
+      datasets: [
+        {
+          label: 'Success Rate',
+          data: lessons.map(l => Number(l.success_rate || 0)),
+          borderColor: '#4AD8F0',
+          backgroundColor: cyanGrad,
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#080B1A',
+          pointBorderColor: '#4AD8F0',
+          pointBorderWidth: 2
+        },
+        {
+          label: 'Quiz Avg',
+          data: lessons.map(l => Number(l.avg_quiz || 0)),
+          borderColor: '#C84BF2',
+          backgroundColor: magentaGrad,
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#080B1A',
+          pointBorderColor: '#C84BF2',
+          pointBorderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(8, 11, 26, 0.95)',
+          borderColor: '#4AD8F0',
+          borderWidth: 1,
+          titleColor: '#8CEEF6',
+          bodyColor: '#EDE9F7',
+          padding: 10,
+          callbacks: {
+            title: (items) => lessons[items[0].dataIndex]?.title || items[0].label,
+            label: (item) => ` ${item.dataset.label}: ${item.parsed.y}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(74, 216, 240, 0.08)' },
+          ticks: { color: '#8E9CC4', font: { family: 'Orbitron', size: 10 } }
+        },
+        y: {
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(74, 216, 240, 0.08)' },
+          ticks: {
+            color: '#8E9CC4',
+            stepSize: 25,
+            callback: (v) => `${v}%`,
+            font: { family: 'Rajdhani', size: 11 }
+          }
+        }
+      }
     }
-    return d;
-  };
-
-  const successLine = buildSmoothPath(ptsSuccess);
-  const successArea = `${successLine} L ${width},${height} L 0,${height} Z`;
-  const quizLine = buildSmoothPath(ptsQuiz);
-  const quizArea = `${quizLine} L ${width},${height} L 0,${height} Z`;
-
-  document.getElementById('spline-svg').innerHTML = `
-    <defs>
-      <linearGradient id="cyanAreaGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#4AD8F0" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="#4AD8F0" stop-opacity="0.0"/>
-      </linearGradient>
-      <linearGradient id="magentaAreaGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#C84BF2" stop-opacity="0.45"/>
-        <stop offset="100%" stop-color="#C84BF2" stop-opacity="0.0"/>
-      </linearGradient>
-    </defs>
-    <line x1="0" y1="45" x2="600" y2="45" stroke="rgba(140,238,246,0.1)" stroke-dasharray="4"/>
-    <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(140,238,246,0.1)" stroke-dasharray="4"/>
-    <line x1="0" y1="155" x2="600" y2="155" stroke="rgba(140,238,246,0.1)" stroke-dasharray="4"/>
-    <path d="${quizArea}" fill="url(#magentaAreaGrad)" />
-    <path d="${successArea}" fill="url(#cyanAreaGrad)" />
-    <path d="${quizLine}" fill="none" stroke="#C84BF2" stroke-width="3" />
-    <path d="${successLine}" fill="none" stroke="#4AD8F0" stroke-width="3.5" />
-    ${ptsSuccess.map(p => `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#080B1A" stroke="#8CEEF6" stroke-width="3"/>`).join('')}
-  `;
-
-  document.getElementById('spline-x-labels').innerHTML = lessons
-    .map(l => `<span>L0${l.lesson_id} (${l.success_rate}%)</span>`)
-    .join('');
+  });
 }
 
 function renderDonutChart() {
   const centerStrong = document.querySelector('.donut-center strong');
   if (centerStrong) centerStrong.innerText = String(state.totalLearners).padStart(2, '0');
 
-  // Dynamically calculate SVG stroke-dasharray for the Donut segments
-  const circumference = 352;
-  let offset = 0;
-  const svg = document.querySelector('.donut-svg');
-  if (svg && state.demographics.length > 0) {
-    const circles = state.demographics.map((d, i) => {
-      const segLen = Math.round((d.percent / 100) * circumference);
-      const circleHtml = `<circle cx="80" cy="80" r="56" class="donut-seg seg-${(i % 4) + 1}" stroke-dasharray="${segLen} ${circumference}" stroke-dashoffset="-${offset}" />`;
-      offset += segLen;
-      return circleHtml;
-    }).join('');
-    svg.innerHTML = `<circle cx="80" cy="80" r="56" class="donut-track" />${circles}`;
-  }
-
   document.getElementById('donut-legend').innerHTML = state.demographics.map(d => `
-    <div class="legend-box" style="border-left-color: ${d.color}">
-      <strong style="color:${d.color}">${d.percent}%</strong>
+    <div class="donut-legend-item">
       <span>${d.group}</span>
+      <strong style="color:${d.color}">${d.percent}%</strong>
     </div>
   `).join('');
+
+  const canvas = document.getElementById('donut-chart');
+  if (!canvas || !state.demographics.length || typeof Chart === 'undefined') return;
+  if (donutChartInstance) donutChartInstance.destroy();
+
+  donutChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: state.demographics.map(d => d.group),
+      datasets: [{
+        data: state.demographics.map(d => d.percent),
+        backgroundColor: state.demographics.map(d => d.color),
+        borderColor: '#101630',
+        borderWidth: 3,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(8, 11, 26, 0.95)',
+          borderColor: '#C84BF2',
+          borderWidth: 1,
+          titleColor: '#8CEEF6',
+          bodyColor: '#EDE9F7',
+          padding: 10,
+          callbacks: {
+            label: (item) => {
+              const d = state.demographics[item.dataIndex];
+              return [` Share: ${d.percent}%`, ` Avg Score: ${d.avgScore}%`];
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 function renderGradientKPIs() {

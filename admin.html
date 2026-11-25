@@ -36,7 +36,6 @@
       min-height: 100vh;
     }
 
-    /* TOPBAR (Matches Player Dashboard) */
     .topbar {
       position: sticky;
       top: 0;
@@ -65,11 +64,7 @@
     }
     .brand-logo span { color: var(--purple); }
 
-    .topbar-right-wrap {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+    .topbar-right-wrap { display: flex; align-items: center; gap: 14px; }
 
     .admin-chip {
       display: inline-flex;
@@ -107,12 +102,7 @@
     }
     .btn-signout:hover { background: var(--red); color: #fff; }
 
-    /* MAIN SHELL */
-    .shell {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 32px 24px 56px;
-    }
+    .shell { max-width: 1240px; margin: 0 auto; padding: 32px 24px 56px; }
 
     .page-header {
       display: flex;
@@ -122,38 +112,13 @@
       margin-bottom: 26px;
       flex-wrap: wrap;
     }
+    .page-header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; letter-spacing: 1.5px; color: #fff; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-    .page-header h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.6rem;
-      letter-spacing: 1.5px;
-      color: #fff;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* TWO-COLUMN ACCOUNT CENTER LAYOUT */
-    .layout {
-      display: grid;
-      grid-template-columns: 230px 1fr;
-      gap: 28px;
-      align-items: start;
-    }
+    .layout { display: grid; grid-template-columns: 230px 1fr; gap: 28px; align-items: start; }
     .layout > main { min-width: 0; }
 
-    /* LEFT SIDEBAR */
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      position: sticky;
-      top: 84px;
-    }
+    .sidebar { display: flex; flex-direction: column; gap: 6px; position: sticky; top: 84px; }
 
     .side-link {
       display: flex;
@@ -173,35 +138,19 @@
       transition: 0.2s;
       clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
     }
-
-    .side-link:hover {
-      color: var(--text);
-      background: rgba(74, 216, 240, 0.06);
-    }
-
+    .side-link:hover { color: var(--text); background: rgba(74, 216, 240, 0.06); }
     .side-link.active {
       color: var(--cyan-light);
       background: rgba(74, 216, 240, 0.14);
       border-color: rgba(74, 216, 240, 0.35);
     }
 
-    .side-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--muted);
-      transform: rotate(45deg);
-      flex-shrink: 0;
-    }
-    .side-link.active .side-dot {
-      background: var(--cyan-light);
-      box-shadow: 0 0 8px var(--cyan);
-    }
+    .side-dot { width: 8px; height: 8px; background: var(--muted); transform: rotate(45deg); flex-shrink: 0; }
+    .side-link.active .side-dot { background: var(--cyan-light); box-shadow: 0 0 8px var(--cyan); }
 
-    /* VIEW WINDOWS */
     .view-window { display: none; flex-direction: column; gap: 20px; min-width: 0; }
     .view-window.active { display: flex; }
 
-    /* PANELS */
     .cp-panel {
       background: rgba(16, 22, 48, 0.9);
       border: 1px solid var(--border);
@@ -220,15 +169,8 @@
       border-bottom: 1px solid rgba(74, 216, 240, 0.14);
     }
     .wrap-header { flex-wrap: wrap; }
+    .panel-header h3 { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; letter-spacing: 1.5px; color: #fff; }
 
-    .panel-header h3 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
-      letter-spacing: 1.5px;
-      color: #fff;
-    }
-
-    /* BUTTONS */
     .cp-notch-btn {
       font-family: 'Orbitron', sans-serif;
       font-size: 0.74rem;
@@ -250,29 +192,11 @@
     .ghost-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .ghost-btn:hover { color: #fff; border-color: var(--cyan); }
 
-    /* DASHBOARD GRIDS */
-    .grid-row-1 {
-      display: grid;
-      grid-template-columns: 1.8fr 1fr;
-      gap: 20px;
-    }
-    .grid-row-2 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-    .grid-row-3 {
-      display: grid;
-      grid-template-columns: 1fr 1.6fr;
-      gap: 20px;
-    }
-    .analytics-two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
+    .grid-row-1 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
+    .grid-row-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .grid-row-3 { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
+    .analytics-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-    /* SPLINE CHART */
     .chart-legend { display: flex; gap: 14px; font-size: 0.85rem; color: var(--muted); }
     .dot-cyan, .dot-magenta { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
     .dot-cyan { background: var(--cyan); }
@@ -284,8 +208,7 @@
     .sub-metric { margin-top: 14px; }
     .sub-metric strong { display: block; font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #fff; }
 
-    .spline-canvas-wrap svg { width: 100%; height: 170px; display: block; }
-    .spline-x-labels { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+    .spline-canvas-wrap { position: relative; height: 195px; width: 100%; }
 
     .spline-bottom-badges {
       display: grid;
@@ -307,24 +230,16 @@
     .badge-icon.cyan { color: var(--cyan); }
     .badge-icon.blue { color: var(--blue); }
 
-    /* DONUT */
-    .donut-wrap { position: relative; width: 150px; height: 150px; margin: 8px auto 14px; }
-    .donut-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .donut-track { fill: none; stroke: rgba(74, 216, 240, 0.1); stroke-width: 16; }
-    .donut-seg { fill: none; stroke-width: 16; }
-    .seg-1 { stroke: var(--cyan); }
-    .seg-2 { stroke: var(--magenta); }
-    .seg-3 { stroke: var(--purple); }
-    .seg-4 { stroke: var(--blue); }
+    .donut-wrap { position: relative; width: 170px; height: 170px; margin: 8px auto 14px; }
     .donut-center {
       position: absolute; inset: 0; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
+      pointer-events: none;
     }
     .donut-center strong { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #fff; }
     .donut-center span { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: var(--muted); }
     .donut-legend { display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; }
 
-    /* KPI STAT TILES */
     .grad-card {
       background: var(--navy-panel);
       border: 1px solid var(--border);
@@ -346,17 +261,10 @@
     .mini-bars span { width: 5px; background: var(--cyan); opacity: 0.7; }
     .mini-wave { width: 64px; height: 30px; }
 
-    /* TIMELINE, BARS & LESSONS GRID */
     .timeline-list, .bar-stack { display: flex; flex-direction: column; gap: 12px; }
-    .lessons-card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-      gap: 16px;
-    }
+    .lessons-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
 
-    /* FILTERS & TABLES */
     .table-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
     .cp-select, .cp-input {
       background: var(--navy-void);
       border: 1px solid var(--blue);
@@ -404,7 +312,6 @@
       white-space: nowrap;
     }
 
-    /* MODALS */
     .cp-modal {
       position: fixed;
       inset: 0;
@@ -434,8 +341,7 @@
     .cp-modal-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; }
     .modal-right-btns { display: flex; gap: 8px; }
 
-    /* FALLBACK FOR DYNAMIC BUTTONS FROM admin.js */
-    .cp-workspace button:not(.side-link):not(.cp-notch-btn),
+    /* FALLBACK & DYNAMIC ELEMENTS */
     main button:not(.cp-notch-btn),
     .topbar-right button:not(.cp-notch-btn) {
       font-family: 'Orbitron', sans-serif;
@@ -450,15 +356,12 @@
       clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
       transition: 0.2s;
     }
-    .cp-workspace button:not(.side-link):not(.cp-notch-btn):hover,
     main button:not(.cp-notch-btn):hover,
     .topbar-right button:not(.cp-notch-btn):hover {
       background: var(--cyan);
       color: var(--navy-void);
     }
 
-    /* DYNAMIC LESSON CARDS & TIMELINE */
-    .lessons-card-grid > div,
     .lesson-card {
       background: rgba(16, 22, 48, 0.9);
       border: 1px solid var(--border);
@@ -479,48 +382,15 @@
       background: var(--navy-void);
       border-left: 3px solid var(--cyan);
     }
+    .bar-row { display: flex; flex-direction: column; gap: 6px; }
+    .bar-meta { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text); }
+    .bar-track { width: 100%; height: 10px; background: var(--navy-void); border: 1px solid var(--border); overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--magenta)); }
+    .donut-legend-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(74, 216, 240, 0.1); }
+    .option-row { display: flex; align-items: center; gap: 10px; }
+    .option-row input[type="text"] { flex: 1; margin-bottom: 0; }
+    .option-row input[type="radio"] { accent-color: var(--cyan); width: 16px; height: 16px; cursor: pointer; }
 
-    /* ANALYTICS BARS & DONUT LEGEND */
-    .bar-row, .bar-item { display: flex; flex-direction: column; gap: 6px; }
-    .bar-meta, .bar-label { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text); }
-    .bar-track {
-      width: 100%;
-      height: 10px;
-      background: var(--navy-void);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--cyan), var(--magenta));
-    }
-    .donut-legend-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-      border-bottom: 1px solid rgba(74, 216, 240, 0.1);
-    }
-
-    /* QUIZ MODAL OPTION ROWS */
-    .cp-options-stack > div,
-    .option-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .cp-options-stack input[type="text"] {
-      flex: 1;
-      margin-bottom: 0;
-    }
-    .cp-options-stack input[type="radio"] {
-      accent-color: var(--cyan);
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-    }
-
-    /* RESPONSIVE */
     @media (max-width: 1024px) {
       .grid-row-1, .grid-row-3, .analytics-two-col { grid-template-columns: 1fr; }
       .grid-row-2 { grid-template-columns: 1fr 1fr; }
@@ -574,7 +444,6 @@
     </div>
 
     <div class="layout">
-      <!-- LEFT SIDEBAR -->
       <aside class="sidebar">
         <button type="button" class="side-link active" onclick="switchView('dashboard', this)">
           <span class="side-dot"></span> Dashboard
@@ -593,7 +462,6 @@
         </button>
       </aside>
 
-      <!-- RIGHT WORKSPACE -->
       <main>
         <!-- WINDOW 1: DASHBOARD -->
         <div id="view-dashboard" class="view-window active">
@@ -620,8 +488,7 @@
                 </div>
 
                 <div class="spline-canvas-wrap">
-                  <svg id="spline-svg" viewBox="0 0 600 210" preserveAspectRatio="none"></svg>
-                  <div id="spline-x-labels" class="spline-x-labels"></div>
+                  <canvas id="spline-chart"></canvas>
                 </div>
               </div>
 
@@ -648,14 +515,8 @@
             <div class="cp-panel donut-panel">
               <div class="panel-header"><h3>AGE GROUPS</h3></div>
               <div class="donut-wrap">
-                <svg viewBox="0 0 160 160" class="donut-svg">
-                  <circle cx="80" cy="80" r="56" class="donut-track" />
-                  <circle cx="80" cy="80" r="56" class="donut-seg seg-1" stroke-dasharray="134 352" stroke-dashoffset="0" />
-                  <circle cx="80" cy="80" r="56" class="donut-seg seg-2" stroke-dasharray="88 352" stroke-dashoffset="-134" />
-                  <circle cx="80" cy="80" r="56" class="donut-seg seg-3" stroke-dasharray="88 352" stroke-dashoffset="-222" />
-                  <circle cx="80" cy="80" r="56" class="donut-seg seg-4" stroke-dasharray="42 352" stroke-dashoffset="-310" />
-                </svg>
-                <div class="donut-center"><strong>08</strong><span>USERS</span></div>
+                <canvas id="donut-chart"></canvas>
+                <div class="donut-center"><strong>00</strong><span>USERS</span></div>
               </div>
               <div id="donut-legend" class="donut-legend"></div>
             </div>
@@ -829,7 +690,7 @@
       </select>
 
       <label>AGE</label>
-<input type="number" id="edit-user-age" class="cp-input" min="10" max="99" placeholder="e.g. 16" />
+      <input type="number" id="edit-user-age" class="cp-input" min="10" max="99" placeholder="e.g. 16" />
 
       <label style="margin-top: 14px;">RECENT QUIZ ATTEMPTS (75% PASSING STANDARD)</label>
       <div class="table-scroll" style="max-height: 180px; margin-bottom: 14px;">
@@ -866,6 +727,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="admin.js"></script>
   <script src="admin-users.js"></script>
 </body>
