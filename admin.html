@@ -5,256 +5,699 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WEBRPG! // Admin Console</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root {
+      --cyan-light: #8CEEF6;
+      --cyan: #4AD8F0;
+      --blue: #2696E8;
+      --navy-void: #080B1A;
+      --navy-panel: #101630;
+      --navy-card: #151D40;
+      --purple: #8B4DF2;
+      --magenta: #C84BF2;
+      --green: #3EF2A8;
+      --red: #FF2A6D;
+      --text: #EDE9F7;
+      --muted: #8E9CC4;
+      --border: rgba(74, 216, 240, 0.22);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--navy-void);
+      background-image:
+        radial-gradient(rgba(74, 216, 240, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 85% 10%, rgba(200, 75, 242, 0.14), transparent 35%),
+        radial-gradient(circle at 10% 90%, rgba(74, 216, 240, 0.12), transparent 40%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* TOPBAR (Matches Player Dashboard) */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(8, 11, 26, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--navy-void);
+      background: var(--cyan-light);
+      padding: 4px 12px;
+      letter-spacing: 2px;
+      text-decoration: none;
+      text-shadow: 2px 2px 0px var(--magenta);
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    }
+    .brand-logo span { color: var(--purple); }
+
+    .topbar-right-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      color: var(--cyan-light);
+      background: var(--navy-panel);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      display: inline-block;
+    }
+
+    .btn-signout {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 42, 109, 0.55);
+      background: rgba(255, 42, 109, 0.1);
+      color: #ff85a9;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-signout:hover { background: var(--red); color: #fff; }
+
+    /* MAIN SHELL */
+    .shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+
+    .page-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* TWO-COLUMN ACCOUNT CENTER LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .layout > main { min-width: 0; }
+
+    /* LEFT SIDEBAR */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: sticky;
+      top: 84px;
+    }
+
+    .side-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+    }
+
+    .side-link:hover {
+      color: var(--text);
+      background: rgba(74, 216, 240, 0.06);
+    }
+
+    .side-link.active {
+      color: var(--cyan-light);
+      background: rgba(74, 216, 240, 0.14);
+      border-color: rgba(74, 216, 240, 0.35);
+    }
+
+    .side-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--muted);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+    .side-link.active .side-dot {
+      background: var(--cyan-light);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* VIEW WINDOWS */
+    .view-window { display: none; flex-direction: column; gap: 20px; min-width: 0; }
+    .view-window.active { display: flex; }
+
+    /* PANELS */
+    .cp-panel {
+      background: rgba(16, 22, 48, 0.9);
+      border: 1px solid var(--border);
+      padding: 22px 24px;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+      min-width: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.14);
+    }
+    .wrap-header { flex-wrap: wrap; }
+
+    .panel-header h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    /* BUTTONS */
+    .cp-notch-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      padding: 10px 16px;
+      border: none;
+      cursor: pointer;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+      transition: 0.2s;
+    }
+    .cp-notch-btn.sm { padding: 7px 12px; font-size: 0.68rem; }
+    .cyan-btn { background: var(--cyan); color: var(--navy-void); }
+    .cyan-btn:hover { background: var(--cyan-light); }
+    .magenta-btn { background: linear-gradient(90deg, var(--magenta), var(--purple)); color: #fff; }
+    .magenta-btn:hover { filter: brightness(1.15); }
+    .danger-btn { background: rgba(255, 42, 109, 0.16); color: #ff85a9; border: 1px solid var(--red); }
+    .danger-btn:hover { background: var(--red); color: #fff; }
+    .ghost-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .ghost-btn:hover { color: #fff; border-color: var(--cyan); }
+
+    /* DASHBOARD GRIDS */
+    .grid-row-1 {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 20px;
+    }
+    .grid-row-2 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .grid-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 20px;
+    }
+    .analytics-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* SPLINE CHART */
+    .chart-legend { display: flex; gap: 14px; font-size: 0.85rem; color: var(--muted); }
+    .dot-cyan, .dot-magenta { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+    .dot-cyan { background: var(--cyan); }
+    .dot-magenta { background: var(--magenta); }
+
+    .spline-body { display: grid; grid-template-columns: 140px 1fr; gap: 16px; align-items: center; }
+    .big-metric strong { display: block; font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: var(--cyan-light); }
+    .big-metric span, .sub-metric span { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 1px; color: var(--muted); }
+    .sub-metric { margin-top: 14px; }
+    .sub-metric strong { display: block; font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #fff; }
+
+    .spline-canvas-wrap svg { width: 100%; height: 170px; display: block; }
+    .spline-x-labels { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    .spline-bottom-badges {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(74, 216, 240, 0.12);
+    }
+    .badge-item { display: flex; align-items: center; gap: 10px; }
+    .badge-item span { display: block; font-size: 0.68rem; font-family: 'Orbitron', sans-serif; color: var(--muted); }
+    .badge-item strong { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; color: #fff; }
+    .badge-icon {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; background: var(--navy-void); border: 1px solid var(--border);
+    }
+    .badge-icon.pink { color: var(--magenta); }
+    .badge-icon.purple { color: var(--purple); }
+    .badge-icon.cyan { color: var(--cyan); }
+    .badge-icon.blue { color: var(--blue); }
+
+    /* DONUT */
+    .donut-wrap { position: relative; width: 150px; height: 150px; margin: 8px auto 14px; }
+    .donut-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .donut-track { fill: none; stroke: rgba(74, 216, 240, 0.1); stroke-width: 16; }
+    .donut-seg { fill: none; stroke-width: 16; }
+    .seg-1 { stroke: var(--cyan); }
+    .seg-2 { stroke: var(--magenta); }
+    .seg-3 { stroke: var(--purple); }
+    .seg-4 { stroke: var(--blue); }
+    .donut-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .donut-center strong { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #fff; }
+    .donut-center span { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: var(--muted); }
+    .donut-legend { display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; }
+
+    /* KPI STAT TILES */
+    .grad-card {
+      background: var(--navy-panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--cyan);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .grad-magenta { border-left-color: var(--magenta); }
+    .grad-purple { border-left-color: var(--purple); }
+    .grad-cyan { border-left-color: var(--cyan); }
+    .grad-indigo { border-left-color: var(--blue); }
+    .grad-info span { display: block; font-family: 'Orbitron', sans-serif; font-size: 0.65rem; letter-spacing: 1px; color: var(--muted); }
+    .grad-info strong { display: block; font-family: 'Orbitron', sans-serif; font-size: 1.45rem; color: #fff; margin: 4px 0 2px; }
+    .grad-info small { color: var(--cyan-light); font-size: 0.82rem; }
+    .mini-bars { display: flex; align-items: flex-end; gap: 3px; height: 34px; }
+    .mini-bars span { width: 5px; background: var(--cyan); opacity: 0.7; }
+    .mini-wave { width: 64px; height: 30px; }
+
+    /* TIMELINE, BARS & LESSONS GRID */
+    .timeline-list, .bar-stack { display: flex; flex-direction: column; gap: 12px; }
+    .lessons-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 16px;
+    }
+
+    /* FILTERS & TABLES */
+    .table-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .cp-select, .cp-input {
+      background: var(--navy-void);
+      border: 1px solid var(--blue);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.98rem;
+      padding: 9px 12px;
+      outline: none;
+    }
+    .cp-input { width: 100%; margin-bottom: 14px; }
+    .cp-select:focus, .cp-input:focus { border-color: var(--cyan-light); }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--navy-void);
+      border: 1px solid var(--blue);
+      padding: 0 12px;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.98rem;
+      padding: 9px 0;
+      outline: none;
+      width: 180px;
+    }
+
+    .table-scroll { overflow-x: auto; }
+    .cp-data-table { width: 100%; border-collapse: collapse; }
+    .cp-data-table th, .cp-data-table td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.12);
+      font-size: 0.95rem;
+    }
+    .cp-data-table th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 1.2px;
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+
+    /* MODALS */
+    .cp-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(5, 8, 20, 0.84);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .cp-modal.hidden { display: none; }
+    .cp-modal-box {
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: linear-gradient(180deg, rgba(22, 31, 69, 0.97), rgba(8, 11, 26, 0.98));
+      border: 2px solid var(--cyan);
+      padding: 24px;
+      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+    .cp-modal-tag { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; color: var(--magenta); letter-spacing: 1.5px; margin-bottom: 4px; }
+    .cp-modal-box h3 { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; color: var(--cyan-light); margin-bottom: 16px; }
+    .cp-modal-box label { display: block; font-size: 0.74rem; font-weight: 700; letter-spacing: 1.2px; color: var(--cyan-light); margin-bottom: 5px; }
+    .cp-options-stack { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .cp-modal-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; }
+    .modal-right-btns { display: flex; gap: 8px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .grid-row-1, .grid-row-3, .analytics-two-col { grid-template-columns: 1fr; }
+      .grid-row-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; gap: 18px; }
+      .sidebar {
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 8px;
+        padding-bottom: 4px;
+      }
+      .sidebar::-webkit-scrollbar { display: none; }
+      .side-link { flex-shrink: 0; white-space: nowrap; width: auto; padding: 10px 14px; font-size: 0.95rem; }
+      .topbar { padding: 12px 16px; }
+      .shell { padding: 22px 16px 40px; }
+      .spline-body { grid-template-columns: 1fr; }
+      .spline-bottom-badges { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .brand-logo { font-size: 1.1rem; padding: 4px 10px; }
+      .admin-chip { display: none; }
+      .page-header h1 { font-size: 1.25rem; }
+      .grid-row-2 { grid-template-columns: 1fr; }
+      .cp-panel { padding: 16px; }
+      .search-box input { width: 130px; }
+    }
+  </style>
 </head>
 <body>
 
-  <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
+  <header class="topbar">
+    <a href="index.html" class="brand-logo">WEBRPG<span>!</span></a>
+    <div class="topbar-right-wrap">
+      <div class="admin-chip">
+        <span class="pulse-dot"></span> TIDB ONLINE
+      </div>
+      <button type="button" class="btn-signout" onclick="logoutAdmin()">SIGN OUT</button>
+    </div>
+  </header>
 
-  <div class="dashboard-shell">
-    <aside class="cp-sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-pill">
-          <span class="brand-dot"></span>
-          <strong>WEBRPG<span>!</span></strong>
-        </div>
-        <button id="burger-btn" class="burger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
-          <span></span><span></span><span></span>
+  <div class="shell">
+    <div class="page-header">
+      <h1 id="workspace-title">DASHBOARD OVERVIEW</h1>
+      <div id="topbar-actions" class="topbar-right"></div>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <button type="button" class="side-link active" onclick="switchView('dashboard', this)">
+          <span class="side-dot"></span> Dashboard
         </button>
-      </div>
+        <button type="button" class="side-link" onclick="switchView('analytics', this)">
+          <span class="side-dot"></span> Analytics
+        </button>
+        <button type="button" class="side-link" onclick="switchView('lessons', this)">
+          <span class="side-dot"></span> Lesson Modules
+        </button>
+        <button type="button" class="side-link" onclick="switchView('quizzes', this)">
+          <span class="side-dot"></span> Quiz Matrix
+        </button>
+        <button type="button" class="side-link" onclick="switchView('users', this); window.loadAdminUsers?.()">
+          <span class="side-dot"></span> Users Management
+        </button>
+      </aside>
 
-      <div id="sidebar-drawer" class="sidebar-drawer">
-        <div class="admin-profile-mini">
-          <div class="avatar-ring">AD</div>
-          <div>
-            <strong>ADMIN</strong>
-            <span>ONLINE</span>
-          </div>
-        </div>
-
-        <nav class="sidebar-nav">
-          <button type="button" class="side-link active" onclick="switchView('dashboard', this)">
-            <span class="side-icon">◈</span> DASHBOARD
-          </button>
-          <button type="button" class="side-link" onclick="switchView('analytics', this)">
-            <span class="side-icon">▤</span> ANALYTICS
-          </button>
-          <button type="button" class="side-link" onclick="switchView('lessons', this)">
-            <span class="side-icon">❖</span> LESSON MODULES
-          </button>
-          <button type="button" class="side-link" onclick="switchView('quizzes', this)">
-            <span class="side-icon">⚡</span> QUIZ MATRIX
-          </button>
-          <button type="button" class="side-link" onclick="switchView('users', this); window.loadAdminUsers?.()">
-            <span class="side-icon">◎</span> USERS MANAGEMENT
-          </button>
-          <button type="button" class="side-link" onclick="logoutAdmin()" style="color: #ff2a6d;">
-            <span class="side-icon" style="color: #ff2a6d;">⏻</span> LOGOUT
-          </button>
-        </nav>
-
-        <div class="sidebar-bottom-card">
-          <div class="db-live-row" style="margin:0;">
-            <span class="pulse-dot"></span> TIDB ONLINE
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <main class="cp-workspace">
-      <header class="cp-topbar">
-        <h1 id="workspace-title">DASHBOARD OVERVIEW</h1>
-        <div id="topbar-actions" class="topbar-right"></div>
-      </header>
-
-      <!-- WINDOW 1: DASHBOARD -->
-      <div id="view-dashboard" class="view-window active">
-        <section class="grid-row-1">
-          <div class="cp-panel spline-panel">
-            <div class="panel-header">
-              <h3>LEARNER PROGRESS</h3>
-              <div class="chart-legend">
-                <span><i class="dot-cyan"></i> Success Rate</span>
-                <span><i class="dot-magenta"></i> Quiz Avg</span>
-              </div>
-            </div>
-
-            <div class="spline-body">
-              <div class="spline-stats">
-                <div class="big-metric">
-                  <strong id="hero-avg-success">84.4%</strong>
-                  <span>SUCCESS RATE</span>
-                </div>
-                <div class="sub-metric">
-                  <strong id="hero-total-lessons">05</strong>
-                  <span>LESSONS</span>
+      <!-- RIGHT WORKSPACE -->
+      <main>
+        <!-- WINDOW 1: DASHBOARD -->
+        <div id="view-dashboard" class="view-window active">
+          <section class="grid-row-1">
+            <div class="cp-panel spline-panel">
+              <div class="panel-header">
+                <h3>LEARNER PROGRESS</h3>
+                <div class="chart-legend">
+                  <span><i class="dot-cyan"></i> Success Rate</span>
+                  <span><i class="dot-magenta"></i> Quiz Avg</span>
                 </div>
               </div>
 
-              <div class="spline-canvas-wrap">
-                <svg id="spline-svg" viewBox="0 0 600 210" preserveAspectRatio="none"></svg>
-                <div id="spline-x-labels" class="spline-x-labels"></div>
+              <div class="spline-body">
+                <div class="spline-stats">
+                  <div class="big-metric">
+                    <strong id="hero-avg-success">84.4%</strong>
+                    <span>SUCCESS RATE</span>
+                  </div>
+                  <div class="sub-metric">
+                    <strong id="hero-total-lessons">05</strong>
+                    <span>LESSONS</span>
+                  </div>
+                </div>
+
+                <div class="spline-canvas-wrap">
+                  <svg id="spline-svg" viewBox="0 0 600 210" preserveAspectRatio="none"></svg>
+                  <div id="spline-x-labels" class="spline-x-labels"></div>
+                </div>
+              </div>
+
+              <div class="spline-bottom-badges">
+                <div class="badge-item">
+                  <div class="badge-icon pink">★</div>
+                  <div><span>PRE-TEST</span><strong>78.0%</strong></div>
+                </div>
+                <div class="badge-item">
+                  <div class="badge-icon purple">⚡</div>
+                  <div><span>MISSIONS</span><strong>84.2%</strong></div>
+                </div>
+                <div class="badge-item">
+                  <div class="badge-icon cyan">◈</div>
+                  <div><span>POST-TEST</span><strong>88.5%</strong></div>
+                </div>
+                <div class="badge-item">
+                  <div class="badge-icon blue">❖</div>
+                  <div><span>PASSING</span><strong>75.0%</strong></div>
+                </div>
               </div>
             </div>
 
-            <div class="spline-bottom-badges">
-              <div class="badge-item">
-                <div class="badge-icon pink">★</div>
-                <div><span>PRE-TEST</span><strong>78.0%</strong></div>
+            <div class="cp-panel donut-panel">
+              <div class="panel-header"><h3>AGE GROUPS</h3></div>
+              <div class="donut-wrap">
+                <svg viewBox="0 0 160 160" class="donut-svg">
+                  <circle cx="80" cy="80" r="56" class="donut-track" />
+                  <circle cx="80" cy="80" r="56" class="donut-seg seg-1" stroke-dasharray="134 352" stroke-dashoffset="0" />
+                  <circle cx="80" cy="80" r="56" class="donut-seg seg-2" stroke-dasharray="88 352" stroke-dashoffset="-134" />
+                  <circle cx="80" cy="80" r="56" class="donut-seg seg-3" stroke-dasharray="88 352" stroke-dashoffset="-222" />
+                  <circle cx="80" cy="80" r="56" class="donut-seg seg-4" stroke-dasharray="42 352" stroke-dashoffset="-310" />
+                </svg>
+                <div class="donut-center"><strong>08</strong><span>USERS</span></div>
               </div>
-              <div class="badge-item">
-                <div class="badge-icon purple">⚡</div>
-                <div><span>MISSIONS</span><strong>84.2%</strong></div>
-              </div>
-              <div class="badge-item">
-                <div class="badge-icon cyan">◈</div>
-                <div><span>POST-TEST</span><strong>88.5%</strong></div>
-              </div>
-              <div class="badge-item">
-                <div class="badge-icon blue">❖</div>
-                <div><span>PASSING</span><strong>75.0%</strong></div>
-              </div>
+              <div id="donut-legend" class="donut-legend"></div>
             </div>
-          </div>
+          </section>
 
-          <div class="cp-panel donut-panel">
-            <div class="panel-header"><h3>AGE GROUPS</h3></div>
-            <div class="donut-wrap">
-              <svg viewBox="0 0 160 160" class="donut-svg">
-                <circle cx="80" cy="80" r="56" class="donut-track" />
-                <circle cx="80" cy="80" r="56" class="donut-seg seg-1" stroke-dasharray="134 352" stroke-dashoffset="0" />
-                <circle cx="80" cy="80" r="56" class="donut-seg seg-2" stroke-dasharray="88 352" stroke-dashoffset="-134" />
-                <circle cx="80" cy="80" r="56" class="donut-seg seg-3" stroke-dasharray="88 352" stroke-dashoffset="-222" />
-                <circle cx="80" cy="80" r="56" class="donut-seg seg-4" stroke-dasharray="42 352" stroke-dashoffset="-310" />
-              </svg>
-              <div class="donut-center"><strong>08</strong><span>USERS</span></div>
+          <section class="grid-row-2">
+            <div class="grad-card grad-magenta">
+              <div class="grad-info"><span>TOP LESSON RATE</span><strong id="card-l1-rate">90%</strong><small>Sector 01</small></div>
+              <div class="mini-bars"><span style="height:45%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:95%"></span><span style="height:85%"></span></div>
             </div>
-            <div id="donut-legend" class="donut-legend"></div>
-          </div>
-        </section>
+            <div class="grad-card grad-purple">
+              <div class="grad-info"><span>TOTAL ASSESSMENTS</span><strong>35</strong><small>7 Quizzes/Lesson</small></div>
+              <svg viewBox="0 0 100 40" class="mini-wave"><path d="M0,30 Q20,5 40,22 T80,12 T100,18" fill="none" stroke="#8CEEF6" stroke-width="3" /></svg>
+            </div>
+            <div class="grad-card grad-cyan">
+              <div class="grad-info"><span>QUESTION BANK</span><strong id="card-q-count">225</strong><small>45 Qs/Lesson</small></div>
+              <svg viewBox="0 0 100 40" class="mini-wave"><path d="M0,28 Q25,35 45,12 T85,20 T100,6" fill="none" stroke="#4AD8F0" stroke-width="3" /></svg>
+            </div>
+            <div class="grad-card grad-indigo">
+              <div class="grad-info"><span>MAX XP REWARD</span><strong id="card-total-xp">550 XP</strong><small>All Modules</small></div>
+              <div class="mini-bars"><span style="height:35%"></span><span style="height:55%"></span><span style="height:75%"></span><span style="height:65%"></span><span style="height:100%"></span></div>
+            </div>
+          </section>
 
-        <section class="grid-row-2">
-          <div class="grad-card grad-magenta">
-            <div class="grad-info"><span>TOP LESSON RATE</span><strong id="card-l1-rate">90%</strong><small>Sector 01</small></div>
-            <div class="mini-bars"><span style="height:45%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:95%"></span><span style="height:85%"></span></div>
-          </div>
-          <div class="grad-card grad-purple">
-            <div class="grad-info"><span>TOTAL ASSESSMENTS</span><strong>35</strong><small>7 Quizzes/Lesson</small></div>
-            <svg viewBox="0 0 100 40" class="mini-wave"><path d="M0,30 Q20,5 40,22 T80,12 T100,18" fill="none" stroke="#8CEEF6" stroke-width="3" /></svg>
-          </div>
-          <div class="grad-card grad-cyan">
-            <div class="grad-info"><span>QUESTION BANK</span><strong id="card-q-count">225</strong><small>45 Qs/Lesson</small></div>
-            <svg viewBox="0 0 100 40" class="mini-wave"><path d="M0,28 Q25,35 45,12 T85,20 T100,6" fill="none" stroke="#0A0E24" stroke-width="3" /></svg>
-          </div>
-          <div class="grad-card grad-indigo">
-            <div class="grad-info"><span>MAX XP REWARD</span><strong id="card-total-xp">550 XP</strong><small>All Modules</small></div>
-            <div class="mini-bars"><span style="height:35%"></span><span style="height:55%"></span><span style="height:75%"></span><span style="height:65%"></span><span style="height:100%"></span></div>
-          </div>
-        </section>
-
-        <section class="grid-row-3">
-          <div class="cp-panel timeline-panel">
-            <div class="panel-header"><h3>LESSONS</h3><button class="cp-notch-btn cyan-btn sm" onclick="switchView('lessons', document.querySelectorAll('.side-link')[2])">VIEW ALL</button></div>
-            <div id="lesson-timeline-list" class="timeline-list"></div>
-          </div>
-          <div class="cp-panel table-panel">
-            <div class="panel-header wrap-header"><h3>RECENT QUESTIONS</h3><button class="cp-notch-btn magenta-btn sm" onclick="switchView('quizzes', document.querySelectorAll('.side-link')[3])">OPEN MATRIX</button></div>
-            <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>QUESTION</th><th>ANSWER</th><th>ACTION</th></tr></thead><tbody id="dashboard-questions-preview"></tbody></table></div>
-          </div>
-        </section>
-      </div>
-
-      <!-- WINDOW 2: ANALYTICS -->
-      <div id="view-analytics" class="view-window">
-        <div class="analytics-two-col">
-          <div class="cp-panel"><div class="panel-header"><h3>AGE GROUP PERFORMANCE</h3></div><div id="analytics-age-bars" class="bar-stack"></div></div>
-          <div class="cp-panel"><div class="panel-header"><h3>ASSESSMENT SCORE BREAKDOWN</h3></div><div id="analytics-score-bars" class="bar-stack"></div></div>
+          <section class="grid-row-3">
+            <div class="cp-panel timeline-panel">
+              <div class="panel-header"><h3>LESSONS</h3><button class="cp-notch-btn cyan-btn sm" onclick="switchView('lessons', document.querySelectorAll('.side-link')[2])">VIEW ALL</button></div>
+              <div id="lesson-timeline-list" class="timeline-list"></div>
+            </div>
+            <div class="cp-panel table-panel">
+              <div class="panel-header wrap-header"><h3>RECENT QUESTIONS</h3><button class="cp-notch-btn magenta-btn sm" onclick="switchView('quizzes', document.querySelectorAll('.side-link')[3])">OPEN MATRIX</button></div>
+              <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>QUESTION</th><th>ANSWER</th><th>ACTION</th></tr></thead><tbody id="dashboard-questions-preview"></tbody></table></div>
+            </div>
+          </section>
         </div>
-        <div class="cp-panel"><div class="panel-header"><h3>LESSON COMPLETION TELEMETRY</h3></div><div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ID</th><th>SECTOR</th><th>TITLE</th><th>AVG QUIZ</th><th>SUCCESS</th><th>XP</th></tr></thead><tbody id="analytics-lesson-tbody"></tbody></table></div></div>
-      </div>
 
-      <!-- WINDOW 3: LESSONS -->
-      <div id="view-lessons" class="view-window"><div id="full-lessons-grid" class="lessons-card-grid"></div></div>
-
-      <!-- WINDOW 4: QUIZZES -->
-      <div id="view-quizzes" class="view-window">
-        <div class="cp-panel">
-          <div class="panel-header wrap-header">
-            <div class="table-filters">
-              <select id="quiz-lesson-select" class="cp-select" onchange="loadAssessmentQuestions()"></select>
-              <select id="quiz-type-select" class="cp-select" onchange="loadAssessmentQuestions()">
-                <option value="pre_test">Pre-Test (10 Qs)</option>
-                <option value="mission_1">Mission 01 (5 Qs)</option>
-                <option value="mission_2">Mission 02 (5 Qs)</option>
-                <option value="mission_3">Mission 03 (5 Qs)</option>
-                <option value="mission_4">Mission 04 (5 Qs)</option>
-                <option value="mission_5">Mission 05 (5 Qs)</option>
-                <option value="post_test">Post-Test (10 Qs)</option>
-              </select>
-            </div>
-            <div class="table-filters">
-              <div class="search-box"><span>⌕</span><input type="text" id="question-search" placeholder="Search..." oninput="renderQuestionTable()" /></div>
-              <button class="cp-notch-btn magenta-btn sm" onclick="openAddQuestionModal()">+ NEW Q</button>
-            </div>
+        <!-- WINDOW 2: ANALYTICS -->
+        <div id="view-analytics" class="view-window">
+          <div class="analytics-two-col">
+            <div class="cp-panel"><div class="panel-header"><h3>AGE GROUP PERFORMANCE</h3></div><div id="analytics-age-bars" class="bar-stack"></div></div>
+            <div class="cp-panel"><div class="panel-header"><h3>ASSESSMENT SCORE BREAKDOWN</h3></div><div id="analytics-score-bars" class="bar-stack"></div></div>
           </div>
-          <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>PROMPT</th><th>CORRECT ANSWER</th><th>POINTS</th><th>ACTION</th></tr></thead><tbody id="questions-table-body"></tbody></table></div>
+          <div class="cp-panel"><div class="panel-header"><h3>LESSON COMPLETION TELEMETRY</h3></div><div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ID</th><th>SECTOR</th><th>TITLE</th><th>AVG QUIZ</th><th>SUCCESS</th><th>XP</th></tr></thead><tbody id="analytics-lesson-tbody"></tbody></table></div></div>
         </div>
-      </div>
 
-      <!-- WINDOW 5: USERS MANAGEMENT -->
-      <div id="view-users" class="view-window">
-        <div class="cp-panel">
-          <div class="panel-header wrap-header">
-            <div class="table-filters">
-              <select id="filter-user-role" class="cp-select">
-                <option value="all">All Roles</option>
-                <option value="learner">Learners</option>
-                <option value="admin">Admins (ICTO)</option>
-              </select>
-              <select id="filter-user-age" class="cp-select">
-                <option value="all">All Age Brackets</option>
-                <option value="13-15">13–15</option>
-                <option value="16-18">16–18</option>
-                <option value="19-21">19–21</option>
-                <option value="22+">22+</option>
-              </select>
-              <select id="filter-user-status" class="cp-select">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-            <div class="table-filters">
-              <div class="search-box">
-                <span>⌕</span>
-                <input type="text" id="user-search-input" placeholder="Search user or email..." />
+        <!-- WINDOW 3: LESSONS -->
+        <div id="view-lessons" class="view-window"><div id="full-lessons-grid" class="lessons-card-grid"></div></div>
+
+        <!-- WINDOW 4: QUIZZES -->
+        <div id="view-quizzes" class="view-window">
+          <div class="cp-panel">
+            <div class="panel-header wrap-header">
+              <div class="table-filters">
+                <select id="quiz-lesson-select" class="cp-select" onchange="loadAssessmentQuestions()"></select>
+                <select id="quiz-type-select" class="cp-select" onchange="loadAssessmentQuestions()">
+                  <option value="pre_test">Pre-Test (10 Qs)</option>
+                  <option value="mission_1">Mission 01 (5 Qs)</option>
+                  <option value="mission_2">Mission 02 (5 Qs)</option>
+                  <option value="mission_3">Mission 03 (5 Qs)</option>
+                  <option value="mission_4">Mission 04 (5 Qs)</option>
+                  <option value="mission_5">Mission 05 (5 Qs)</option>
+                  <option value="post_test">Post-Test (10 Qs)</option>
+                </select>
               </div>
-              <button type="button" id="btn-refresh-users" class="cp-notch-btn cyan-btn sm">↻ REFRESH</button>
+              <div class="table-filters">
+                <div class="search-box"><span>⌕</span><input type="text" id="question-search" placeholder="Search..." oninput="renderQuestionTable()" /></div>
+                <button class="cp-notch-btn magenta-btn sm" onclick="openAddQuestionModal()">+ NEW Q</button>
+              </div>
             </div>
-          </div>
-
-          <div class="table-scroll">
-            <table class="cp-data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>USER / EMAIL</th>
-                  <th>ROLE</th>
-                  <th>AGE GROUP</th>
-                  <th>LEVEL / XP</th>
-                  <th>AVG SCORE</th>
-                  <th>STATUS</th>
-                  <th>ACTION</th>
-                </tr>
-              </thead>
-              <tbody id="users-table-body">
-                <tr><td colspan="8" style="text-align:center; padding:20px;">Loading users...</td></tr>
-              </tbody>
-            </table>
+            <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>PROMPT</th><th>CORRECT ANSWER</th><th>POINTS</th><th>ACTION</th></tr></thead><tbody id="questions-table-body"></tbody></table></div>
           </div>
         </div>
-      </div>
-    </main>
+
+        <!-- WINDOW 5: USERS MANAGEMENT -->
+        <div id="view-users" class="view-window">
+          <div class="cp-panel">
+            <div class="panel-header wrap-header">
+              <div class="table-filters">
+                <select id="filter-user-role" class="cp-select">
+                  <option value="all">All Roles</option>
+                  <option value="learner">Learners</option>
+                  <option value="admin">Admins (ICTO)</option>
+                </select>
+                <select id="filter-user-age" class="cp-select">
+                  <option value="all">All Age Brackets</option>
+                  <option value="13-15">13–15</option>
+                  <option value="16-18">16–18</option>
+                  <option value="19-21">19–21</option>
+                  <option value="22+">22+</option>
+                </select>
+                <select id="filter-user-status" class="cp-select">
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <div class="table-filters">
+                <div class="search-box">
+                  <span>⌕</span>
+                  <input type="text" id="user-search-input" placeholder="Search user or email..." />
+                </div>
+                <button type="button" id="btn-refresh-users" class="cp-notch-btn cyan-btn sm">↻ REFRESH</button>
+              </div>
+            </div>
+
+            <div class="table-scroll">
+              <table class="cp-data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>USER / EMAIL</th>
+                    <th>ROLE</th>
+                    <th>AGE GROUP</th>
+                    <th>LEVEL / XP</th>
+                    <th>AVG SCORE</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <tr><td colspan="8" style="text-align:center; padding:20px;">Loading users...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 
   <!-- MODALS -->
@@ -281,7 +724,6 @@
     </div>
   </div>
 
-  <!-- USER MANAGEMENT MODAL -->
   <div id="user-modal" class="cp-modal hidden" onclick="if(event.target===this) closeUserModal()">
     <div class="cp-modal-box" style="max-width: 620px;">
       <div class="cp-modal-tag" id="modal-user-tag">ACCOUNT</div>
@@ -335,7 +777,11 @@
   </div>
 
   <div id="notify-modal" class="cp-modal hidden" onclick="closeNotifyModal()">
-    <div class="cp-modal-box" style="max-width: 340px; text-align: center;"><h3 id="notify-title" style="color: #4AD8F0;">SAVED</h3><p id="notify-message" style="margin: 10px 0 18px;"></p><button class="cp-notch-btn cyan-btn" onclick="closeNotifyModal()" style="width:100%;">OK</button></div>
+    <div class="cp-modal-box" style="max-width: 340px; text-align: center;">
+      <h3 id="notify-title" style="color: #4AD8F0;">SAVED</h3>
+      <p id="notify-message" style="margin: 10px 0 18px;"></p>
+      <button class="cp-notch-btn cyan-btn" onclick="closeNotifyModal()" style="width:100%;">OK</button>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
