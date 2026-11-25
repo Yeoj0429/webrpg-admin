@@ -325,7 +325,7 @@
     .timeline-list, .bar-stack { display: flex; flex-direction: column; gap: 12px; }
     .lessons-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }
 
-    .table-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .table-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; max-width: 100%; min-width: 0; }    
     .cp-select, .cp-input {
       background: var(--navy-void);
       border: 1px solid var(--blue);
@@ -334,6 +334,8 @@
       font-size: 0.98rem;
       padding: 9px 12px;
       outline: none;
+      max-width: 100%;
+      text-overflow: ellipsis;
     }
     .cp-input { width: 100%; margin-bottom: 14px; }
     .cp-select:focus, .cp-input:focus { border-color: var(--cyan-light); }
@@ -642,6 +644,10 @@
 
     /* MOBILE (<= 640px) */
     @media (max-width: 640px) {
+      .table-filters { width: 100%; }
+      .cp-select { width: 100%; }
+      .search-box { flex: 1; min-width: 0; }
+      .search-box input { width: 100%; }
       .topbar { padding: 12px 16px; }
       .brand-logo { font-size: 1.1rem; padding: 4px 10px; }
       .mobile-nav-dropdown { top: 53px; }
@@ -857,7 +863,7 @@
                 <button class="cp-notch-btn magenta-btn sm" onclick="openAddQuestionModal()">+ NEW Q</button>
               </div>
             </div>
-            <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>PROMPT</th><th>CORRECT ANSWER</th><th>POINTS</th><th>ACTION</th></tr></thead><tbody id="questions-table-body"></tbody></table></div>
+            <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>QUESTION</th><th>CORRECT ANSWER</th><th>POINTS</th><th>ACTION</th></tr></thead><tbody id="questions-table-body"></tbody></table></div>
           </div>
         </div>
 
@@ -936,7 +942,7 @@
       <div class="cp-modal-tag" id="modal-question-tag">QUESTION</div>
       <h3 id="modal-question-heading">EDIT QUESTION</h3>
       <input type="hidden" id="edit-question-index" />
-      <label>PROMPT</label><textarea id="edit-question-text" rows="3" class="cp-input"></textarea>
+      <label>QUESTION</label><textarea id="edit-question-text" rows="3" class="cp-input"></textarea>
       <label>CHOICES</label><div id="modal-options-container" class="cp-options-stack"></div>
       <div class="cp-modal-actions"><button id="delete-question-btn" class="cp-notch-btn danger-btn" onclick="deleteQuestionModal()">DELETE</button><div class="modal-right-btns"><button class="cp-notch-btn ghost-btn" onclick="closeQuestionModal()">CANCEL</button><button class="cp-notch-btn cyan-btn" onclick="saveQuestionModal()">SAVE</button></div></div>
     </div>
