@@ -20,7 +20,6 @@ const pool = mysql.createPool({
   connectionLimit: 5
 });
 
-// Password Hashing & Verification Helpers
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
   const derived = crypto.scryptSync(password, salt, 64).toString('hex');
@@ -38,6 +37,9 @@ function verifyPassword(password, storedHash) {
   return storedHash === sha256 || storedHash === password;
 }
 
+// ==========================================
+// 1. HEALTH & LEGACY ADMIN LOGIN
+// ==========================================
 app.get('/api/health', async (req, res) => {
   try {
     await pool.query('SELECT 1');
@@ -47,7 +49,6 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// POST Admin Login (Checks TiDB users table for role = 'admin')
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -59,16 +60,11 @@ app.post('/api/admin/login', async (req, res) => {
       [username, username]
     );
 
-    if (rows.length === 0) {
-      return res.status(401).json({ error: 'Admin account not found.' });
-    }
+    if (rows.length === 0) return res.status(401).json({ error: 'Admin account not found.' });
 
     const admin = rows[0];
     const isValid = verifyPassword(password, admin.password_hash) || (password === 'admin123');
-
-    if (!isValid) {
-      return res.status(401).json({ error: 'Incorrect password.' });
-    }
+    if (!isValid) return res.status(401).json({ error: 'Incorrect password.' });
 
     res.json({
       authenticated: true,
@@ -80,7 +76,9 @@ app.post('/api/admin/login', async (req, res) => {
   }
 });
 
-// 1. GET Lessons + Progress
+// ==========================================
+// 2. ADMIN: LESSONS, ANALYTICS & EXPORT
+// ==========================================
 app.get('/api/admin/lesson-progress', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -96,7 +94,7 @@ app.get('/api/admin/lesson-progress', async (req, res) => {
       LEFT JOIN locations loc ON l.location_id = loc.location_id
       LEFT JOIN assessments a ON l.lesson_id = a.lesson_id
       LEFT JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id
-      GROUP BY l.lesson_id, l.title, l.content, l.xp_reward, loc.location_name
+      GROUP BY l.lesson_id, l.title, l.content, l.xp_reward, loc.location_name, l.lesson_order
       ORDER BY l.lesson_order ASC
     `);
     res.json(rows);
@@ -105,7 +103,6 @@ app.get('/api/admin/lesson-progress', async (req, res) => {
   }
 });
 
-// GET Live Telemetry for Analytics, Donut Chart, and KPI Cards
 app.get('/api/admin/analytics', async (req, res) => {
   try {
     const [[{ totalLearners }]] = await pool.query(
@@ -146,19 +143,12 @@ app.get('/api/admin/analytics', async (req, res) => {
       GROUP BY category
     `);
 
-    res.json({
-      totalLearners,
-      totalAssessments,
-      totalQuestions,
-      ageRows,
-      scoreRows
-    });
+    res.json({ totalLearners, totalAssessments, totalQuestions, ageRows, scoreRows });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET Full Learner & Assessment Dataset for Excel (.xlsx) Export
 app.get('/api/admin/export-data', async (req, res) => {
   let learners = [];
   let lessonStats = [];
@@ -171,7 +161,7 @@ app.get('/api/admin/export-data', async (req, res) => {
         u.user_id,
         u.username,
         u.email,
-        ANY_VALUE(lp.age) AS age,
+        lp.age,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type = 'pre_test' THEN aa.score END), 1), 0) AS pre_test_avg,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type LIKE 'mission_%' THEN aa.score END), 1), 0) AS mission_avg,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type = 'post_test' THEN aa.score END), 1), 0) AS post_test_avg,
@@ -182,7 +172,7 @@ app.get('/api/admin/export-data', async (req, res) => {
       LEFT JOIN assessment_attempts aa ON u.user_id = aa.user_id
       LEFT JOIN assessments a ON aa.assessment_id = a.assessment_id
       WHERE u.role = 'learner'
-      GROUP BY u.user_id, u.username, u.email
+      GROUP BY u.user_id, u.username, u.email, lp.age
       ORDER BY u.user_id ASC
     `);
     learners = rows;
@@ -194,7 +184,7 @@ app.get('/api/admin/export-data', async (req, res) => {
     const [rows] = await pool.query(`
       SELECT 
         l.lesson_id,
-        ANY_VALUE(loc.location_name) AS location_name,
+        loc.location_name,
         l.title,
         l.xp_reward,
         COALESCE(ROUND(AVG(CASE WHEN a.assessment_type = 'pre_test' THEN aa.score END), 1), 0) AS pre_avg,
@@ -205,7 +195,7 @@ app.get('/api/admin/export-data', async (req, res) => {
       LEFT JOIN locations loc ON l.location_id = loc.location_id
       LEFT JOIN assessments a ON l.lesson_id = a.lesson_id
       LEFT JOIN assessment_attempts aa ON a.assessment_id = aa.assessment_id
-      GROUP BY l.lesson_id, l.title, l.xp_reward, l.lesson_order
+      GROUP BY l.lesson_id, loc.location_name, l.title, l.xp_reward, l.lesson_order
       ORDER BY l.lesson_order ASC
     `);
     lessonStats = rows;
@@ -238,7 +228,6 @@ app.get('/api/admin/export-data', async (req, res) => {
   res.json({ learners, lessonStats, questionBank, errors });
 });
 
-// 2. POST Add Lesson
 app.post('/api/admin/lessons', async (req, res) => {
   try {
     const { location_id, title, content, xp_reward } = req.body;
@@ -255,7 +244,6 @@ app.post('/api/admin/lessons', async (req, res) => {
   }
 });
 
-// 3. PUT Edit Lesson
 app.put('/api/admin/lessons/:lessonId', async (req, res) => {
   try {
     const { lessonId } = req.params;
@@ -270,7 +258,6 @@ app.put('/api/admin/lessons/:lessonId', async (req, res) => {
   }
 });
 
-// 4. DELETE Lesson
 app.delete('/api/admin/lessons/:lessonId', async (req, res) => {
   try {
     const { lessonId } = req.params;
@@ -281,7 +268,9 @@ app.delete('/api/admin/lessons/:lessonId', async (req, res) => {
   }
 });
 
-// 5. GET Questions + Options
+// ==========================================
+// 3. ADMIN: QUESTIONS CRUD
+// ==========================================
 app.get('/api/admin/questions', async (req, res) => {
   try {
     const { lessonId, assessmentType } = req.query;
@@ -306,7 +295,6 @@ app.get('/api/admin/questions', async (req, res) => {
   }
 });
 
-// 6. POST Add Question + 4 Options
 app.post('/api/admin/questions', async (req, res) => {
   const conn = await pool.getConnection();
   try {
@@ -359,7 +347,6 @@ app.post('/api/admin/questions', async (req, res) => {
   }
 });
 
-// 7. PUT Edit Question + Options
 app.put('/api/admin/questions/:questionId', async (req, res) => {
   const conn = await pool.getConnection();
   try {
@@ -391,7 +378,6 @@ app.put('/api/admin/questions/:questionId', async (req, res) => {
   }
 });
 
-// 8. DELETE Question
 app.delete('/api/admin/questions/:questionId', async (req, res) => {
   try {
     const { questionId } = req.params;
@@ -403,10 +389,8 @@ app.delete('/api/admin/questions/:questionId', async (req, res) => {
 });
 
 // ==========================================
-// 9. ADMIN: USERS MANAGEMENT ROUTES
+// 4. ADMIN: USERS MANAGEMENT
 // ==========================================
-
-// GET All Users (Search + Role, Age Bracket & Status Filters)
 app.get('/api/admin/users', async (req, res) => {
   try {
     const { q = '', role = 'all', age_bracket = 'all', status = 'all' } = req.query;
@@ -470,7 +454,6 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
-// GET Single User Details + Attempt History (for Inline Modal)
 app.get('/api/admin/users/:id', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -481,13 +464,6 @@ app.get('/api/admin/users/:id', async (req, res) => {
         COALESCE(u.account_status, 'active') AS status,
         u.created_at,
         lp.age,
-        CASE 
-          WHEN lp.age BETWEEN 13 AND 15 THEN '13-15'
-          WHEN lp.age BETWEEN 16 AND 18 THEN '16-18'
-          WHEN lp.age BETWEEN 19 AND 21 THEN '19-21'
-          WHEN lp.age >= 22 THEN '22+'
-          ELSE 'N/A'
-        END AS age_bracket,
         COALESCE(lp.current_level, 1) AS level,
         COALESCE(lp.total_xp, 0) AS xp
       FROM users u
@@ -520,23 +496,24 @@ app.get('/api/admin/users/:id', async (req, res) => {
   }
 });
 
-// PUT Update User Role, Status & Age Bracket
 app.put('/api/admin/users/:id', async (req, res) => {
   try {
     const userId = Number(req.params.id);
-    const { role, status, age_bracket } = req.body;
+    const { role, status, age } = req.body;
 
     await pool.query(
       `UPDATE users SET role = ?, account_status = ? WHERE user_id = ?`,
       [role, status, userId]
     );
 
-    const ageMap = { '13-15': 14, '16-18': 17, '19-21': 20, '22+': 22 };
-    if (ageMap[age_bracket]) {
-      await pool.query(
-        `UPDATE learner_profiles SET age = ? WHERE user_id = ?`,
-        [ageMap[age_bracket], userId]
-      );
+    if (age !== '' && age !== null && age !== undefined) {
+      const numericAge = Number(age);
+      if (!Number.isNaN(numericAge) && numericAge >= 10 && numericAge <= 99) {
+        await pool.query(
+          `UPDATE learner_profiles SET age = ? WHERE user_id = ?`,
+          [numericAge, userId]
+        );
+      }
     }
 
     res.json({ success: true, message: 'User updated successfully.' });
@@ -546,7 +523,6 @@ app.put('/api/admin/users/:id', async (req, res) => {
   }
 });
 
-// DELETE User (Safely clears dependent records in a transaction)
 app.delete('/api/admin/users/:id', async (req, res) => {
   const conn = await pool.getConnection();
   try {
@@ -578,25 +554,8 @@ app.delete('/api/admin/users/:id', async (req, res) => {
 });
 
 // ==========================================
-// 10. AUTH: LOGIN, REGISTER & LOCATIONS
+// 5. UNIFIED AUTH (LOGIN & REGISTER)
 // ==========================================
-
-// GET Valenzuela Barangays for Registration Dropdown
-app.get('/api/locations', async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      `SELECT location_id, location_name AS barangay_name, 'Valenzuela City' AS city_name
-       FROM locations
-       ORDER BY location_name ASC`
-    );
-    res.json({ success: true, locations: rows });
-  } catch (err) {
-    console.error('GET /api/locations error:', err);
-    res.status(500).json({ success: false, message: 'Failed to load locations.' });
-  }
-});
-
-// POST Unified Login (Admin -> admin.html, Learner -> player-dashboard.html)
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { identifier = '', password = '' } = req.body;
@@ -620,12 +579,11 @@ app.post('/api/auth/login', async (req, res) => {
     if (user.account_status !== 'active') {
       return res.status(403).json({
         success: false,
-        message: `Your account is currently ${user.account_status}. Contact ICTO Valenzuela.`
+        message: `Your account is currently ${user.account_status}.`
       });
     }
 
     const token = crypto.randomBytes(24).toString('hex');
-
     res.json({
       success: true,
       token,
@@ -642,7 +600,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// POST Learner Registration (Creates users + learner_profiles in one transaction)
 app.post('/api/auth/register', async (req, res) => {
   const conn = await pool.getConnection();
   try {
@@ -716,7 +673,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // ==========================================
-// 11. PLAYER DASHBOARD API ROUTE
+// 6. PLAYER DASHBOARD & ACCOUNT SETTINGS
 // ==========================================
 app.get('/api/player/dashboard', async (req, res) => {
   try {
@@ -773,12 +730,6 @@ app.get('/api/player/dashboard', async (req, res) => {
   }
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
-}
-
-// PUT Update Learner Profile (Username & Email remain locked)
 app.put('/api/player/profile', async (req, res) => {
   try {
     const { user_id, first_name = '', last_name = '', age, sex = 'prefer_not_to_say' } = req.body;
@@ -792,9 +743,7 @@ app.put('/api/player/profile', async (req, res) => {
     }
 
     await pool.query(
-      `UPDATE learner_profiles
-       SET first_name = ?, last_name = ?, age = ?, sex = ?
-       WHERE user_id = ?`,
+      `UPDATE learner_profiles SET first_name = ?, last_name = ?, age = ?, sex = ? WHERE user_id = ?`,
       [first_name.trim(), last_name.trim(), numericAge, sex, user_id]
     );
 
@@ -805,7 +754,6 @@ app.put('/api/player/profile', async (req, res) => {
   }
 });
 
-// PUT Change Learner Password
 app.put('/api/player/password', async (req, res) => {
   try {
     const { user_id, current_password = '', new_password = '' } = req.body;
@@ -833,5 +781,10 @@ app.put('/api/player/password', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update password.' });
   }
 });
+
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(`Local API running on http://localhost:${PORT}`));
+}
 
 module.exports = app;

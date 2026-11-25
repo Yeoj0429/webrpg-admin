@@ -65,9 +65,7 @@
         headers: getAuthHeaders()
       });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Unable to load users.');
-      }
+      if (!res.ok || !data.success) throw new Error(data.message || 'Unable to load users.');
       renderUsersTable(data.users || []);
     } catch (err) {
       tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ff2a6d; padding:18px;">${escapeHtml(err.message)}</td></tr>`;
@@ -84,10 +82,9 @@
       .map((u) => {
         const isAdmin = u.role === 'admin';
         const status = (u.status || 'active').toLowerCase();
-        const statusColor =
-          status === 'active' ? '#3ef2a8' : status === 'suspended' ? '#fcee0a' : '#ff2a6d';
-        const avgDisplay =
-          u.avg_score !== null && u.avg_score !== undefined ? `${u.avg_score}%` : '—';
+        const statusColor = status === 'active' ? '#3ef2a8' : '#ff2a6d';
+        const avgDisplay = u.avg_score !== null && u.avg_score !== undefined ? `${u.avg_score}%` : '—';
+        const ageDisplay = u.age !== null && u.age !== undefined ? escapeHtml(u.age) : '—';
 
         return `
           <tr>
@@ -99,7 +96,7 @@
             <td style="color:${isAdmin ? '#C84BF2' : '#4AD8F0'}; font-weight:700;">
               ${escapeHtml((u.role || 'learner').toUpperCase())}
             </td>
-            <td>${escapeHtml(u.age_bracket || 'N/A')}</td>
+            <td>${ageDisplay}</td>
             <td>Lv. ${u.level ?? 1} <small style="opacity:0.75;">(${u.xp ?? 0} XP)</small></td>
             <td>${avgDisplay}</td>
             <td style="color:${statusColor}; font-weight:700;">
@@ -118,9 +115,7 @@
 
   async function openUserModal(userId) {
     try {
-      const res = await fetch(`${API_BASE}/${userId}`, {
-        headers: getAuthHeaders()
-      });
+      const res = await fetch(`${API_BASE}/${userId}`, { headers: getAuthHeaders() });
       const data = await res.json();
       if (!res.ok || !data.success) {
         return notifyUser('ERROR', data.message || 'Failed to load user details.');
@@ -132,11 +127,7 @@
       document.getElementById('edit-user-id').value = user.user_id;
       document.getElementById('edit-user-role').value = user.role || 'learner';
       document.getElementById('edit-user-status').value = user.status || 'active';
-
-      const ageSelect = document.getElementById('edit-user-age');
-      if (user.age_bracket && [...ageSelect.options].some((o) => o.value === user.age_bracket)) {
-        ageSelect.value = user.age_bracket;
-      }
+      document.getElementById('edit-user-age').value = user.age ?? '';
 
       attemptsBody.innerHTML = attempts.length
         ? attempts
@@ -157,7 +148,7 @@
         : `<tr><td colspan="5" style="text-align:center; padding:12px;">No quiz attempts recorded yet.</td></tr>`;
 
       userModal.classList.remove('hidden');
-    } catch (err) {
+    } catch {
       notifyUser('ERROR', 'Could not fetch user profile.');
     }
   }
@@ -171,7 +162,7 @@
     const payload = {
       role: document.getElementById('edit-user-role').value,
       status: document.getElementById('edit-user-status').value,
-      age_bracket: document.getElementById('edit-user-age').value
+      age: document.getElementById('edit-user-age').value
     };
 
     try {
@@ -181,13 +172,11 @@
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        return notifyUser('ERROR', data.message || 'Update failed.');
-      }
+      if (!res.ok || !data.success) return notifyUser('ERROR', data.message || 'Update failed.');
       closeUserModal();
       notifyUser('UPDATED', data.message || 'User account updated.');
       loadAdminUsers();
-    } catch (err) {
+    } catch {
       notifyUser('ERROR', 'Network error while saving user.');
     }
   }
@@ -202,18 +191,15 @@
         headers: getAuthHeaders()
       });
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        return notifyUser('ERROR', data.message || 'Delete failed.');
-      }
+      if (!res.ok || !data.success) return notifyUser('ERROR', data.message || 'Delete failed.');
       closeUserModal();
       notifyUser('DELETED', data.message || 'User account deleted.');
       loadAdminUsers();
-    } catch (err) {
+    } catch {
       notifyUser('ERROR', 'Network error while deleting user.');
     }
   }
 
-  // Filter & Search Listeners
   [roleFilter, ageFilter, statusFilter].forEach((el) => el?.addEventListener('change', loadAdminUsers));
   refreshBtn?.addEventListener('click', loadAdminUsers);
 
@@ -223,7 +209,6 @@
     debounceTimer = setTimeout(loadAdminUsers, 280);
   });
 
-  // Expose handlers for inline onclick attributes
   window.loadAdminUsers = loadAdminUsers;
   window.openUserModal = openUserModal;
   window.closeUserModal = closeUserModal;

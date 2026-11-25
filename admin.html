@@ -434,6 +434,92 @@
     .cp-modal-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; }
     .modal-right-btns { display: flex; gap: 8px; }
 
+    /* FALLBACK FOR DYNAMIC BUTTONS FROM admin.js */
+    .cp-workspace button:not(.side-link):not(.cp-notch-btn),
+    main button:not(.cp-notch-btn),
+    .topbar-right button:not(.cp-notch-btn) {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 8px 14px;
+      border: 1px solid var(--cyan);
+      background: rgba(74, 216, 240, 0.14);
+      color: var(--cyan-light);
+      cursor: pointer;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+      transition: 0.2s;
+    }
+    .cp-workspace button:not(.side-link):not(.cp-notch-btn):hover,
+    main button:not(.cp-notch-btn):hover,
+    .topbar-right button:not(.cp-notch-btn):hover {
+      background: var(--cyan);
+      color: var(--navy-void);
+    }
+
+    /* DYNAMIC LESSON CARDS & TIMELINE */
+    .lessons-card-grid > div,
+    .lesson-card {
+      background: rgba(16, 22, 48, 0.9);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--cyan);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    }
+    .timeline-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--navy-void);
+      border-left: 3px solid var(--cyan);
+    }
+
+    /* ANALYTICS BARS & DONUT LEGEND */
+    .bar-row, .bar-item { display: flex; flex-direction: column; gap: 6px; }
+    .bar-meta, .bar-label { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text); }
+    .bar-track {
+      width: 100%;
+      height: 10px;
+      background: var(--navy-void);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    }
+    .donut-legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.1);
+    }
+
+    /* QUIZ MODAL OPTION ROWS */
+    .cp-options-stack > div,
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cp-options-stack input[type="text"] {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .cp-options-stack input[type="radio"] {
+      accent-color: var(--cyan);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 1024px) {
       .grid-row-1, .grid-row-3, .analytics-two-col { grid-template-columns: 1fr; }
@@ -682,7 +768,7 @@
                     <th>ID</th>
                     <th>USER / EMAIL</th>
                     <th>ROLE</th>
-                    <th>AGE GROUP</th>
+                    <th>AGE</th>
                     <th>LEVEL / XP</th>
                     <th>AVG SCORE</th>
                     <th>STATUS</th>
@@ -742,13 +828,8 @@
         <option value="inactive">Inactive</option>
       </select>
 
-      <label>AGE BRACKET</label>
-      <select id="edit-user-age" class="cp-input">
-        <option value="13-15">13–15</option>
-        <option value="16-18">16–18</option>
-        <option value="19-21">19–21</option>
-        <option value="22+">22+</option>
-      </select>
+      <label>AGE</label>
+<input type="number" id="edit-user-age" class="cp-input" min="10" max="99" placeholder="e.g. 16" />
 
       <label style="margin-top: 14px;">RECENT QUIZ ATTEMPTS (75% PASSING STANDARD)</label>
       <div class="table-scroll" style="max-height: 180px; margin-bottom: 14px;">
