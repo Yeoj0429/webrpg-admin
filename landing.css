@@ -187,6 +187,7 @@ body {
 .cp-poster.p-2 { background: linear-gradient(180deg, #26357A 0%, #4864E6 50%, #080B1A 100%); }
 .cp-poster.p-3 { background: linear-gradient(180deg, #432B6E 0%, #8B4DF2 50%, #080B1A 100%); }
 .cp-poster.p-4 { background: linear-gradient(180deg, #5A287A 0%, #C84BF2 50%, #080B1A 100%); }
+.cp-poster.p-5 { background: linear-gradient(180deg, #7A285A 0%, #F24BC8 50%, #080B1A 100%); }
 .poster-badge { font-size: clamp(0.65rem, 1vw, 0.72rem); font-weight: 700; letter-spacing: 2px; color: var(--pal-cyan-light); }
 .poster-top h3 { font-family: 'Teko', sans-serif; font-size: clamp(2rem, 3.5vw, 2.3rem); line-height: 0.95; color: #fff; margin-top: 4px; }
 .poster-bottom p { font-size: clamp(0.85rem, 1.2vw, 0.94rem); line-height: 1.4; margin-bottom: 16px; }
