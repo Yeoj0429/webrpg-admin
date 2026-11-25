@@ -7,27 +7,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --pal-cyan-light: #8CEEF6;
-      --pal-cyan-bright: #4AD8F0;
-      --pal-blue-electric: #2696E8;
-      --pal-navy-deep: #1B2654;
-      --pal-navy-void: #080B1A;
-      --pal-purple-neon: #8B4DF2;
-      --pal-magenta-neon: #C84BF2;
-      --pal-pink-neon: #F288E8;
-      --pal-white-soft: #EDE9F7;
+      --cyan-light: #8CEEF6;
+      --cyan: #4AD8F0;
+      --blue: #2696E8;
+      --navy-void: #080B1A;
+      --purple: #8B4DF2;
+      --magenta: #C84BF2;
+      --text: #EDE9F7;
+      --muted: #9AA8CE;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--pal-navy-void);
+      background-color: var(--navy-void);
       background-image:
         radial-gradient(rgba(74, 216, 240, 0.12) 1px, transparent 1px),
         radial-gradient(circle at 85% 15%, rgba(200, 75, 242, 0.2), transparent 35%),
         radial-gradient(circle at 15% 85%, rgba(38, 150, 232, 0.2), transparent 40%);
       background-size: 24px 24px, 100% 100%, 100% 100%;
-      color: var(--pal-white-soft);
+      color: var(--text);
       font-family: 'Rajdhani', sans-serif;
       min-height: 100vh;
       display: flex;
@@ -38,40 +37,37 @@
 
     .login-card {
       width: 100%;
-      max-width: 460px;
+      max-width: 440px;
       background: linear-gradient(180deg, rgba(27, 38, 84, 0.85), rgba(8, 11, 26, 0.96));
-      border: 2px solid var(--pal-cyan-bright);
-      padding: 34px 30px;
+      border: 2px solid var(--cyan);
+      padding: 32px 28px;
       clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
       box-shadow: 0 0 35px rgba(74, 216, 240, 0.2);
       transition: max-width 0.25s ease;
     }
 
-    .login-card.register-mode {
-      max-width: 540px;
-    }
+    .login-card.register-mode { max-width: 520px; }
 
     .brand-logo {
       display: inline-block;
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       font-weight: 900;
-      color: var(--pal-navy-void);
-      background: var(--pal-cyan-light);
+      color: var(--navy-void);
+      background: var(--cyan-light);
       padding: 4px 14px;
       letter-spacing: 2px;
-      text-shadow: 2px 2px 0px var(--pal-magenta-neon);
+      text-shadow: 2px 2px 0px var(--magenta);
       clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
       margin-bottom: 18px;
     }
-
-    .brand-logo span { color: var(--pal-purple-neon); }
+    .brand-logo span { color: var(--purple); }
 
     .mode-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .mode-tab {
@@ -81,8 +77,8 @@
       letter-spacing: 1.5px;
       padding: 10px;
       background: rgba(8, 11, 26, 0.85);
-      border: 1px solid var(--pal-blue-electric);
-      color: #a9b5d9;
+      border: 1px solid var(--blue);
+      color: var(--muted);
       cursor: pointer;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
       transition: 0.2s;
@@ -90,23 +86,9 @@
 
     .mode-tab.active {
       background: rgba(74, 216, 240, 0.16);
-      border-color: var(--pal-cyan-light);
-      color: var(--pal-cyan-light);
+      border-color: var(--cyan-light);
+      color: var(--cyan-light);
       box-shadow: 0 0 12px rgba(74, 216, 240, 0.25);
-    }
-
-    h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.25rem;
-      color: var(--pal-cyan-light);
-      letter-spacing: 1.5px;
-      margin-bottom: 6px;
-    }
-
-    p.sub {
-      font-size: 0.92rem;
-      color: #a9b5d9;
-      margin-bottom: 20px;
     }
 
     .form-grid {
@@ -121,17 +103,17 @@
 
     label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--pal-cyan-light);
+      letter-spacing: 1.4px;
+      color: var(--cyan-light);
       margin-bottom: 6px;
     }
 
     .cp-input {
       width: 100%;
       background: rgba(8, 11, 26, 0.9);
-      border: 1px solid var(--pal-blue-electric);
+      border: 1px solid var(--blue);
       color: #fff;
       font-family: 'Rajdhani', sans-serif;
       font-size: 1.05rem;
@@ -141,7 +123,7 @@
     }
 
     .cp-input:focus {
-      border-color: var(--pal-cyan-light);
+      border-color: var(--cyan-light);
       box-shadow: 0 0 12px rgba(74, 216, 240, 0.35);
     }
 
@@ -165,7 +147,7 @@
       padding: 14px;
       border: none;
       cursor: pointer;
-      background: linear-gradient(90deg, var(--pal-magenta-neon), var(--pal-purple-neon));
+      background: linear-gradient(90deg, var(--magenta), var(--purple));
       color: #fff;
       clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
       transition: 0.2s;
@@ -181,10 +163,10 @@
       display: block;
       text-align: center;
       margin-top: 20px;
-      color: var(--pal-cyan-bright);
+      color: var(--cyan);
       text-decoration: none;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       letter-spacing: 1px;
     }
   </style>
@@ -199,15 +181,12 @@
       <button type="button" id="tab-register" class="mode-tab" onclick="switchMode('register')">REGISTER</button>
     </div>
 
-    <h2 id="portal-heading">ACCESS PORTAL</h2>
-    <p id="portal-sub" class="sub">Sign in with your learner or administrator credentials.</p>
-
     <div id="login-error" class="error-msg">Invalid username or password.</div>
 
-    <!-- SIGN IN FORM -->
+    <!-- SIGN IN -->
     <form id="login-form" onsubmit="handleUnifiedLogin(event)">
       <label>USERNAME OR EMAIL</label>
-      <input type="text" id="login-user" class="cp-input" placeholder="Enter username or email" required />
+      <input type="text" id="login-user" class="cp-input" placeholder="Username or email" required />
 
       <label>PASSWORD</label>
       <input type="password" id="login-pass" class="cp-input" placeholder="••••••••" required />
@@ -215,7 +194,7 @@
       <button type="submit" id="login-submit-btn" class="login-btn">SIGN IN</button>
     </form>
 
-    <!-- LEARNER REGISTRATION FORM -->
+    <!-- REGISTER -->
     <form id="register-form" style="display: none;" onsubmit="handleLearnerRegister(event)">
       <div class="form-grid">
         <div>
@@ -254,26 +233,21 @@
         </div>
       </div>
 
-      <label>BARANGAY (VALENZUELA CITY)</label>
-      <select id="reg-location" class="cp-input">
-        <option value="">Loading barangays...</option>
-      </select>
-
-      <label>PASSWORD (MIN. 6 CHARACTERS)</label>
-      <input type="password" id="reg-pass" class="cp-input" minlength="6" placeholder="••••••••" required />
+      <label>PASSWORD</label>
+      <input type="password" id="reg-pass" class="cp-input" minlength="6" placeholder="Min. 6 characters" required />
 
       <button type="submit" id="reg-submit-btn" class="login-btn">CREATE ACCOUNT</button>
     </form>
 
-    <a href="index.html" class="back-link">← RETURN TO GAME WEBSITE</a>
+    <a href="index.html" class="back-link">← HOME</a>
   </div>
 
   <script>
-    // Redirect if already authenticated
-    if (sessionStorage.getItem('webrpg_admin_token') || localStorage.getItem('role') === 'admin') {
-      window.location.href = 'admin.html';
+    // Safe redirect check (prevents admin logout loop)
+    if (sessionStorage.getItem('webrpg_admin_token')) {
+      window.location.replace('admin.html');
     } else if (localStorage.getItem('token') && localStorage.getItem('role') === 'learner') {
-      window.location.href = 'player-dashboard.html';
+      window.location.replace('player-dashboard.html');
     }
 
     function switchMode(mode) {
@@ -284,10 +258,6 @@
       document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
       document.getElementById('register-form').style.display = isLogin ? 'none' : 'block';
       document.getElementById('portal-card').classList.toggle('register-mode', !isLogin);
-      document.getElementById('portal-heading').innerText = isLogin ? 'ACCESS PORTAL' : 'LEARNER REGISTRATION';
-      document.getElementById('portal-sub').innerText = isLogin
-        ? 'Sign in with your learner or administrator credentials.'
-        : 'Create your Valenzuela City learner operative profile.';
     }
 
     function completeAuthRedirect(data) {
@@ -300,28 +270,9 @@
       if (data.user.role === 'admin') {
         sessionStorage.setItem('webrpg_admin_token', data.token);
         sessionStorage.setItem('webrpg_admin_user', data.user.username);
-        window.location.href = 'admin.html';
+        window.location.replace('admin.html');
       } else {
-        window.location.href = 'player-dashboard.html';
-      }
-    }
-
-    async function loadLocations() {
-      const select = document.getElementById('reg-location');
-      try {
-        const res = await fetch('/api/locations');
-        const data = await res.json();
-        if (data.success && data.locations.length) {
-          select.innerHTML =
-            `<option value="">Select Barangay (Valenzuela City)</option>` +
-            data.locations
-              .map(l => `<option value="${l.location_id}">${l.barangay_name}</option>`)
-              .join('');
-        } else {
-          select.innerHTML = `<option value="">Valenzuela City</option>`;
-        }
-      } catch {
-        select.innerHTML = `<option value="">Valenzuela City</option>`;
+        window.location.replace('player-dashboard.html');
       }
     }
 
@@ -332,25 +283,24 @@
       errBox.style.display = 'none';
       btn.innerText = 'VERIFYING...';
 
-      const identifier = document.getElementById('login-user').value.trim();
-      const password = document.getElementById('login-pass').value;
-
       try {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier, password })
+          body: JSON.stringify({
+            identifier: document.getElementById('login-user').value.trim(),
+            password: document.getElementById('login-pass').value
+          })
         });
 
         const data = await res.json();
         if (res.ok && data.success) {
           completeAuthRedirect(data);
           return;
-        } else {
-          errBox.innerText = data.message || 'Invalid credentials.';
-          errBox.style.display = 'block';
         }
-      } catch (err) {
+        errBox.innerText = data.message || 'Invalid credentials.';
+        errBox.style.display = 'block';
+      } catch {
         errBox.innerText = 'Server connection error.';
         errBox.style.display = 'block';
       }
@@ -375,7 +325,6 @@
             email: document.getElementById('reg-email').value.trim(),
             age: document.getElementById('reg-age').value,
             sex: document.getElementById('reg-sex').value,
-            location_id: document.getElementById('reg-location').value || null,
             password: document.getElementById('reg-pass').value
           })
         });
@@ -384,11 +333,10 @@
         if (res.ok && data.success) {
           completeAuthRedirect(data);
           return;
-        } else {
-          errBox.innerText = data.message || 'Registration failed.';
-          errBox.style.display = 'block';
         }
-      } catch (err) {
+        errBox.innerText = data.message || 'Registration failed.';
+        errBox.style.display = 'block';
+      } catch {
         errBox.innerText = 'Server connection error.';
         errBox.style.display = 'block';
       }
@@ -398,7 +346,6 @@
     if (new URLSearchParams(window.location.search).get('mode') === 'register') {
       switchMode('register');
     }
-    loadLocations();
   </script>
 </body>
 </html>

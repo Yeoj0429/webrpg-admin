@@ -653,23 +653,19 @@ app.post('/api/auth/register', async (req, res) => {
       first_name = '',
       last_name = '',
       age,
-      sex = 'prefer_not_to_say',
-      location_id
+      sex = 'prefer_not_to_say'
     } = req.body;
 
     if (!username.trim() || !email.trim() || !password || !first_name.trim() || !last_name.trim() || !age) {
-      conn.release();
       return res.status(400).json({ success: false, message: 'Please fill in all required fields.' });
     }
 
     if (password.length < 6) {
-      conn.release();
       return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' });
     }
 
     const numericAge = Number(age);
     if (Number.isNaN(numericAge) || numericAge < 10 || numericAge > 99) {
-      conn.release();
       return res.status(400).json({ success: false, message: 'Please enter a valid age.' });
     }
 
@@ -678,7 +674,6 @@ app.post('/api/auth/register', async (req, res) => {
       [username.trim(), email.trim()]
     );
     if (existing.length > 0) {
-      conn.release();
       return res.status(409).json({ success: false, message: 'Username or email is already registered.' });
     }
 
@@ -693,9 +688,9 @@ app.post('/api/auth/register', async (req, res) => {
     const newUserId = userResult.insertId;
 
     await conn.query(
-      `INSERT INTO learner_profiles (user_id, first_name, last_name, age, sex, location_id, total_xp, current_level)
-       VALUES (?, ?, ?, ?, ?, ?, 0, 1)`,
-      [newUserId, first_name.trim(), last_name.trim(), numericAge, sex, location_id || null]
+      `INSERT INTO learner_profiles (user_id, first_name, last_name, age, sex, total_xp, current_level)
+       VALUES (?, ?, ?, ?, ?, 0, 1)`,
+      [newUserId, first_name.trim(), last_name.trim(), numericAge, sex]
     );
 
     await conn.commit();

@@ -3,156 +3,418 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! // Learner Dashboard</title>
+  <title>WEBRPG! // Player Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
   <style>
     :root {
-      --cp-bg: #121212;
-      --cp-surface: #1e1e1e;
-      --cp-cyan: #4AD8F0;
-      --cp-magenta: #C84BF2;
-      --cp-yellow: #FCEE0A;
-      --cp-green: #3EF2A8;
-      --cp-border: #333333;
+      --cyan-light: #8CEEF6;
+      --cyan: #4AD8F0;
+      --blue: #2696E8;
+      --navy-void: #080B1A;
+      --navy-panel: #111836;
+      --navy-card: #161F45;
+      --purple: #8B4DF2;
+      --magenta: #C84BF2;
+      --green: #3EF2A8;
+      --red: #FF2A6D;
+      --text: #EDE9F7;
+      --muted: #9AA8CE;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background-color: var(--cp-bg);
-      color: #f2f4f3;
+      background-color: var(--navy-void);
+      background-image:
+        radial-gradient(rgba(74, 216, 240, 0.1) 1px, transparent 1px),
+        radial-gradient(circle at 85% 10%, rgba(200, 75, 242, 0.16), transparent 35%),
+        radial-gradient(circle at 10% 90%, rgba(74, 216, 240, 0.14), transparent 40%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
+      color: var(--text);
       font-family: 'Rajdhani', sans-serif;
-      margin: 0;
-      padding: 0;
-      visibility: hidden; /* Hidden until auth check passes */
+      min-height: 100vh;
+      visibility: hidden;
     }
-    .player-shell { max-width: 1200px; margin: 0 auto; padding: 24px; }
-    .player-header {
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 2px solid var(--cp-cyan); padding-bottom: 16px; margin-bottom: 24px;
+
+    /* TOP NAVBAR (Matches Main Website) */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(8, 11, 26, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(74, 216, 240, 0.25);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
-    .player-header h1 {
-      font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.8rem;
-      color: var(--cp-cyan); letter-spacing: 1px;
+
+    .brand-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: var(--navy-void);
+      background: var(--cyan-light);
+      padding: 4px 14px;
+      letter-spacing: 2px;
+      text-decoration: none;
+      text-shadow: 2px 2px 0px var(--magenta);
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
     }
-    .player-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
-    @media (max-width: 900px) { .player-grid { grid-template-columns: 1fr; } }
-    .cp-card {
-      background: var(--cp-surface); border: 1px solid var(--cp-border);
-      border-left: 4px solid var(--cp-cyan); padding: 20px; margin-bottom: 20px;
+    .brand-logo span { color: var(--purple); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .cp-card.magenta { border-left-color: var(--cp-magenta); }
-    .cp-card.yellow { border-left-color: var(--cp-yellow); }
-    .cp-card h3 {
-      font-family: 'Orbitron', sans-serif; margin-top: 0; font-size: 1.1rem;
-      letter-spacing: 0.5px; color: #fff;
+
+    .nav-link {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 4px;
+      transition: color 0.2s;
     }
-    .stat-row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 1.1rem; }
-    .stat-row strong { font-family: 'Orbitron', sans-serif; }
-    .progress-bar-wrap {
-      background: #0a0e24; border: 1px solid #444; height: 14px;
-      width: 100%; margin-top: 8px; overflow: hidden;
+    .nav-link:hover { color: var(--cyan-light); }
+
+    .btn-magenta {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 10px 18px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(90deg, var(--magenta), var(--purple));
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+      transition: filter 0.2s, box-shadow 0.2s;
     }
-    .progress-bar-fill {
-      background: linear-gradient(90deg, var(--cp-cyan), var(--cp-magenta));
-      height: 100%; width: 0%; transition: width 0.5s ease;
+    .btn-magenta:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 16px rgba(200, 75, 242, 0.45);
     }
+
+    /* MAIN CONTAINER */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HERO PROFILE + STATS (Matches Main Site Game Stats Box) */
+    .hero-panel {
+      background: linear-gradient(135deg, rgba(22, 31, 69, 0.92), rgba(11, 16, 38, 0.96));
+      border: 1px solid rgba(74, 216, 240, 0.35);
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+      padding: 26px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .profile-left {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .profile-identity {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--cyan-light), var(--blue));
+      color: var(--navy-void);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    }
+
+    .profile-identity h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.55rem;
+      color: var(--cyan-light);
+      letter-spacing: 1px;
+      line-height: 1.15;
+    }
+
+    .profile-meta {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .xp-block {
+      background: rgba(8, 11, 26, 0.65);
+      border: 1px solid rgba(74, 216, 240, 0.2);
+      padding: 12px 14px;
+    }
+
+    .xp-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      color: var(--cyan-light);
+      margin-bottom: 8px;
+    }
+
+    .xp-track {
+      height: 10px;
+      background: #080B1A;
+      border: 1px solid rgba(74, 216, 240, 0.25);
+      overflow: hidden;
+    }
+
+    .xp-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--magenta));
+      transition: width 0.5s ease;
+    }
+
+    /* 2x2 STATS GRID */
+    .stats-box {
+      background: rgba(8, 11, 26, 0.75);
+      border: 1px solid rgba(74, 216, 240, 0.25);
+      padding: 18px;
+    }
+
+    .section-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      color: var(--cyan-light);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-tile {
+      background: var(--navy-card);
+      border-left: 3px solid var(--cyan);
+      padding: 12px 14px;
+    }
+
+    .stat-tile strong {
+      display: block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .stat-tile span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    /* PANELS */
+    .cp-panel {
+      background: rgba(17, 24, 54, 0.85);
+      border: 1px solid rgba(74, 216, 240, 0.25);
+      padding: 22px;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    }
+
+    /* MODULES GRID (Matches Main Site Bottom Cards) */
     .modules-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
     }
-    .module-item { background: #181818; border: 1px solid #333; padding: 14px; border-radius: 4px; }
-    .badge {
-      display: inline-block; padding: 2px 8px; font-size: 0.75rem;
-      font-weight: 700; font-family: 'Orbitron', sans-serif; text-transform: uppercase;
+
+    .module-card {
+      background: var(--navy-void);
+      border: 1px solid rgba(74, 216, 240, 0.22);
+      border-top: 2px solid var(--cyan);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .badge-cyan { background: rgba(74, 216, 240, 0.15); color: var(--cp-cyan); border: 1px solid var(--cp-cyan); }
-    .badge-green { background: rgba(62, 242, 168, 0.15); color: var(--cp-green); border: 1px solid var(--cp-green); }
-    .cp-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+
+    .module-card.cleared { border-top-color: var(--green); }
+
+    .module-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+    }
+
+    .module-status {
+      color: var(--magenta);
+      font-weight: 700;
+    }
+    .module-card.cleared .module-status { color: var(--green); }
+
+    .module-score {
+      color: var(--cyan-light);
+      font-weight: 700;
+    }
+
+    .module-card h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      color: #fff;
+      line-height: 1.35;
+    }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+
+    .cp-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
     .cp-table th, .cp-table td {
-      padding: 10px; text-align: left; border-bottom: 1px solid #333; font-size: 0.95rem;
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.15);
+      font-size: 0.98rem;
     }
-    .cp-table th { font-family: 'Orbitron', sans-serif; color: var(--cp-cyan); font-size: 0.85rem; }
-    .logout-btn {
-      background: transparent; border: 1px solid #ff2a6d; color: #ff2a6d;
-      padding: 8px 16px; font-family: 'Orbitron', sans-serif; cursor: pointer; font-weight: 700;
+
+    .cp-table th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 1.2px;
+      color: var(--cyan);
     }
-    .logout-btn:hover { background: #ff2a6d; color: #fff; }
+
+    .pill-pass { color: var(--green); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 700; }
+    .pill-fail { color: var(--red); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 700; }
+
+    @media (max-width: 860px) {
+      .hero-panel { grid-template-columns: 1fr; }
+      .topbar { padding: 12px 16px; }
+      .container { padding: 20px 16px 36px; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="player-shell">
-    <header class="player-header">
-      <div>
-        <h1>WEB-RPG! // OPERATIVE PORTAL</h1>
-        <small style="color: #888;">Valenzuela City Cyber-Security E-Learning Initiative (MST 4 Aligned)</small>
-      </div>
-      <button class="logout-btn" onclick="logoutPlayer()">DISCONNECT</button>
-    </header>
-
-    <div class="player-grid">
-      <!-- LEFT COLUMN: Profile & Stats -->
-      <div>
-        <div class="cp-card">
-          <h3>OPERATIVE ID CARD</h3>
-          <div style="text-align: center; margin: 15px 0;">
-            <div id="player-avatar" style="width: 70px; height: 70px; background: var(--cp-cyan); color: #121212; font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto; border-radius: 50%;">--</div>
-            <h2 id="player-username" style="margin: 10px 0 2px; font-family: 'Orbitron', sans-serif; color: #fff;">—</h2>
-            <span id="player-email" style="color: #aaa; font-size: 0.9rem;">—</span>
-          </div>
-          <div class="stat-row"><span>Age Group:</span> <strong id="player-age">—</strong></div>
-          <div class="stat-row"><span>Current Level:</span> <strong id="player-level" style="color: var(--cp-cyan);">—</strong></div>
-          <div class="stat-row"><span>Total XP:</span> <strong id="player-xp" style="color: var(--cp-yellow);">—</strong></div>
-
-          <div style="margin-top: 15px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
-              <span>RANK PROGRESS</span>
-              <span id="xp-to-next">— / 500 XP</span>
-            </div>
-            <div class="progress-bar-wrap">
-              <div id="xp-progress-bar" class="progress-bar-fill"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="cp-card magenta">
-          <h3>ACADEMIC BENCHMARK</h3>
-          <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 12px;">
-            Institutional passing standard anchored to PLV MST 4: <strong>75.00%</strong> required to clear mission assessments.
-          </p>
-          <div class="stat-row"><span>Overall Average:</span> <strong id="player-overall-avg" style="color: var(--cp-magenta);">—</strong></div>
-          <div class="stat-row"><span>Completed Modules:</span> <strong id="player-completed-count">— / 5</strong></div>
-        </div>
-      </div>
-
-      <!-- RIGHT COLUMN: Modules & Attempt History -->
-      <div>
-        <div class="cp-card yellow">
-          <h3>MST 4 MODULE MASTERY GRID</h3>
-          <div id="modules-container" class="modules-grid"></div>
-        </div>
-
-        <div class="cp-card">
-          <h3>ASSESSMENT ATTEMPT HISTORY</h3>
-          <div style="overflow-x: auto;">
-            <table class="cp-table">
-              <thead>
-                <tr>
-                  <th>MODULE / ASSESSMENT</th>
-                  <th>TYPE</th>
-                  <th>SCORE</th>
-                  <th>STATUS</th>
-                  <th>DATE</th>
-                </tr>
-              </thead>
-              <tbody id="attempts-table-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+  <header class="topbar">
+    <a href="index.html" class="brand-logo">WEBRPG<span>!</span></a>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-link">HOME</a>
+      <button type="button" class="btn-magenta" onclick="logoutPlayer()">SIGN OUT</button>
     </div>
-  </div>
+  </header>
+
+  <main class="container">
+    <!-- PROFILE & STATS -->
+    <section class="hero-panel">
+      <div class="profile-left">
+        <div class="profile-identity">
+          <div id="player-avatar" class="avatar">--</div>
+          <div>
+            <h1 id="player-username">—</h1>
+            <div class="profile-meta">
+              <span id="player-email">—</span> · <span id="player-age">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="xp-block">
+          <div class="xp-label-row">
+            <span>NEXT LEVEL PROGRESS</span>
+            <span id="xp-to-next">0 / 500 XP</span>
+          </div>
+          <div class="xp-track">
+            <div id="xp-progress-bar" class="xp-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-box">
+        <div class="section-tag">
+          <span>PLAYER STATS</span>
+          <span style="font-size:0.68rem; color:var(--muted);">PASSING: 75%</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <strong id="player-level">—</strong>
+            <span>LEVEL</span>
+          </div>
+          <div class="stat-tile">
+            <strong id="player-xp">—</strong>
+            <span>TOTAL XP</span>
+          </div>
+          <div class="stat-tile">
+            <strong id="player-overall-avg">—</strong>
+            <span>AVG SCORE</span>
+          </div>
+          <div class="stat-tile">
+            <strong id="player-completed-count">—</strong>
+            <span>CLEARED</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULES -->
+    <section class="cp-panel">
+      <div class="section-tag"><span>MODULES</span></div>
+      <div id="modules-container" class="modules-grid"></div>
+    </section>
+
+    <!-- RECENT ATTEMPTS -->
+    <section class="cp-panel">
+      <div class="section-tag"><span>RECENT ATTEMPTS</span></div>
+      <div class="table-wrap">
+        <table class="cp-table">
+          <thead>
+            <tr>
+              <th>ASSESSMENT</th>
+              <th>TYPE</th>
+              <th>SCORE</th>
+              <th>STATUS</th>
+              <th>DATE</th>
+            </tr>
+          </thead>
+          <tbody id="attempts-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // 1. STRICT AUTH GUARD: Block unauthenticated access immediately
     const userId = localStorage.getItem('user_id');
     const token = localStorage.getItem('token') || localStorage.getItem('webrpg_token');
     const role = localStorage.getItem('role');
@@ -165,19 +427,15 @@
       document.body.style.visibility = 'visible';
     }
 
-    function getAuthHeaders() {
-      return {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      };
-    }
-
     async function loadPlayerDashboard() {
       if (!userId || !token) return;
 
       try {
         const res = await fetch(`/api/player/dashboard?user_id=${encodeURIComponent(userId)}`, {
-          headers: getAuthHeaders()
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
         });
 
         if (res.status === 401 || res.status === 403) {
@@ -186,18 +444,15 @@
         }
 
         const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'Unable to load learner data.');
-        }
+        if (!res.ok || !data.success) throw new Error(data.message || 'Unable to load data.');
 
         const { user, profile, modules, attempts } = data;
 
-        // Populate Profile Card from real DB values only
         document.getElementById('player-username').textContent = user.username.toUpperCase();
         document.getElementById('player-email').textContent = user.email;
         document.getElementById('player-avatar').textContent = user.username.substring(0, 2).toUpperCase();
-        document.getElementById('player-age').textContent = profile?.age ? `${profile.age} Yrs Old` : '—';
-        document.getElementById('player-level').textContent = profile?.current_level ?? 1;
+        document.getElementById('player-age').textContent = profile?.age ? `Age ${profile.age}` : '—';
+        document.getElementById('player-level').textContent = String(profile?.current_level ?? 1).padStart(2, '0');
         document.getElementById('player-xp').textContent = `${profile?.total_xp ?? 0} XP`;
 
         const xp = profile?.total_xp ?? 0;
@@ -206,53 +461,51 @@
         document.getElementById('xp-to-next').textContent = `${currentLevelXP} / 500 XP`;
 
         const avgScore = attempts.length
-          ? `${(attempts.reduce((acc, a) => acc + Number(a.score), 0) / attempts.length).toFixed(1)}%`
+          ? `${(attempts.reduce((acc, a) => acc + Number(a.score), 0) / attempts.length).toFixed(0)}%`
           : '—';
         document.getElementById('player-overall-avg').textContent = avgScore;
 
-        // Render Modules Grid
         const modContainer = document.getElementById('modules-container');
         let completedCount = 0;
+
         modContainer.innerHTML = modules.length
           ? modules.map(m => {
               const hasScore = m.best_score !== null && m.best_score !== undefined;
               const isPassed = hasScore && Number(m.best_score) >= 75;
               if (isPassed) completedCount++;
               return `
-                <div class="module-item">
-                  <span class="badge ${isPassed ? 'badge-green' : 'badge-cyan'}">
-                    ${isPassed ? 'CLEARED' : hasScore ? 'IN PROGRESS' : 'NOT STARTED'}
-                  </span>
-                  <h4 style="margin: 8px 0 4px; font-size: 0.95rem; color:#fff;">${m.title}</h4>
-                  <small style="color: #aaa;">Best Score: <strong>${hasScore ? m.best_score + '%' : '—'}</strong></small>
+                <div class="module-card ${isPassed ? 'cleared' : ''}">
+                  <div class="module-top">
+                    <span class="module-status">${isPassed ? 'CLEARED' : hasScore ? 'IN PROGRESS' : 'NOT STARTED'}</span>
+                    <span class="module-score">${hasScore ? `${m.best_score}%` : '—'}</span>
+                  </div>
+                  <h4>${m.title}</h4>
                 </div>
               `;
             }).join('')
-          : `<div class="module-item">No modules available.</div>`;
+          : `<div class="module-card"><h4>No modules available.</h4></div>`;
 
-        document.getElementById('player-completed-count').textContent = `${completedCount} / ${modules.length || 5}`;
+        document.getElementById('player-completed-count').textContent = `${completedCount}/${modules.length || 5}`;
 
-        // Render Attempts Table
         const tbody = document.getElementById('attempts-table-body');
         tbody.innerHTML = attempts.length
-          ? attempts.map(a => `
-              <tr>
-                <td>${a.assessment_title}</td>
-                <td><span style="opacity:0.8; font-size:0.85rem;">${a.assessment_type.toUpperCase()}</span></td>
-                <td><strong>${a.score}%</strong></td>
-                <td style="color:${Number(a.score) >= 75 ? 'var(--cp-green)' : '#ff2a6d'}; font-weight:700;">
-                  ${Number(a.score) >= 75 ? 'PASSED' : 'FAILED'}
-                </td>
-                <td>${new Date(a.attempted_at).toLocaleDateString()}</td>
-              </tr>
-            `).join('')
-          : `<tr><td colspan="5" style="text-align:center; color:#888;">No quiz attempts recorded yet.</td></tr>`;
+          ? attempts.map(a => {
+              const passed = Number(a.score) >= 75;
+              return `
+                <tr>
+                  <td>${a.assessment_title}</td>
+                  <td style="color:var(--muted); font-size:0.85rem;">${a.assessment_type.replace('_', ' ').toUpperCase()}</td>
+                  <td><strong>${a.score}%</strong></td>
+                  <td><span class="${passed ? 'pill-pass' : 'pill-fail'}">${passed ? 'PASSED' : 'FAILED'}</span></td>
+                  <td style="color:var(--muted);">${new Date(a.attempted_at).toLocaleDateString()}</td>
+                </tr>
+              `;
+            }).join('')
+          : `<tr><td colspan="5" style="text-align:center; color:var(--muted);">No attempts yet.</td></tr>`;
 
       } catch (err) {
         document.getElementById('modules-container').innerHTML =
-          `<div class="module-item" style="color:#ff2a6d;">${err.message}</div>`;
-        document.getElementById('attempts-table-body').innerHTML =
-          `<tr><td colspan="5" style="text-align:center; color:#ff2a6d;">${err.message}</td></tr>`;
+          `<div class="module-card" style="color:var(--red);">${err.message}</div>`;
       }
     }
 
