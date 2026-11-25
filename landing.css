@@ -242,7 +242,7 @@ body {
 .modal-actions .cp-btn-cyan::before { display: none; }
 .cp-poster,
 .matrix-card {
-  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease, border-color 0.22s ease;
+  transition: box-shadow 0.22s ease, filter 0.22s ease, border-color 0.22s ease;
 }
 
 .cp-poster:hover {
