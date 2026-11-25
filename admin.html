@@ -774,6 +774,45 @@
       .topbar, .mobile-nav-dropdown { position: static; }
       .shell { padding: 14px 16px 28px; }
     }
+    /* LOCK VIEWPORT WIDTH & STOP HORIZONTAL SWIPE */
+    html, body {
+      max-width: 100%;
+      overflow-x: clip;
+    }
+
+    .shell,
+    .layout,
+    .layout > main,
+    .view-window,
+    .grid-row-1,
+    .grid-row-2,
+    .grid-row-3,
+    .analytics-two-col,
+    .cp-panel,
+    .grad-card {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    /* Keep wide tables scrolling ONLY inside their own box */
+    .table-scroll {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent 340px min-width from overflowing small phones */
+    .lessons-card-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    }
+
+    /* Keep Chart.js canvas strictly inside its container */
+    .spline-canvas-wrap {
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
