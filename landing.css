@@ -181,7 +181,25 @@ body {
 .cp-brackets.top-b span:first-child, .cp-brackets.bottom-b span:first-child { border-right: 2px solid var(--pal-navy-dark); }
 .cp-brackets.bottom-b { border-bottom: 2px solid var(--pal-navy-dark); border-left: 2px solid var(--pal-navy-dark); border-right: 2px solid var(--pal-navy-dark); margin-top: 16px; }
 
-.cp-posters-grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--pal-navy-dark); border: 5px solid var(--pal-navy-dark); gap: 5px; }
+/* Change from repeat(4, 1fr) to repeat(5, 1fr) */
+.cp-posters-grid {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: var(--pal-navy-dark);
+  border: 5px solid var(--pal-navy-dark);
+  gap: 5px;
+}
+
+/* Slightly scale heading so long words like CYBERSECURITY fit cleanly in 5 columns */
+.poster-top h3 {
+  font-family: 'Teko', sans-serif;
+  font-size: clamp(1.75rem, 2.4vw, 2.15rem);
+  line-height: 0.95;
+  color: #fff;
+  margin-top: 4px;
+}
 .cp-poster { min-height: clamp(380px, 50vh, 450px); padding: clamp(20px, 3vh, 28px) clamp(16px, 2vw, 22px); display: flex; flex-direction: column; justify-content: space-between; color: var(--pal-white-soft); }
 .cp-poster.p-1 { background: linear-gradient(180deg, #1B2654 0%, #2696E8 50%, #080B1A 100%); }
 .cp-poster.p-2 { background: linear-gradient(180deg, #26357A 0%, #4864E6 50%, #080B1A 100%); }
@@ -189,7 +207,6 @@ body {
 .cp-poster.p-4 { background: linear-gradient(180deg, #5A287A 0%, #C84BF2 50%, #080B1A 100%); }
 .cp-poster.p-5 { background: linear-gradient(180deg, #7A285A 0%, #F24BC8 50%, #080B1A 100%); }
 .poster-badge { font-size: clamp(0.65rem, 1vw, 0.72rem); font-weight: 700; letter-spacing: 2px; color: var(--pal-cyan-light); }
-.poster-top h3 { font-family: 'Teko', sans-serif; font-size: clamp(2rem, 3.5vw, 2.3rem); line-height: 0.95; color: #fff; margin-top: 4px; }
 .poster-bottom p { font-size: clamp(0.85rem, 1.2vw, 0.94rem); line-height: 1.4; margin-bottom: 16px; }
 
 /* DOWNLOAD & SPECS */
@@ -197,7 +214,7 @@ body {
 .cp-download-inner { max-width: 1150px; margin: 0 auto; text-align: center; }
 .cp-download-inner h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.2rem, 2.2vw, 2rem); letter-spacing: 1.5px; margin-bottom: 6px; }
 .cp-specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; text-align: left; }
-.spec-box { background: var(--pal-navy-dark); color: var(--pal-white-soft); padding: clamp(20px, 3vh, 26px); border-left: 4px solid var(--pal-magenta-neon); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%, 0 100%); }
+.spec-box { background: var(--pal-navy-dark); color: var(--pal-white-soft); padding: clamp(20px, 3vh, 26px); border-left: 4px solid var(--pal-magenta-neon); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); }
 .spec-box h4 { font-family: 'Orbitron', sans-serif; color: var(--pal-cyan-light); margin-bottom: 10px; font-size: clamp(0.85rem, 1.2vw, 0.95rem); }
 .spec-box ul { list-style: none; display: flex; flex-direction: column; gap: 5px; font-size: clamp(0.85rem, 1.1vw, 0.95rem); }
 
