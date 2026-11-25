@@ -264,19 +264,16 @@
 
   <script src="landing.js"></script>
   <script>
-    // Automatically switch navbar & hero button if user is already logged in
     (function syncNavAuthState() {
+      const adminToken = sessionStorage.getItem('webrpg_admin_token');
+      const learnerToken = localStorage.getItem('token');
       const role = localStorage.getItem('role');
-      const token = localStorage.getItem('token') || sessionStorage.getItem('webrpg_admin_token');
       const navLink = document.getElementById('nav-auth-link');
-      const heroBtn = document.getElementById('hero-auth-btn');
 
-      if (token && (role === 'admin' || sessionStorage.getItem('webrpg_admin_token'))) {
+      if (adminToken) {
         if (navLink) { navLink.textContent = 'ADMIN CONSOLE'; navLink.href = 'admin.html'; }
-        if (heroBtn) { heroBtn.textContent = 'OPEN ADMIN CONSOLE'; heroBtn.href = 'admin.html'; }
-      } else if (token && role === 'learner') {
+      } else if (learnerToken && role === 'learner') {
         if (navLink) { navLink.textContent = 'DASHBOARD'; navLink.href = 'player-dashboard.html'; }
-        if (heroBtn) { heroBtn.textContent = 'OPEN DASHBOARD'; heroBtn.href = 'player-dashboard.html'; }
       }
     })();
   </script>
