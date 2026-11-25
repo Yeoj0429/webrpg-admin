@@ -197,7 +197,7 @@ body {
 .cp-download-inner { max-width: 1150px; margin: 0 auto; text-align: center; }
 .cp-download-inner h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.2rem, 2.2vw, 2rem); letter-spacing: 1.5px; margin-bottom: 6px; }
 .cp-specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; text-align: left; }
-.spec-box { background: var(--pal-navy-dark); color: var(--pal-white-soft); padding: clamp(20px, 3vh, 26px); border-left: 4px solid var(--pal-magenta-neon); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); }
+.spec-box { background: var(--pal-navy-dark); color: var(--pal-white-soft); padding: clamp(20px, 3vh, 26px); border-left: 4px solid var(--pal-magenta-neon); clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%, 0 100%); }
 .spec-box h4 { font-family: 'Orbitron', sans-serif; color: var(--pal-cyan-light); margin-bottom: 10px; font-size: clamp(0.85rem, 1.2vw, 0.95rem); }
 .spec-box ul { list-style: none; display: flex; flex-direction: column; gap: 5px; font-size: clamp(0.85rem, 1.1vw, 0.95rem); }
 
