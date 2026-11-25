@@ -778,4 +778,60 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => console.log(`Local Admin API running on http://localhost:${PORT}`));
 }
 
+// PUT Update Learner Profile (Username & Email remain locked)
+app.put('/api/player/profile', async (req, res) => {
+  try {
+    const { user_id, first_name = '', last_name = '', age, sex = 'prefer_not_to_say' } = req.body;
+    if (!user_id || !first_name.trim() || !last_name.trim() || !age) {
+      return res.status(400).json({ success: false, message: 'All profile fields are required.' });
+    }
+
+    const numericAge = Number(age);
+    if (Number.isNaN(numericAge) || numericAge < 10 || numericAge > 99) {
+      return res.status(400).json({ success: false, message: 'Enter a valid age (10–99).' });
+    }
+
+    await pool.query(
+      `UPDATE learner_profiles
+       SET first_name = ?, last_name = ?, age = ?, sex = ?
+       WHERE user_id = ?`,
+      [first_name.trim(), last_name.trim(), numericAge, sex, user_id]
+    );
+
+    res.json({ success: true, message: 'Profile updated.' });
+  } catch (err) {
+    console.error('PUT /api/player/profile error:', err);
+    res.status(500).json({ success: false, message: 'Failed to update profile.' });
+  }
+});
+
+// PUT Change Learner Password
+app.put('/api/player/password', async (req, res) => {
+  try {
+    const { user_id, current_password = '', new_password = '' } = req.body;
+    if (!user_id || !current_password || !new_password) {
+      return res.status(400).json({ success: false, message: 'All password fields are required.' });
+    }
+    if (new_password.length < 6) {
+      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters.' });
+    }
+
+    const [[user]] = await pool.query(
+      `SELECT password_hash FROM users WHERE user_id = ? LIMIT 1`,
+      [user_id]
+    );
+    if (!user || !verifyPassword(current_password, user.password_hash)) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect.' });
+    }
+
+    const newHash = hashPassword(new_password);
+    await pool.query(`UPDATE users SET password_hash = ? WHERE user_id = ?`, [newHash, user_id]);
+
+    res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (err) {
+    console.error('PUT /api/player/password error:', err);
+    res.status(500).json({ success: false, message: 'Failed to update password.' });
+  }
+});
+
 module.exports = app;

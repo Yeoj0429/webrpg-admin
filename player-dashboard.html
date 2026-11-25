@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WEBRPG! // Player Dashboard</title>
+  <title>WEBRPG! // Account Center</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -11,14 +11,15 @@
       --cyan: #4AD8F0;
       --blue: #2696E8;
       --navy-void: #080B1A;
-      --navy-panel: #111836;
-      --navy-card: #161F45;
+      --navy-panel: #101630;
+      --navy-card: #151D40;
       --purple: #8B4DF2;
       --magenta: #C84BF2;
       --green: #3EF2A8;
       --red: #FF2A6D;
       --text: #EDE9F7;
-      --muted: #9AA8CE;
+      --muted: #8E9CC4;
+      --border: rgba(74, 216, 240, 0.22);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,9 +27,9 @@
     body {
       background-color: var(--navy-void);
       background-image:
-        radial-gradient(rgba(74, 216, 240, 0.1) 1px, transparent 1px),
-        radial-gradient(circle at 85% 10%, rgba(200, 75, 242, 0.16), transparent 35%),
-        radial-gradient(circle at 10% 90%, rgba(74, 216, 240, 0.14), transparent 40%);
+        radial-gradient(rgba(74, 216, 240, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 85% 10%, rgba(200, 75, 242, 0.14), transparent 35%),
+        radial-gradient(circle at 10% 90%, rgba(74, 216, 240, 0.12), transparent 40%);
       background-size: 24px 24px, 100% 100%, 100% 100%;
       color: var(--text);
       font-family: 'Rajdhani', sans-serif;
@@ -36,191 +37,264 @@
       visibility: hidden;
     }
 
-    /* TOP NAVBAR (Matches Main Website) */
+    /* TOP BAR */
     .topbar {
       position: sticky;
       top: 0;
       z-index: 20;
-      background: rgba(8, 11, 26, 0.92);
+      background: rgba(8, 11, 26, 0.94);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(74, 216, 240, 0.25);
-      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
     }
 
     .brand-logo {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.45rem;
+      font-size: 1.35rem;
       font-weight: 900;
       color: var(--navy-void);
       background: var(--cyan-light);
-      padding: 4px 14px;
+      padding: 4px 12px;
       letter-spacing: 2px;
       text-decoration: none;
       text-shadow: 2px 2px 0px var(--magenta);
-      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
     }
     .brand-logo span { color: var(--purple); }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .nav-link {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--text);
-      text-decoration: none;
-      padding: 8px 4px;
-      transition: color 0.2s;
-    }
-    .nav-link:hover { color: var(--cyan-light); }
-
-    .btn-magenta {
+    .top-link {
       font-family: 'Orbitron', sans-serif;
       font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
-      padding: 10px 18px;
-      border: none;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(90deg, var(--magenta), var(--purple));
-      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
-      transition: filter 0.2s, box-shadow 0.2s;
+      letter-spacing: 1.4px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
     }
-    .btn-magenta:hover {
-      filter: brightness(1.15);
-      box-shadow: 0 0 16px rgba(200, 75, 242, 0.45);
-    }
+    .top-link:hover { color: var(--cyan-light); }
 
-    /* MAIN CONTAINER */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 28px 24px 48px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    /* HERO PROFILE + STATS (Matches Main Site Game Stats Box) */
-    .hero-panel {
-      background: linear-gradient(135deg, rgba(22, 31, 69, 0.92), rgba(11, 16, 38, 0.96));
-      border: 1px solid rgba(74, 216, 240, 0.35);
-      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-      padding: 26px;
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 28px;
-      align-items: center;
-    }
-
-    .profile-left {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .profile-identity {
+    .topbar-right {
       display: flex;
       align-items: center;
       gap: 16px;
     }
 
-    .avatar {
-      width: 64px;
-      height: 64px;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, var(--cyan-light), var(--blue));
-      color: var(--navy-void);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.45rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-    }
-
-    .profile-identity h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.55rem;
+    .user-chip {
+      font-size: 0.92rem;
       color: var(--cyan-light);
-      letter-spacing: 1px;
-      line-height: 1.15;
+      font-weight: 600;
     }
 
-    .profile-meta {
-      font-size: 0.95rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .xp-block {
-      background: rgba(8, 11, 26, 0.65);
-      border: 1px solid rgba(74, 216, 240, 0.2);
-      padding: 12px 14px;
-    }
-
-    .xp-label-row {
-      display: flex;
-      justify-content: space-between;
+    .btn-signout {
       font-family: 'Orbitron', sans-serif;
       font-size: 0.72rem;
-      letter-spacing: 1px;
-      color: var(--cyan-light);
-      margin-bottom: 8px;
-    }
-
-    .xp-track {
-      height: 10px;
-      background: #080B1A;
-      border: 1px solid rgba(74, 216, 240, 0.25);
-      overflow: hidden;
-    }
-
-    .xp-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--cyan), var(--magenta));
-      transition: width 0.5s ease;
-    }
-
-    /* 2x2 STATS GRID */
-    .stats-box {
-      background: rgba(8, 11, 26, 0.75);
-      border: 1px solid rgba(74, 216, 240, 0.25);
-      padding: 18px;
-    }
-
-    .section-tag {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
       font-weight: 700;
-      letter-spacing: 1.8px;
-      color: var(--cyan-light);
-      margin-bottom: 14px;
+      letter-spacing: 1.2px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 42, 109, 0.55);
+      background: rgba(255, 42, 109, 0.1);
+      color: #ff85a9;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-signout:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* SHELL */
+    .shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 36px 24px 56px;
+    }
+
+    .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
     }
 
-    .stats-grid {
+    .page-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.75rem;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    .id-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--navy-panel);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.76rem;
+      letter-spacing: 1px;
+      color: var(--cyan-light);
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-left: 1px solid var(--border);
+    }
+    .copy-btn:hover { color: var(--cyan-light); }
+
+    /* TWO-COLUMN ACCOUNT CENTER LAYOUT */
+    .layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 240px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* LEFT SIDEBAR */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: sticky;
+      top: 84px;
+    }
+
+    .side-item {
+      display: flex;
+      align-items: center;
       gap: 12px;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+    }
+
+    .side-item:hover {
+      color: var(--text);
+      background: rgba(74, 216, 240, 0.06);
+    }
+
+    .side-item.active {
+      color: var(--cyan-light);
+      background: rgba(74, 216, 240, 0.14);
+      border-color: rgba(74, 216, 240, 0.35);
+    }
+
+    .side-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--muted);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+    .side-item.active .side-dot {
+      background: var(--cyan-light);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* RIGHT CONTENT AREA */
+    .content-pane { display: none; flex-direction: column; gap: 20px; }
+    .content-pane.active { display: flex; }
+
+    .ac-card {
+      background: rgba(16, 22, 48, 0.9);
+      border: 1px solid var(--border);
+      padding: 24px 26px;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    }
+
+    .ac-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.14);
+    }
+
+    .ac-card-head h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 1.5px;
+      color: #fff;
+    }
+
+    .manage-link {
+      background: none;
+      border: none;
+      color: var(--cyan);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .manage-link:hover { color: var(--cyan-light); }
+
+    /* KEY-VALUE ROWS (HoYoverse Style) */
+    .kv-list { display: flex; flex-direction: column; }
+
+    .kv-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.1);
+    }
+    .kv-row:last-child { border-bottom: none; padding-bottom: 4px; }
+
+    .kv-label {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .kv-value {
+      color: #fff;
+      font-size: 1.02rem;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* COMPACT STATS STRIP */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .stat-tile {
-      background: var(--navy-card);
+      background: var(--navy-void);
       border-left: 3px solid var(--cyan);
       padding: 12px 14px;
     }
@@ -228,27 +302,97 @@
     .stat-tile strong {
       display: block;
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       color: #fff;
-      line-height: 1.2;
     }
 
     .stat-tile span {
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       letter-spacing: 1px;
       color: var(--muted);
     }
 
-    /* PANELS */
-    .cp-panel {
-      background: rgba(17, 24, 54, 0.85);
-      border: 1px solid rgba(74, 216, 240, 0.25);
-      padding: 22px;
-      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    .xp-track {
+      height: 8px;
+      background: var(--navy-void);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .xp-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--magenta));
+      transition: width 0.5s ease;
     }
 
-    /* MODULES GRID (Matches Main Site Bottom Cards) */
+    /* FORMS */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 16px;
+    }
+
+    .cp-label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--cyan-light);
+      margin-bottom: 6px;
+    }
+
+    .cp-input {
+      width: 100%;
+      background: var(--navy-void);
+      border: 1px solid var(--blue);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.02rem;
+      padding: 11px 14px;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    .cp-input:focus {
+      border-color: var(--cyan-light);
+      box-shadow: 0 0 10px rgba(74, 216, 240, 0.25);
+    }
+    .cp-input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-color: rgba(74, 216, 240, 0.2);
+    }
+
+    .btn-primary {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 12px 24px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(90deg, var(--magenta), var(--purple));
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+      transition: 0.2s;
+    }
+    .btn-primary:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 16px rgba(200, 75, 242, 0.45);
+    }
+
+    .status-banner {
+      display: none;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .status-banner.err { display: block; background: rgba(255, 42, 109, 0.14); border-left: 3px solid var(--red); color: #ff85a9; }
+    .status-banner.ok  { display: block; background: rgba(62, 242, 168, 0.14); border-left: 3px solid var(--green); color: var(--green); }
+
+    /* MODULES & TABLE */
     .modules-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -257,161 +401,289 @@
 
     .module-card {
       background: var(--navy-void);
-      border: 1px solid rgba(74, 216, 240, 0.22);
+      border: 1px solid var(--border);
       border-top: 2px solid var(--cyan);
       padding: 16px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
     }
-
     .module-card.cleared { border-top-color: var(--green); }
 
     .module-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       font-family: 'Orbitron', sans-serif;
       font-size: 0.68rem;
       letter-spacing: 1px;
     }
-
-    .module-status {
-      color: var(--magenta);
-      font-weight: 700;
-    }
+    .module-status { color: var(--magenta); font-weight: 700; }
     .module-card.cleared .module-status { color: var(--green); }
+    .module-score { color: var(--cyan-light); font-weight: 700; }
+    .module-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.88rem; color: #fff; line-height: 1.35; }
 
-    .module-score {
-      color: var(--cyan-light);
-      font-weight: 700;
-    }
-
-    .module-card h4 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
-      color: #fff;
-      line-height: 1.35;
-    }
-
-    /* TABLE */
     .table-wrap { overflow-x: auto; }
-
-    .cp-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
+    .cp-table { width: 100%; border-collapse: collapse; }
     .cp-table th, .cp-table td {
       padding: 12px 10px;
       text-align: left;
-      border-bottom: 1px solid rgba(74, 216, 240, 0.15);
-      font-size: 0.98rem;
+      border-bottom: 1px solid rgba(74, 216, 240, 0.12);
+      font-size: 0.96rem;
     }
-
     .cp-table th {
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       letter-spacing: 1.2px;
       color: var(--cyan);
     }
+    .pill-pass { color: var(--green); font-family: 'Orbitron', sans-serif; font-size: 0.74rem; font-weight: 700; }
+    .pill-fail { color: var(--red); font-family: 'Orbitron', sans-serif; font-size: 0.74rem; font-weight: 700; }
 
-    .pill-pass { color: var(--green); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 700; }
-    .pill-fail { color: var(--red); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 700; }
-
-    @media (max-width: 860px) {
-      .hero-panel { grid-template-columns: 1fr; }
+    /* RESPONSIVE */
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: 1fr; gap: 18px; }
+      .sidebar {
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .side-item { white-space: nowrap; width: auto; padding: 10px 14px; font-size: 0.95rem; }
+      .stats-strip { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
       .topbar { padding: 12px 16px; }
-      .container { padding: 20px 16px 36px; }
+      .user-chip { display: none; }
     }
   </style>
 </head>
 <body>
 
   <header class="topbar">
-    <a href="index.html" class="brand-logo">WEBRPG<span>!</span></a>
-    <div class="nav-actions">
-      <a href="index.html" class="nav-link">HOME</a>
-      <button type="button" class="btn-magenta" onclick="logoutPlayer()">SIGN OUT</button>
+    <div class="topbar-left">
+      <a href="index.html" class="brand-logo">WEBRPG<span>!</span></a>
+      <a href="index.html" class="top-link">HOME</a>
+    </div>
+    <div class="topbar-right">
+      <span id="top-email" class="user-chip">—</span>
+      <button type="button" class="btn-signout" onclick="logoutPlayer()">SIGN OUT</button>
     </div>
   </header>
 
-  <main class="container">
-    <!-- PROFILE & STATS -->
-    <section class="hero-panel">
-      <div class="profile-left">
-        <div class="profile-identity">
-          <div id="player-avatar" class="avatar">--</div>
-          <div>
-            <h1 id="player-username">—</h1>
-            <div class="profile-meta">
-              <span id="player-email">—</span> · <span id="player-age">—</span>
+  <main class="shell">
+    <div class="page-header">
+      <h1>ACCOUNT CENTER</h1>
+      <div class="id-badge">
+        <span id="player-id-label">ID: —</span>
+        <button type="button" class="copy-btn" onclick="copyUserId(this)">COPY</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <button type="button" class="side-item active" data-pane="overview" onclick="switchPane('overview', this)">
+          <span class="side-dot"></span> Account Overview
+        </button>
+        <button type="button" class="side-item" data-pane="personal" onclick="switchPane('personal', this)">
+          <span class="side-dot"></span> Personal Information
+        </button>
+        <button type="button" class="side-item" data-pane="security" onclick="switchPane('security', this)">
+          <span class="side-dot"></span> Password and Security
+        </button>
+        <button type="button" class="side-item" data-pane="progress" onclick="switchPane('progress', this)">
+          <span class="side-dot"></span> Modules & Progress
+        </button>
+      </aside>
+
+      <!-- RIGHT CONTENT -->
+      <div>
+        <!-- PANE 1: ACCOUNT OVERVIEW -->
+        <section id="pane-overview" class="content-pane active">
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>PERSONAL INFORMATION</h2>
+              <button type="button" class="manage-link" onclick="switchPane('personal')">MANAGE →</button>
+            </div>
+            <div class="kv-list">
+              <div class="kv-row">
+                <span class="kv-label">Username</span>
+                <span id="ov-username" class="kv-value">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="kv-label">Email Address</span>
+                <span id="ov-email" class="kv-value">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="kv-label">Full Name</span>
+                <span id="ov-fullname" class="kv-value">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="kv-label">Age</span>
+                <span id="ov-age" class="kv-value">—</span>
+              </div>
+              <div class="kv-row">
+                <span class="kv-label">Sex</span>
+                <span id="ov-sex" class="kv-value">—</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="xp-block">
-          <div class="xp-label-row">
-            <span>NEXT LEVEL PROGRESS</span>
-            <span id="xp-to-next">0 / 500 XP</span>
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>PASSWORD AND SECURITY</h2>
+              <button type="button" class="manage-link" onclick="switchPane('security')">MANAGE →</button>
+            </div>
+            <div class="kv-list">
+              <div class="kv-row">
+                <span class="kv-label">Password</span>
+                <span class="kv-value">••••••••</span>
+              </div>
+              <div class="kv-row">
+                <span class="kv-label">Account Role</span>
+                <span class="kv-value" style="color:var(--cyan-light);">LEARNER</span>
+              </div>
+            </div>
           </div>
-          <div class="xp-track">
-            <div id="xp-progress-bar" class="xp-fill"></div>
+
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>GAME PROGRESS</h2>
+              <button type="button" class="manage-link" onclick="switchPane('progress')">VIEW ALL →</button>
+            </div>
+            <div class="stats-strip">
+              <div class="stat-tile">
+                <strong id="st-level">—</strong>
+                <span>LEVEL</span>
+              </div>
+              <div class="stat-tile">
+                <strong id="st-xp">—</strong>
+                <span>TOTAL XP</span>
+              </div>
+              <div class="stat-tile">
+                <strong id="st-avg">—</strong>
+                <span>AVG SCORE</span>
+              </div>
+              <div class="stat-tile">
+                <strong id="st-cleared">—</strong>
+                <span>CLEARED</span>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-family:'Orbitron',sans-serif; font-size:0.7rem; color:var(--cyan-light);">
+              <span>NEXT LEVEL</span>
+              <span id="st-xp-next">0 / 500 XP</span>
+            </div>
+            <div class="xp-track"><div id="st-xp-bar" class="xp-fill"></div></div>
           </div>
-        </div>
+        </section>
+
+        <!-- PANE 2: PERSONAL INFORMATION (EDITABLE) -->
+        <section id="pane-personal" class="content-pane">
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>PERSONAL INFORMATION</h2>
+            </div>
+
+            <div id="profile-msg" class="status-banner"></div>
+
+            <form onsubmit="saveProfile(event)">
+              <div class="form-grid">
+                <div>
+                  <label class="cp-label">USERNAME (LOCKED)</label>
+                  <input type="text" id="set-username" class="cp-input" disabled />
+                </div>
+                <div>
+                  <label class="cp-label">EMAIL ADDRESS (LOCKED)</label>
+                  <input type="email" id="set-email" class="cp-input" disabled />
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div>
+                  <label class="cp-label">FIRST NAME</label>
+                  <input type="text" id="set-first" class="cp-input" required />
+                </div>
+                <div>
+                  <label class="cp-label">LAST NAME</label>
+                  <input type="text" id="set-last" class="cp-input" required />
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div>
+                  <label class="cp-label">AGE</label>
+                  <input type="number" id="set-age" class="cp-input" min="10" max="99" required />
+                </div>
+                <div>
+                  <label class="cp-label">SEX</label>
+                  <select id="set-sex" class="cp-input">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary">SAVE CHANGES</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- PANE 3: PASSWORD AND SECURITY -->
+        <section id="pane-security" class="content-pane">
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>CHANGE PASSWORD</h2>
+            </div>
+
+            <div id="password-msg" class="status-banner"></div>
+
+            <form id="password-form" onsubmit="savePassword(event)" style="max-width: 460px;">
+              <label class="cp-label">CURRENT PASSWORD</label>
+              <input type="password" id="set-cur-pass" class="cp-input" required />
+
+              <label class="cp-label">NEW PASSWORD</label>
+              <input type="password" id="set-new-pass" class="cp-input" minlength="6" placeholder="Min. 6 characters" required />
+
+              <label class="cp-label">CONFIRM NEW PASSWORD</label>
+              <input type="password" id="set-confirm-pass" class="cp-input" minlength="6" required />
+
+              <button type="submit" class="btn-primary">UPDATE PASSWORD</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- PANE 4: MODULES & PROGRESS -->
+        <section id="pane-progress" class="content-pane">
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>MODULES</h2>
+              <span style="font-family:'Orbitron',sans-serif; font-size:0.7rem; color:var(--muted);">PASSING: 75%</span>
+            </div>
+            <div id="modules-container" class="modules-grid"></div>
+          </div>
+
+          <div class="ac-card">
+            <div class="ac-card-head">
+              <h2>RECENT ATTEMPTS</h2>
+            </div>
+            <div class="table-wrap">
+              <table class="cp-table">
+                <thead>
+                  <tr>
+                    <th>ASSESSMENT</th>
+                    <th>TYPE</th>
+                    <th>SCORE</th>
+                    <th>STATUS</th>
+                    <th>DATE</th>
+                  </tr>
+                </thead>
+                <tbody id="attempts-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
-
-      <div class="stats-box">
-        <div class="section-tag">
-          <span>PLAYER STATS</span>
-          <span style="font-size:0.68rem; color:var(--muted);">PASSING: 75%</span>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-tile">
-            <strong id="player-level">—</strong>
-            <span>LEVEL</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="player-xp">—</strong>
-            <span>TOTAL XP</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="player-overall-avg">—</strong>
-            <span>AVG SCORE</span>
-          </div>
-          <div class="stat-tile">
-            <strong id="player-completed-count">—</strong>
-            <span>CLEARED</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MODULES -->
-    <section class="cp-panel">
-      <div class="section-tag"><span>MODULES</span></div>
-      <div id="modules-container" class="modules-grid"></div>
-    </section>
-
-    <!-- RECENT ATTEMPTS -->
-    <section class="cp-panel">
-      <div class="section-tag"><span>RECENT ATTEMPTS</span></div>
-      <div class="table-wrap">
-        <table class="cp-table">
-          <thead>
-            <tr>
-              <th>ASSESSMENT</th>
-              <th>TYPE</th>
-              <th>SCORE</th>
-              <th>STATUS</th>
-              <th>DATE</th>
-            </tr>
-          </thead>
-          <tbody id="attempts-table-body"></tbody>
-        </table>
-      </div>
-    </section>
+    </div>
   </main>
 
   <script>
@@ -427,56 +699,90 @@
       document.body.style.visibility = 'visible';
     }
 
+    function switchPane(paneName, btnEl) {
+      document.querySelectorAll('.content-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(`pane-${paneName}`)?.classList.add('active');
+
+      document.querySelectorAll('.side-item').forEach(b => {
+        b.classList.toggle('active', b.dataset.pane === paneName);
+      });
+    }
+
+    function copyUserId(btn) {
+      navigator.clipboard?.writeText(String(userId));
+      btn.textContent = 'COPIED';
+      setTimeout(() => (btn.textContent = 'COPY'), 1400);
+    }
+
+    function showBanner(id, text, isOk = false) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className = `status-banner ${isOk ? 'ok' : 'err'}`;
+    }
+
+    function formatSex(val) {
+      if (val === 'male') return 'Male';
+      if (val === 'female') return 'Female';
+      return 'Prefer not to say';
+    }
+
     async function loadPlayerDashboard() {
       if (!userId || !token) return;
 
       try {
         const res = await fetch(`/api/player/dashboard?user_id=${encodeURIComponent(userId)}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
         });
 
-        if (res.status === 401 || res.status === 403) {
-          logoutPlayer();
-          return;
-        }
+        if (res.status === 401 || res.status === 403) return logoutPlayer();
 
         const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message || 'Unable to load data.');
+        if (!res.ok || !data.success) throw new Error(data.message || 'Unable to load account.');
 
         const { user, profile, modules, attempts } = data;
+        const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || '—';
 
-        document.getElementById('player-username').textContent = user.username.toUpperCase();
-        document.getElementById('player-email').textContent = user.email;
-        document.getElementById('player-avatar').textContent = user.username.substring(0, 2).toUpperCase();
-        document.getElementById('player-age').textContent = profile?.age ? `Age ${profile.age}` : '—';
-        document.getElementById('player-level').textContent = String(profile?.current_level ?? 1).padStart(2, '0');
-        document.getElementById('player-xp').textContent = `${profile?.total_xp ?? 0} XP`;
+        // Header & Overview
+        document.getElementById('top-email').textContent = user.email;
+        document.getElementById('player-id-label').textContent = `ID: ${user.user_id}`;
+        document.getElementById('ov-username').textContent = user.username;
+        document.getElementById('ov-email').textContent = user.email;
+        document.getElementById('ov-fullname').textContent = fullName;
+        document.getElementById('ov-age').textContent = profile?.age ? `${profile.age}` : '—';
+        document.getElementById('ov-sex').textContent = formatSex(profile?.sex);
 
+        // Edit Profile Form
+        document.getElementById('set-username').value = user.username || '';
+        document.getElementById('set-email').value = user.email || '';
+        document.getElementById('set-first').value = profile?.first_name || '';
+        document.getElementById('set-last').value = profile?.last_name || '';
+        document.getElementById('set-age').value = profile?.age || '';
+        document.getElementById('set-sex').value = profile?.sex || 'prefer_not_to_say';
+
+        // Stats
         const xp = profile?.total_xp ?? 0;
-        const currentLevelXP = xp % 500;
-        document.getElementById('xp-progress-bar').style.width = `${Math.min(100, (currentLevelXP / 500) * 100)}%`;
-        document.getElementById('xp-to-next').textContent = `${currentLevelXP} / 500 XP`;
+        const levelXp = xp % 500;
+        document.getElementById('st-level').textContent = String(profile?.current_level ?? 1).padStart(2, '0');
+        document.getElementById('st-xp').textContent = `${xp} XP`;
+        document.getElementById('st-xp-next').textContent = `${levelXp} / 500 XP`;
+        document.getElementById('st-xp-bar').style.width = `${Math.min(100, (levelXp / 500) * 100)}%`;
 
         const avgScore = attempts.length
           ? `${(attempts.reduce((acc, a) => acc + Number(a.score), 0) / attempts.length).toFixed(0)}%`
           : '—';
-        document.getElementById('player-overall-avg').textContent = avgScore;
+        document.getElementById('st-avg').textContent = avgScore;
 
-        const modContainer = document.getElementById('modules-container');
-        let completedCount = 0;
-
-        modContainer.innerHTML = modules.length
+        // Modules
+        let clearedCount = 0;
+        document.getElementById('modules-container').innerHTML = modules.length
           ? modules.map(m => {
               const hasScore = m.best_score !== null && m.best_score !== undefined;
-              const isPassed = hasScore && Number(m.best_score) >= 75;
-              if (isPassed) completedCount++;
+              const passed = hasScore && Number(m.best_score) >= 75;
+              if (passed) clearedCount++;
               return `
-                <div class="module-card ${isPassed ? 'cleared' : ''}">
+                <div class="module-card ${passed ? 'cleared' : ''}">
                   <div class="module-top">
-                    <span class="module-status">${isPassed ? 'CLEARED' : hasScore ? 'IN PROGRESS' : 'NOT STARTED'}</span>
+                    <span class="module-status">${passed ? 'CLEARED' : hasScore ? 'IN PROGRESS' : 'NOT STARTED'}</span>
                     <span class="module-score">${hasScore ? `${m.best_score}%` : '—'}</span>
                   </div>
                   <h4>${m.title}</h4>
@@ -485,10 +791,10 @@
             }).join('')
           : `<div class="module-card"><h4>No modules available.</h4></div>`;
 
-        document.getElementById('player-completed-count').textContent = `${completedCount}/${modules.length || 5}`;
+        document.getElementById('st-cleared').textContent = `${clearedCount}/${modules.length || 5}`;
 
-        const tbody = document.getElementById('attempts-table-body');
-        tbody.innerHTML = attempts.length
+        // Attempts Table
+        document.getElementById('attempts-table-body').innerHTML = attempts.length
           ? attempts.map(a => {
               const passed = Number(a.score) >= 75;
               return `
@@ -504,8 +810,53 @@
           : `<tr><td colspan="5" style="text-align:center; color:var(--muted);">No attempts yet.</td></tr>`;
 
       } catch (err) {
-        document.getElementById('modules-container').innerHTML =
-          `<div class="module-card" style="color:var(--red);">${err.message}</div>`;
+        console.error(err);
+      }
+    }
+
+    async function saveProfile(e) {
+      e.preventDefault();
+      try {
+        const res = await fetch('/api/player/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            user_id: userId,
+            first_name: document.getElementById('set-first').value.trim(),
+            last_name: document.getElementById('set-last').value.trim(),
+            age: document.getElementById('set-age').value,
+            sex: document.getElementById('set-sex').value
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) return showBanner('profile-msg', data.message || 'Update failed.');
+        showBanner('profile-msg', 'Personal information updated.', true);
+        loadPlayerDashboard();
+      } catch {
+        showBanner('profile-msg', 'Network error.');
+      }
+    }
+
+    async function savePassword(e) {
+      e.preventDefault();
+      const current_password = document.getElementById('set-cur-pass').value;
+      const new_password = document.getElementById('set-new-pass').value;
+      const confirm = document.getElementById('set-confirm-pass').value;
+
+      if (new_password !== confirm) return showBanner('password-msg', 'New passwords do not match.');
+
+      try {
+        const res = await fetch('/api/player/password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ user_id: userId, current_password, new_password })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) return showBanner('password-msg', data.message || 'Password update failed.');
+        document.getElementById('password-form').reset();
+        showBanner('password-msg', 'Password updated successfully.', true);
+      } catch {
+        showBanner('password-msg', 'Network error.');
       }
     }
 
@@ -514,6 +865,7 @@
       localStorage.removeItem('token');
       localStorage.removeItem('webrpg_token');
       localStorage.removeItem('role');
+      localStorage.removeItem('username');
       window.location.replace('login.html');
     }
 
