@@ -220,7 +220,7 @@
     .ghost-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .ghost-btn:hover { color: #fff; border-color: var(--cyan); }
 
-    .grid-row-1 { display: grid; grid-template-columns: 1.55fr 1.15fr; gap: 22px; }
+    .grid-row-1 { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
     .grid-row-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
     .grid-row-3 { display: grid; grid-template-columns: 1fr 1.6fr; gap: 22px; }
     .analytics-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
@@ -260,9 +260,9 @@
 
     .donut-wrap {
       position: relative;
-      width: 176px;
-      height: 176px;
-      margin: 10px auto 16px;
+      width: 155px;
+      height: 155px;
+      margin: 8px auto 14px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -817,28 +817,26 @@
           position: 'fixed',
           pointerEvents: 'none',
           zIndex: '9999',
-          minWidth: '172px',
-          background: 'linear-gradient(180deg, rgba(21, 29, 64, 0.97), rgba(8, 11, 26, 0.98))',
-          border: '1px solid #4AD8F0',
-          borderLeft: '3px solid #C84BF2',
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.55), 0 0 18px rgba(74, 216, 240, 0.32)',
-          padding: '12px 15px',
+          background: 'rgba(8, 11, 26, 0.95)',
+          border: '1px solid rgba(74, 216, 240, 0.65)',
+          borderRadius: '4px',
+          boxShadow: '0 6px 18px rgba(0, 0, 0, 0.5)',
+          padding: '8px 11px',
           color: '#EDE9F7',
           fontFamily: "'Rajdhani', sans-serif",
-          fontSize: '0.95rem',
-          lineHeight: '1.4',
+          fontSize: '0.8rem',
+          lineHeight: '1.35',
           whiteSpace: 'nowrap',
           opacity: '0',
-          transform: 'translate3d(0, 6px, 0) scale(0.92)',
-          clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
-          transition: 'opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), left 0.16s ease-out, top 0.16s ease-out'
+          transform: 'translate3d(0, 4px, 0) scale(0.95)',
+          transition: 'opacity 0.16s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), left 0.15s ease-out, top 0.15s ease-out'
         });
         document.body.appendChild(el);
       }
 
       if (tooltip.opacity === 0) {
         el.style.opacity = '0';
-        el.style.transform = 'translate3d(0, 6px, 0) scale(0.92)';
+        el.style.transform = 'translate3d(0, 4px, 0) scale(0.95)';
         return;
       }
 
@@ -846,13 +844,13 @@
       const lines = (tooltip.body || []).map((b, i) => {
         const colors = tooltip.labelColors?.[i];
         const swatch = colors && i === 0
-          ? `<span style="display:inline-block;width:10px;height:10px;margin-right:7px;background:${colors.backgroundColor};border:1px solid ${colors.borderColor || '#fff'};vertical-align:middle;"></span>`
+          ? `<span style="display:inline-block;width:8px;height:8px;margin-right:6px;background:${colors.backgroundColor};border:1px solid ${colors.borderColor || '#fff'};vertical-align:middle;"></span>`
           : '';
-        return `<div style="margin-top:2px;">${swatch}${(b.lines || []).join(' ')}</div>`;
+        return `<div>${swatch}${(b.lines || []).join(' ')}</div>`;
       }).join('');
 
       el.innerHTML = `
-        <div style="font-family:'Orbitron',sans-serif;font-size:0.76rem;font-weight:700;color:#8CEEF6;letter-spacing:1.2px;padding-bottom:5px;margin-bottom:5px;border-bottom:1px solid rgba(74,216,240,0.2);">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:0.82rem;font-weight:700;color:#8CEEF6;margin-bottom:3px;">
           ${title}
         </div>
         ${lines}
@@ -864,7 +862,7 @@
       const dx = tooltip.caretX - rect.width / 2;
       const dy = tooltip.caretY - rect.height / 2;
       const angle = Math.atan2(dy, dx);
-      const outerDist = rect.width / 2 + 14;
+      const outerDist = rect.width / 2 + 12;
 
       const anchorX = cx + Math.cos(angle) * outerDist;
       const anchorY = cy + Math.sin(angle) * outerDist;
@@ -875,8 +873,8 @@
       let left = isRightSide ? anchorX : anchorX - tipW;
       let top = anchorY - tipH / 2;
 
-      left = Math.max(10, Math.min(window.innerWidth - tipW - 10, left));
-      top = Math.max(10, Math.min(window.innerHeight - tipH - 10, top));
+      left = Math.max(8, Math.min(window.innerWidth - tipW - 8, left));
+      top = Math.max(8, Math.min(window.innerHeight - tipH - 8, top));
 
       el.style.left = `${left}px`;
       el.style.top = `${top}px`;
