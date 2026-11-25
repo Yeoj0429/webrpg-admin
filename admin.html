@@ -745,7 +745,90 @@
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script>
+    function renderDonutOuterTooltip(context) {
+      const { chart, tooltip } = context;
+      let el = document.getElementById('donut-outer-tooltip');
+
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'donut-outer-tooltip';
+        Object.assign(el.style, {
+          position: 'fixed',
+          pointerEvents: 'none',
+          zIndex: '9999',
+          background: 'rgba(8, 11, 26, 0.96)',
+          border: '1px solid #4AD8F0',
+          boxShadow: '0 0 16px rgba(74, 216, 240, 0.35)',
+          padding: '8px 12px',
+          color: '#EDE9F7',
+          fontFamily: "'Rajdhani', sans-serif",
+          fontSize: '0.88rem',
+          lineHeight: '1.35',
+          whiteSpace: 'nowrap',
+          clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+          transition: 'opacity 0.12s ease'
+        });
+        document.body.appendChild(el);
+      }
+
+      if (tooltip.opacity === 0) {
+        el.style.opacity = '0';
+        return;
+      }
+
+      const title = (tooltip.title || []).join(' ');
+      const lines = (tooltip.body || []).map((b, i) => {
+        const colors = tooltip.labelColors?.[i];
+        const swatch = colors && i === 0
+          ? `<span style="display:inline-block;width:9px;height:9px;margin-right:6px;background:${colors.backgroundColor};border:1px solid ${colors.borderColor || '#fff'};vertical-align:middle;"></span>`
+          : '';
+        return `<div>${swatch}${(b.lines || []).join(' ')}</div>`;
+      }).join('');
+
+      el.innerHTML = `
+        <div style="font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:700;color:#8CEEF6;letter-spacing:1px;margin-bottom:3px;">
+          ${title}
+        </div>
+        ${lines}
+      `;
+      el.style.opacity = '1';
+
+      // Push tooltip outward beyond the outer radius of the donut ring
+      const rect = chart.canvas.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = tooltip.caretX - rect.width / 2;
+      const dy = tooltip.caretY - rect.height / 2;
+      const angle = Math.atan2(dy, dx);
+      const outerDist = rect.width / 2 + 12;
+
+      const anchorX = cx + Math.cos(angle) * outerDist;
+      const anchorY = cy + Math.sin(angle) * outerDist;
+      const isRightSide = Math.cos(angle) >= 0;
+
+      const tipRect = el.getBoundingClientRect();
+      let left = isRightSide ? anchorX : anchorX - tipRect.width;
+      let top = anchorY - tipRect.height / 2;
+
+      // Clamp inside viewport on smaller screens
+      left = Math.max(8, Math.min(window.innerWidth - tipRect.width - 8, left));
+      top = Math.max(8, Math.min(window.innerHeight - tipRect.height - 8, top));
+
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
+    }
+
+    Chart.register({
+      id: 'donutOuterTooltip',
+      beforeInit(chart) {
+        if (chart.canvas && chart.canvas.id === 'donut-chart') {
+          chart.options.plugins.tooltip.enabled = false;
+          chart.options.plugins.tooltip.external = renderDonutOuterTooltip;
+        }
+      }
+    });
+  </script>
   <script src="admin.js"></script>
   <script src="admin-users.js"></script>
 </body>
-</html>
