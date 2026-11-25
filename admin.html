@@ -467,6 +467,127 @@
     .option-row input[type="text"] { flex: 1; margin-bottom: 0; }
     .option-row input[type="radio"] { accent-color: var(--cyan); width: 16px; height: 16px; cursor: pointer; }
 
+    /* MOBILE HOYOVERSE-STYLE NAV & DRAWER */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .mobile-menu-btn span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--cyan-light);
+    }
+
+    .mobile-nav-dropdown {
+      display: none;
+      position: sticky;
+      top: 57px;
+      z-index: 19;
+      background: rgba(16, 22, 48, 0.98);
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-nav-trigger {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mobile-nav-chevron {
+      color: var(--cyan-light);
+      transition: transform 0.2s ease;
+      font-size: 0.95rem;
+    }
+    .mobile-nav-dropdown.open .mobile-nav-chevron { transform: rotate(180deg); }
+
+    .mobile-nav-list {
+      display: none;
+      flex-direction: column;
+      background: rgba(8, 11, 26, 0.98);
+      border-top: 1px solid rgba(74, 216, 240, 0.14);
+      padding: 6px 0 10px;
+    }
+    .mobile-nav-dropdown.open .mobile-nav-list { display: flex; }
+
+    .mobile-nav-opt {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 13px 20px;
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mobile-nav-opt.active { color: var(--cyan-light); }
+
+    /* FULL-SCREEN ADMIN DRAWER */
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: var(--navy-void);
+      flex-direction: column;
+    }
+    .mobile-drawer.open { display: flex; }
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-close {
+      background: none;
+      border: none;
+      color: var(--cyan-light);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .drawer-body { padding: 22px 20px; display: flex; flex-direction: column; gap: 18px; }
+    .drawer-action {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: none;
+      color: #ff85a9;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 0;
+      text-align: left;
+    }
+    .drawer-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+    .drawer-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
     @media (max-width: 1024px) {
       .grid-row-1, .grid-row-3, .analytics-two-col { grid-template-columns: 1fr; }
       .grid-row-2 { grid-template-columns: 1fr 1fr; }
@@ -474,31 +595,30 @@
 
     @media (max-width: 860px) {
       .layout { grid-template-columns: 1fr; gap: 18px; }
-      .sidebar {
-        position: static;
-        flex-direction: row;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        gap: 8px;
-        padding-bottom: 4px;
-      }
-      .sidebar::-webkit-scrollbar { display: none; }
-      .side-link { flex-shrink: 0; white-space: nowrap; width: auto; padding: 10px 14px; font-size: 0.95rem; }
       .topbar { padding: 12px 16px; }
-      .shell { padding: 22px 16px 40px; }
+      .topbar-right-wrap { display: none; }
+      .mobile-menu-btn { display: flex; }
+      .mobile-nav-dropdown { display: block; }
+      .sidebar { display: none; }
+      .page-header h1 { display: none; }
+      .page-header { margin-bottom: 16px; }
+      .shell { padding: 16px 16px 40px; }
       .spline-body { grid-template-columns: 1fr; }
       .spline-bottom-badges { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 480px) {
       .brand-logo { font-size: 1.1rem; padding: 4px 10px; }
-      .admin-chip { display: none; }
-      .page-header h1 { font-size: 1.25rem; }
+      .mobile-nav-dropdown { top: 53px; }
       .grid-row-2 { grid-template-columns: 1fr; }
       .cp-panel { padding: 16px; }
       .donut-wrap { width: 150px; height: 150px; }
       .search-box input { width: 130px; }
+    }
+
+    @media (max-height: 500px) and (orientation: landscape) {
+      .topbar, .mobile-nav-dropdown { position: static; }
+      .shell { padding: 16px 16px 32px; }
     }
   </style>
 </head>
@@ -512,7 +632,41 @@
       </div>
       <button type="button" class="btn-signout" onclick="logoutAdmin()">SIGN OUT</button>
     </div>
+    <button type="button" class="mobile-menu-btn" onclick="toggleAdminDrawer()" aria-label="Open menu">
+      <span></span><span></span>
+    </button>
   </header>
+
+  <!-- MOBILE COLLAPSIBLE SECTION DROPDOWN -->
+  <div id="admin-nav-dropdown" class="mobile-nav-dropdown">
+    <button type="button" class="mobile-nav-trigger" onclick="toggleAdminNavDropdown()">
+      <span id="mobile-admin-nav-label">Dashboard</span>
+      <span class="mobile-nav-chevron">⌄</span>
+    </button>
+    <div class="mobile-nav-list">
+      <button type="button" class="mobile-nav-opt active" data-view="dashboard" onclick="selectMobileAdminView('dashboard', 'Dashboard', 0)">Dashboard</button>
+      <button type="button" class="mobile-nav-opt" data-view="analytics" onclick="selectMobileAdminView('analytics', 'Analytics', 1)">Analytics</button>
+      <button type="button" class="mobile-nav-opt" data-view="lessons" onclick="selectMobileAdminView('lessons', 'Lesson Modules', 2)">Lesson Modules</button>
+      <button type="button" class="mobile-nav-opt" data-view="quizzes" onclick="selectMobileAdminView('quizzes', 'Quiz Matrix', 3)">Quiz Matrix</button>
+      <button type="button" class="mobile-nav-opt" data-view="users" onclick="selectMobileAdminView('users', 'Users Management', 4)">Users Management</button>
+    </div>
+  </div>
+
+  <!-- MOBILE FULL-SCREEN ADMIN DRAWER -->
+  <div id="admin-mobile-drawer" class="mobile-drawer">
+    <div class="drawer-head">
+      <a href="index.html" class="brand-logo">WEBRPG<span>!</span></a>
+      <button type="button" class="drawer-close" onclick="toggleAdminDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="admin-chip" style="width: fit-content;">
+        <span class="pulse-dot"></span> TIDB ONLINE
+      </div>
+      <button type="button" class="drawer-action" onclick="logoutAdmin()">⏻ Sign Out</button>
+      <hr class="drawer-divider" />
+      <a href="index.html" class="drawer-link">Home Portal</a>
+    </div>
+  </div>
 
   <div class="shell">
     <div class="page-header">
@@ -620,11 +774,11 @@
 
           <section class="grid-row-3">
             <div class="cp-panel timeline-panel">
-              <div class="panel-header"><h3>LESSONS</h3><button class="cp-notch-btn cyan-btn sm" onclick="switchView('lessons', document.querySelectorAll('.side-link')[2])">VIEW ALL</button></div>
+              <div class="panel-header"><h3>LESSONS</h3><button class="cp-notch-btn cyan-btn sm" onclick="selectMobileAdminView('lessons', 'Lesson Modules', 2)">VIEW ALL</button></div>
               <div id="lesson-timeline-list" class="timeline-list"></div>
             </div>
             <div class="cp-panel table-panel">
-              <div class="panel-header wrap-header"><h3>RECENT QUESTIONS</h3><button class="cp-notch-btn magenta-btn sm" onclick="switchView('quizzes', document.querySelectorAll('.side-link')[3])">OPEN MATRIX</button></div>
+              <div class="panel-header wrap-header"><h3>RECENT QUESTIONS</h3><button class="cp-notch-btn magenta-btn sm" onclick="selectMobileAdminView('quizzes', 'Quiz Matrix', 3)">OPEN MATRIX</button></div>
               <div class="table-scroll"><table class="cp-data-table"><thead><tr><th>ORDER</th><th>QUESTION</th><th>ANSWER</th><th>ACTION</th></tr></thead><tbody id="dashboard-questions-preview"></tbody></table></div>
             </div>
           </section>
@@ -891,7 +1045,31 @@
         }
       }
     });
+
+    function toggleAdminNavDropdown() {
+      document.getElementById('admin-nav-dropdown')?.classList.toggle('open');
+    }
+
+    function toggleAdminDrawer() {
+      const drawer = document.getElementById('admin-mobile-drawer');
+      drawer?.classList.toggle('open');
+      document.body.style.overflow = drawer?.classList.contains('open') ? 'hidden' : '';
+    }
+
+    function selectMobileAdminView(viewName, label, idx) {
+      const sideLinks = document.querySelectorAll('.side-link');
+      switchView(viewName, sideLinks[idx]);
+      if (viewName === 'users') window.loadAdminUsers?.();
+
+      const labelEl = document.getElementById('mobile-admin-nav-label');
+      if (labelEl) labelEl.textContent = label;
+      document.querySelectorAll('#admin-nav-dropdown .mobile-nav-opt').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === viewName);
+      });
+      document.getElementById('admin-nav-dropdown')?.classList.remove('open');
+    }
   </script>
   <script src="admin.js"></script>
   <script src="admin-users.js"></script>
 </body>
+</html>

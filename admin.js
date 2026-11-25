@@ -90,8 +90,32 @@ function closeNotifyModal() {
   document.getElementById('notify-modal').classList.add('hidden');
 }
 
+async function checkDbHealth() {
+  const chips = document.querySelectorAll('.admin-chip');
+  try {
+    const res = await fetch('/api/health');
+    const data = await res.json();
+    const isOnline = res.ok && data.db === 'connected';
+
+    chips.forEach(chip => {
+      chip.innerHTML = isOnline
+        ? `<span class="pulse-dot"></span> TIDB ONLINE`
+        : `<span class="pulse-dot" style="background:#FF2A6D; box-shadow:0 0 8px #FF2A6D;"></span> TIDB OFFLINE`;
+      chip.style.borderColor = isOnline ? '' : 'rgba(255, 42, 109, 0.55)';
+      chip.style.color = isOnline ? '' : '#ff85a9';
+    });
+  } catch {
+    chips.forEach(chip => {
+      chip.innerHTML = `<span class="pulse-dot" style="background:#FF2A6D; box-shadow:0 0 8px #FF2A6D;"></span> TIDB OFFLINE`;
+      chip.style.borderColor = 'rgba(255, 42, 109, 0.55)';
+      chip.style.color = '#ff85a9';
+    });
+  }
+}
+
 async function initDashboard() {
   renderTopbarActions(state.activeView);
+  checkDbHealth();
 
   try {
     const [lessonsRes, analyticsRes] = await Promise.all([
@@ -298,6 +322,7 @@ function renderDonutChart() {
 }
 
 function renderGradientKPIs() {
+  const lessonCount = state.lessons.length || 0;
   const topLesson = state.lessons.reduce((best, cur) =>
     Number(cur.success_rate || 0) >= Number(best?.success_rate || 0) ? cur : best
   , state.lessons[0]);
@@ -311,15 +336,23 @@ function renderGradientKPIs() {
   }
 
   const assessCardStrong = document.querySelector('.grad-purple strong');
-  if (assessCardStrong && state.totalAssessments) {
-    assessCardStrong.innerText = String(state.totalAssessments);
+  const assessCardSmall = document.querySelector('.grad-purple small');
+  if (assessCardStrong) assessCardStrong.innerText = String(state.totalAssessments || 0);
+  if (assessCardSmall) {
+    const avgAssess = lessonCount ? (state.totalAssessments / lessonCount).toFixed(1).replace(/\.0$/, '') : 0;
+    assessCardSmall.innerText = `${avgAssess} Quizzes/Lesson`;
   }
 
-  if (state.totalQuestions) {
-    document.getElementById('card-q-count').innerText = String(state.totalQuestions);
+  document.getElementById('card-q-count').innerText = String(state.totalQuestions || 0);
+  const qCardSmall = document.querySelector('.grad-cyan small');
+  if (qCardSmall) {
+    const avgQs = lessonCount ? (state.totalQuestions / lessonCount).toFixed(1).replace(/\.0$/, '') : 0;
+    qCardSmall.innerText = `${avgQs} Qs/Lesson`;
   }
 
   document.getElementById('card-total-xp').innerText = `${totalXp} XP`;
+  const xpCardSmall = document.querySelector('.grad-indigo small');
+  if (xpCardSmall) xpCardSmall.innerText = `Across ${lessonCount} Modules`;
 }
 
 function renderLessonTimeline() {
